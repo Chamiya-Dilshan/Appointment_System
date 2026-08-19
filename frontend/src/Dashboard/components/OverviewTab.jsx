@@ -100,7 +100,7 @@ export default function OverviewTab({ appointments, setActiveTab }) {
 
       {/* Main Grid: Recent Activity & Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Today's Schedule Agenda */}
         <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs space-y-5">
           <div className="flex justify-between items-center">
@@ -134,13 +134,12 @@ export default function OverviewTab({ appointments, setActiveTab }) {
                         <span className="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded font-mono font-bold select-all">
                           {appt.refNo}
                         </span>
-                        <span className={`px-2 py-0.5 rounded-full font-bold text-[8px] ml-auto ${
-                          appt.status === 'Confirmed'
+                        <span className={`px-2 py-0.5 rounded-full font-bold text-[8px] ml-auto ${appt.status === 'Confirmed'
                             ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-450'
                             : appt.status === 'Pending'
                               ? 'bg-amber-50 text-amber-755 dark:bg-amber-950/30 dark:text-amber-450'
                               : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-450'
-                        }`}>
+                          }`}>
                           {appt.status}
                         </span>
                       </div>
@@ -166,7 +165,7 @@ export default function OverviewTab({ appointments, setActiveTab }) {
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs space-y-6 flex flex-col justify-between">
           <div className="space-y-4">
             <h3 className="text-sm font-extrabold tracking-tight">Quick System Insights</h3>
-            
+
             <div className="space-y-3.5">
               <div className="p-3.5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100/50 dark:border-indigo-900/50 flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">

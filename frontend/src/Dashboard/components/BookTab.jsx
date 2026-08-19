@@ -22,6 +22,18 @@ const TIME_SLOTS = [
   { value: "17:00", label: "05:00 PM" }
 ]
 
+const PROVINCES_AND_DISTRICTS = {
+  "Western": ["Colombo", "Gampaha", "Kalutara"],
+  "Central": ["Kandy", "Matale", "Nuwara Eliya"],
+  "Southern": ["Galle", "Matara", "Hambantota"],
+  "Northern": ["Jaffna", "Kilinochchi", "Mannar", "Mullaitivu", "Vavuniya"],
+  "Eastern": ["Ampara", "Batticaloa", "Trincomalee"],
+  "North Western": ["Kurunegala", "Puttalam"],
+  "North Central": ["Anuradhapura", "Polonnaruwa"],
+  "Uva": ["Badulla", "Moneragala"],
+  "Sabaragamuwa": ["Kegalle", "Ratnapura"]
+}
+
 export default function BookTab({ appointments, allowedDates, onAddAppointment, setActiveTab, currentUser }) {
   // New appointment form state
   const [newName, setNewName] = useState('')
@@ -93,7 +105,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
 
     if (!newName.trim() || !newPhone.trim() || !newEmail.trim() || !newReason.trim() || !newDate || !newTime ||
       !newNic.trim() || !newDistrict.trim() || !newProvince.trim() || !newCouncil.trim() ||
-      !newGsDivision.trim() || !newAddress.trim() || !newPostalCode.trim()) {
+      !newGsDivision.trim() || !newAddress.trim()) {
       alert("Please fill in all required fields.")
       return
     }
@@ -259,32 +271,63 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="space-y-1">
+              <div className="space-y-1 ">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                   Province *
                 </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Western"
-                  value={newProvince}
-                  onChange={(e) => setNewProvince(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm"
-                />
+                <div className="relative">
+                  <select
+                    required
+                    value={newProvince}
+                    onChange={(e) => {
+                      setNewProvince(e.target.value)
+                      setNewDistrict('')
+                    }}
+                    className="w-full appearance-none px-4 py-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm cursor-pointer"
+                  >
+                    <option value="">Select Province</option>
+                    {Object.keys(PROVINCES_AND_DISTRICTS).map((prov) => (
+                      <option key={prov} value={prov}>
+                        {prov}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 dark:text-slate-500">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-1">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                   District *
                 </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Colombo"
-                  value={newDistrict}
-                  onChange={(e) => setNewDistrict(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm"
-                />
+                <div className="relative">
+                  <select
+                    required
+                    value={newDistrict}
+                    onChange={(e) => setNewDistrict(e.target.value)}
+                    disabled={!newProvince}
+                    className="w-full appearance-none px-4 py-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="">
+                      {!newProvince ? "Select Province First" : "Select District"}
+                    </option>
+                    {newProvince &&
+                      PROVINCES_AND_DISTRICTS[newProvince].map((dist) => (
+                        <option key={dist} value={dist}>
+                          {dist}
+                        </option>
+                      ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 dark:text-slate-500">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-1">
@@ -333,11 +376,10 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
 
               <div className="space-y-1">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  Postal Code *
+                  Postal Code
                 </label>
                 <input
                   type="text"
-                  required
                   placeholder="e.g. 00100"
                   value={newPostalCode}
                   onChange={(e) => setNewPostalCode(e.target.value)}
@@ -394,28 +436,35 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                 <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                   Available Time Slot *
                 </label>
-                <select
-                  required
-                  value={newTime}
-                  disabled={!newDate}
-                  onChange={(e) => setNewTime(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {!newDate ? (
-                    <option value="">Please select a date first</option>
-                  ) : getAvailableTimeSlots().length === 0 ? (
-                    <option value="">No time slots available for this date</option>
-                  ) : (
-                    <>
-                      <option value="">Choose a time slot</option>
-                      {getAvailableTimeSlots().map(slot => (
-                        <option key={slot.value} value={slot.value}>
-                          {slot.label}
-                        </option>
-                      ))}
-                    </>
-                  )}
-                </select>
+                <div className="relative">
+                  <select
+                    required
+                    value={newTime}
+                    disabled={!newDate}
+                    onChange={(e) => setNewTime(e.target.value)}
+                    className="w-full appearance-none px-4 py-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {!newDate ? (
+                      <option value="">Please select a date first</option>
+                    ) : getAvailableTimeSlots().length === 0 ? (
+                      <option value="">No time slots available for this date</option>
+                    ) : (
+                      <>
+                        <option value="">Choose a time slot</option>
+                        {getAvailableTimeSlots().map(slot => (
+                          <option key={slot.value} value={slot.value}>
+                            {slot.label}
+                          </option>
+                        ))}
+                      </>
+                    )}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 dark:text-slate-500">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
 
               {/* Appointment With (Read-only Confirmation) */}
@@ -468,7 +517,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-white dark:text-slate-950 transition-colors cursor-pointer shadow-sm shadow-indigo-500/10"
+              className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:text-white transition-colors cursor-pointer shadow-sm shadow-indigo-500/10"
             >
               Submit Booking
             </button>

@@ -215,17 +215,17 @@ export default function DailyTab({ appointments, onConfirm, onDelete }) {
                             {isPending && (
                               <button
                                 onClick={() => onConfirm(appt.id)}
-                                className="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-all font-bold cursor-pointer text-xs"
+                                className="px-3 py-1.5 rounded-lg bg-emerald-100/80 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-200/80 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50 dark:hover:bg-emerald-900/40 transition-all font-bold cursor-pointer text-xs"
                               >
                                 Confirm
                               </button>
                             )}
-                            <button
-                              onClick={() => onDelete(appt.id)}
-                              className="px-3 py-1.5 rounded-lg bg-red-600/60 dark:bg-red-600/60 text-white dark:text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/20 dark:hover:text-rose-455 transition-all font-bold cursor-pointer text-xs"
-                            >
-                              Delete
-                            </button>
+                             <button
+                               onClick={() => onDelete(appt.id)}
+                               className="px-3 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
+                             >
+                               Delete
+                             </button>
                           </div>
                         </div>
 

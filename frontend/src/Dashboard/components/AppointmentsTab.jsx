@@ -151,10 +151,10 @@ export default function AppointmentsTab({
                             </div>
                           )}
                           {appt.address && (
-                            <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 italic max-w-xs truncate" title={`${appt.address}, ${appt.postalCode}`}>
-                              📍 {appt.address} ({appt.postalCode})
-                            </div>
-                          )}
+                             <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 italic max-w-xs truncate" title={`${appt.address}${appt.postalCode ? `, ${appt.postalCode}` : ''}`}>
+                               📍 {appt.address}{appt.postalCode ? ` (${appt.postalCode})` : ''}
+                             </div>
+                           )}
                         </div>
                       </div>
                     </td>
@@ -197,7 +197,7 @@ export default function AppointmentsTab({
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => setSelectedDetailedAppt(appt)}
-                          className="px-2.5 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-all font-bold cursor-pointer text-xs"
+                          className="px-2.5 py-1.5 rounded-lg bg-indigo-100/80 text-indigo-700 border border-indigo-200/80 hover:bg-indigo-200/80 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/50 dark:hover:bg-indigo-900/40 transition-all font-bold cursor-pointer text-xs"
                           title="View Complete Details"
                         >
                           View
@@ -205,7 +205,7 @@ export default function AppointmentsTab({
                         {isHistory ? (
                           <button
                             onClick={() => onDelete(appt.id)}
-                            className="px-2.5 py-1.5 rounded-lg bg-red-605/10 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
+                            className="px-2.5 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
                             title="Delete Appointment"
                           >
                             Delete
@@ -215,7 +215,7 @@ export default function AppointmentsTab({
                             {appt.status === 'Pending' && (
                               <button
                                 onClick={() => onConfirm(appt.id)}
-                                className="px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-all font-bold cursor-pointer text-xs"
+                                className="px-2.5 py-1.5 rounded-lg bg-emerald-100/80 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-200/80 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50 dark:hover:bg-emerald-900/40 transition-all font-bold cursor-pointer text-xs"
                                 title="Confirm Appointment"
                               >
                                 Confirm
@@ -224,7 +224,7 @@ export default function AppointmentsTab({
                             {appt.status !== 'Cancelled' && (
                               <button
                                 onClick={() => setCancellingAppt(appt)}
-                                className="px-2.5 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-455 hover:bg-rose-100 transition-all font-bold cursor-pointer text-xs"
+                                className="px-2.5 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
                                 title="Cancel Appointment"
                               >
                                 Cancel
@@ -275,8 +275,8 @@ export default function AppointmentsTab({
                         </div>
                       )}
                       {appt.address && (
-                        <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-1 italic max-w-[200px] truncate" title={`${appt.address}, ${appt.postalCode}`}>
-                          📍 {appt.address} ({appt.postalCode})
+                        <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-1 italic max-w-[200px] truncate" title={`${appt.address}${appt.postalCode ? `, ${appt.postalCode}` : ''}`}>
+                          📍 {appt.address}{appt.postalCode ? ` (${appt.postalCode})` : ''}
                         </div>
                       )}
                     </div>
@@ -311,14 +311,14 @@ export default function AppointmentsTab({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setSelectedDetailedAppt(appt)}
-                      className="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-all font-bold cursor-pointer text-xs"
+                      className="px-3 py-1.5 rounded-lg bg-indigo-100/80 text-indigo-700 border border-indigo-200/80 hover:bg-indigo-200/80 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/50 dark:hover:bg-indigo-900/40 transition-all font-bold cursor-pointer text-xs"
                     >
                       View
                     </button>
                     {isHistory ? (
                       <button
                         onClick={() => onDelete(appt.id)}
-                        className="px-3 py-1.5 rounded-lg bg-red-600/60 text-white dark:text-slate-400 hover:bg-red-700 transition-all font-bold cursor-pointer text-xs"
+                        className="px-3 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
                       >
                         Delete
                       </button>
@@ -327,7 +327,7 @@ export default function AppointmentsTab({
                         {appt.status === 'Pending' && (
                           <button
                             onClick={() => onConfirm(appt.id)}
-                            className="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-all font-bold cursor-pointer text-xs"
+                            className="px-3 py-1.5 rounded-lg bg-emerald-100/80 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-200/80 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50 dark:hover:bg-emerald-900/40 transition-all font-bold cursor-pointer text-xs"
                           >
                             Confirm
                           </button>
@@ -335,7 +335,7 @@ export default function AppointmentsTab({
                         {appt.status !== 'Cancelled' && (
                           <button
                             onClick={() => setCancellingAppt(appt)}
-                            className="px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-455 hover:bg-rose-100 transition-all font-bold cursor-pointer text-xs"
+                            className="px-3 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
                           >
                             Cancel
                           </button>
@@ -469,7 +469,7 @@ export default function AppointmentsTab({
                 <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
                   <span className="text-slate-400 dark:text-slate-500 block">Address & Postal Code</span>
                   <p className="font-medium text-slate-800 dark:text-slate-200 mt-0.5">
-                    📍 {selectedDetailedAppt.address} ({selectedDetailedAppt.postalCode})
+                    📍 {selectedDetailedAppt.address}{selectedDetailedAppt.postalCode ? ` (${selectedDetailedAppt.postalCode})` : ''}
                   </p>
                 </div>
               </div>
@@ -497,7 +497,7 @@ export default function AppointmentsTab({
                         <button
                           type="button"
                           onClick={() => setIsCancelling(false)}
-                          className="px-3 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 cursor-pointer transition-colors"
+                          className="px-3 py-2 rounded-xl text-xs font-bold bg-slate-100/80 text-slate-700 border border-slate-200 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-205 dark:border-slate-700 dark:hover:bg-slate-700 cursor-pointer transition-all"
                         >
                           Go Back
                         </button>
@@ -512,7 +512,7 @@ export default function AppointmentsTab({
                             })
                             setIsCancelling(false)
                           }}
-                          className="px-3 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 cursor-pointer transition-colors"
+                          className="px-3 py-2 rounded-xl text-xs font-bold bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 cursor-pointer transition-all"
                         >
                           Confirm Cancellation
                         </button>
@@ -528,14 +528,14 @@ export default function AppointmentsTab({
                               if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Pending')
                               setSelectedDetailedAppt({ ...selectedDetailedAppt, status: 'Pending' })
                             }}
-                            className="px-3 py-2 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-950/30 dark:text-amber-400 cursor-pointer transition-colors"
+                            className="px-3 py-2 rounded-xl text-xs font-bold bg-amber-100/80 text-amber-700 border border-amber-200/80 hover:bg-amber-200/80 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50 dark:hover:bg-amber-900/40 cursor-pointer transition-all"
                           >
                             Revert to Pending
                           </button>
                           <button
                             type="button"
                             onClick={() => setIsCancelling(true)}
-                            className="px-3 py-2 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 hover:bg-rose-100 dark:bg-rose-950/30 dark:text-rose-455 cursor-pointer transition-colors"
+                            className="px-3 py-2 rounded-xl text-xs font-bold bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 cursor-pointer transition-all"
                           >
                             Cancel Appointment
                           </button>
@@ -550,14 +550,14 @@ export default function AppointmentsTab({
                               if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Confirmed')
                               setSelectedDetailedAppt({ ...selectedDetailedAppt, status: 'Confirmed' })
                             }}
-                            className="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-450 cursor-pointer transition-colors"
+                            className="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-100/80 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-200/80 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50 dark:hover:bg-emerald-900/40 cursor-pointer transition-all"
                           >
                             Confirm Appointment
                           </button>
                           <button
                             type="button"
                             onClick={() => setIsCancelling(true)}
-                            className="px-3 py-2 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 hover:bg-rose-100 dark:bg-rose-950/30 dark:text-rose-455 cursor-pointer transition-colors"
+                            className="px-3 py-2 rounded-xl text-xs font-bold bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 cursor-pointer transition-all"
                           >
                             Cancel Appointment
                           </button>
@@ -572,7 +572,7 @@ export default function AppointmentsTab({
               <button
                 type="button"
                 onClick={() => setSelectedDetailedAppt(null)}
-                className="px-5 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 hover:bg-slate-205 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer ml-auto"
+                className="px-5 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-200 hover:bg-slate-205 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer transition-all ml-auto"
               >
                 Close View
               </button>
@@ -628,7 +628,7 @@ export default function AppointmentsTab({
               <button
                 type="button"
                 onClick={() => setCancellingAppt(null)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-200 hover:bg-slate-205 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer transition-all"
               >
                 Go Back
               </button>
@@ -638,7 +638,7 @@ export default function AppointmentsTab({
                   if (onUpdateStatus) onUpdateStatus(cancellingAppt.id, 'Cancelled', quickCancelRemark)
                   setCancellingAppt(null)
                 }}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 cursor-pointer transition-colors shadow-sm shadow-rose-500/10"
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 cursor-pointer transition-all"
               >
                 Confirm Cancellation
               </button>
