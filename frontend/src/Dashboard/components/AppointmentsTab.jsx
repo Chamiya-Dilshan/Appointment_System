@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 export default function AppointmentsTab({
   appointments,
@@ -11,6 +11,20 @@ export default function AppointmentsTab({
   isHistory = false
 }) {
   const [selectedDetailedAppt, setSelectedDetailedAppt] = useState(null)
+  const [isCancelling, setIsCancelling] = useState(false)
+  const [cancellationRemark, setCancellationRemark] = useState('')
+
+  useEffect(() => {
+    setIsCancelling(false)
+    setCancellationRemark('')
+  }, [selectedDetailedAppt])
+
+  const [cancellingAppt, setCancellingAppt] = useState(null)
+  const [quickCancelRemark, setQuickCancelRemark] = useState('')
+
+  useEffect(() => {
+    setQuickCancelRemark('')
+  }, [cancellingAppt])
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
 
@@ -52,7 +66,7 @@ export default function AppointmentsTab({
           <p className="text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
         </div>
         <button
-          onClick={() => setActiveTab('book')}
+          onClick={() => setActiveTab('booking')}
           className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-indigo-500/10"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -188,7 +202,15 @@ export default function AppointmentsTab({
                         >
                           View
                         </button>
-                        {!isHistory && (
+                        {isHistory ? (
+                          <button
+                            onClick={() => onDelete(appt.id)}
+                            className="px-2.5 py-1.5 rounded-lg bg-red-605/10 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
+                            title="Delete Appointment"
+                          >
+                            Delete
+                          </button>
+                        ) : (
                           <>
                             {appt.status === 'Pending' && (
                               <button
@@ -199,13 +221,15 @@ export default function AppointmentsTab({
                                 Confirm
                               </button>
                             )}
-                            <button
-                              onClick={() => onDelete(appt.id)}
-                              className="px-2.5 py-1.5 rounded-lg bg-red-600/60 dark:bg-red-600/60 text-white dark:text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/20 dark:hover:text-rose-455 transition-all font-bold cursor-pointer text-xs"
-                              title="Delete Appointment"
-                            >
-                              Delete
-                            </button>
+                            {appt.status !== 'Cancelled' && (
+                              <button
+                                onClick={() => setCancellingAppt(appt)}
+                                className="px-2.5 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-455 hover:bg-rose-100 transition-all font-bold cursor-pointer text-xs"
+                                title="Cancel Appointment"
+                              >
+                                Cancel
+                              </button>
+                            )}
                           </>
                         )}
                       </div>
@@ -291,7 +315,14 @@ export default function AppointmentsTab({
                     >
                       View
                     </button>
-                    {!isHistory && (
+                    {isHistory ? (
+                      <button
+                        onClick={() => onDelete(appt.id)}
+                        className="px-3 py-1.5 rounded-lg bg-red-600/60 text-white dark:text-slate-400 hover:bg-red-700 transition-all font-bold cursor-pointer text-xs"
+                      >
+                        Delete
+                      </button>
+                    ) : (
                       <>
                         {appt.status === 'Pending' && (
                           <button
@@ -301,12 +332,14 @@ export default function AppointmentsTab({
                             Confirm
                           </button>
                         )}
-                        <button
-                          onClick={() => onDelete(appt.id)}
-                          className="px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/20 dark:hover:text-rose-455 transition-all font-bold cursor-pointer text-xs"
-                        >
-                          Delete
-                        </button>
+                        {appt.status !== 'Cancelled' && (
+                          <button
+                            onClick={() => setCancellingAppt(appt)}
+                            className="px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-455 hover:bg-rose-100 transition-all font-bold cursor-pointer text-xs"
+                          >
+                            Cancel
+                          </button>
+                        )}
                       </>
                     )}
                   </div>
@@ -323,8 +356,8 @@ export default function AppointmentsTab({
 
       {/* Details Modal */}
       {selectedDetailedAppt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity overflow-y-auto">
-          <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800/80 shadow-2xl p-6 relative animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-start justify-center p-4 py-8 bg-slate-900/60 backdrop-blur-xs transition-opacity overflow-y-auto">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800/80 shadow-2xl p-6 relative animate-in fade-in zoom-in-95 duration-150 my-auto">
             
             {/* Modal Header */}
             <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
@@ -402,6 +435,14 @@ export default function AppointmentsTab({
                   <span className="text-slate-400 dark:text-slate-500 block">Reason for Visit</span>
                   <p className="font-medium text-slate-800 dark:text-slate-200 mt-0.5">{selectedDetailedAppt.reason}</p>
                 </div>
+                {selectedDetailedAppt.status === 'Cancelled' && (
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
+                    <span className="text-slate-400 dark:text-slate-500 block">Cancellation Remark</span>
+                    <p className="font-medium text-rose-600 dark:text-rose-400 mt-0.5 bg-rose-50/50 dark:bg-rose-950/10 p-2.5 rounded-xl border border-rose-100/50 dark:border-rose-950/20 italic">
+                      {selectedDetailedAppt.cancellationRemark || 'No remark provided.'}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Location Block */}
@@ -439,79 +480,89 @@ export default function AppointmentsTab({
             <div className="flex flex-wrap items-center justify-between gap-3 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
               {/* Left Side: Status actions for admin (Active/Future only) */}
               {!isHistory && (
-                <div className="flex flex-wrap gap-2">
-                  {selectedDetailedAppt.status === 'Confirmed' && (
+                <div className="flex flex-wrap gap-2 flex-1">
+                  {isCancelling ? (
+                    <div className="w-full space-y-3 p-3 bg-rose-50/30 dark:bg-rose-950/10 rounded-2xl border border-rose-100/50 dark:border-rose-950/20">
+                      <div className="text-xs font-bold text-rose-600 dark:text-rose-400">
+                        Are you sure you want to cancel this appointment?
+                      </div>
+                      <textarea
+                        placeholder="Enter cancellation remark (optional)..."
+                        value={cancellationRemark}
+                        onChange={(e) => setCancellationRemark(e.target.value)}
+                        className="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-905 text-slate-805 dark:text-slate-200 focus:outline-hidden focus:ring-1 focus:ring-rose-500 placeholder-slate-400"
+                        rows={2}
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setIsCancelling(false)}
+                          className="px-3 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 cursor-pointer transition-colors"
+                        >
+                          Go Back
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Cancelled', cancellationRemark)
+                            setSelectedDetailedAppt({
+                              ...selectedDetailedAppt,
+                              status: 'Cancelled',
+                              cancellationRemark: cancellationRemark
+                            })
+                            setIsCancelling(false)
+                          }}
+                          className="px-3 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 cursor-pointer transition-colors"
+                        >
+                          Confirm Cancellation
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
                     <>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Pending')
-                          setSelectedDetailedAppt({ ...selectedDetailedAppt, status: 'Pending' })
-                        }}
-                        className="px-3 py-2 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-950/30 dark:text-amber-400 cursor-pointer transition-colors"
-                      >
-                        Revert to Pending
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Cancelled')
-                          setSelectedDetailedAppt({ ...selectedDetailedAppt, status: 'Cancelled' })
-                        }}
-                        className="px-3 py-2 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 hover:bg-rose-100 dark:bg-rose-950/30 dark:text-rose-455 cursor-pointer transition-colors"
-                      >
-                        Cancel Appointment
-                      </button>
-                    </>
-                  )}
+                      {selectedDetailedAppt.status === 'Confirmed' && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Pending')
+                              setSelectedDetailedAppt({ ...selectedDetailedAppt, status: 'Pending' })
+                            }}
+                            className="px-3 py-2 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-950/30 dark:text-amber-400 cursor-pointer transition-colors"
+                          >
+                            Revert to Pending
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsCancelling(true)}
+                            className="px-3 py-2 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 hover:bg-rose-100 dark:bg-rose-950/30 dark:text-rose-455 cursor-pointer transition-colors"
+                          >
+                            Cancel Appointment
+                          </button>
+                        </>
+                      )}
 
-                  {selectedDetailedAppt.status === 'Pending' && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Confirmed')
-                          setSelectedDetailedAppt({ ...selectedDetailedAppt, status: 'Confirmed' })
-                        }}
-                        className="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-450 cursor-pointer transition-colors"
-                      >
-                        Confirm Appointment
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Cancelled')
-                          setSelectedDetailedAppt({ ...selectedDetailedAppt, status: 'Cancelled' })
-                        }}
-                        className="px-3 py-2 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 hover:bg-rose-100 dark:bg-rose-950/30 dark:text-rose-455 cursor-pointer transition-colors"
-                      >
-                        Cancel Appointment
-                      </button>
-                    </>
-                  )}
-
-                  {selectedDetailedAppt.status === 'Cancelled' && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Pending')
-                          setSelectedDetailedAppt({ ...selectedDetailedAppt, status: 'Pending' })
-                        }}
-                        className="px-3 py-2 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-950/30 dark:text-amber-400 cursor-pointer transition-colors"
-                      >
-                        Revert to Pending
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Confirmed')
-                          setSelectedDetailedAppt({ ...selectedDetailedAppt, status: 'Confirmed' })
-                        }}
-                        className="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-450 cursor-pointer transition-colors"
-                      >
-                        Confirm Appointment
-                      </button>
+                      {selectedDetailedAppt.status === 'Pending' && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Confirmed')
+                              setSelectedDetailedAppt({ ...selectedDetailedAppt, status: 'Confirmed' })
+                            }}
+                            className="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-450 cursor-pointer transition-colors"
+                          >
+                            Confirm Appointment
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsCancelling(true)}
+                            className="px-3 py-2 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 hover:bg-rose-100 dark:bg-rose-950/30 dark:text-rose-455 cursor-pointer transition-colors"
+                          >
+                            Cancel Appointment
+                          </button>
+                        </>
+                      )}
                     </>
                   )}
                 </div>
@@ -524,6 +575,72 @@ export default function AppointmentsTab({
                 className="px-5 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 hover:bg-slate-205 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer ml-auto"
               >
                 Close View
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+      {/* Quick Cancel Modal */}
+      {cancellingAppt && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center p-4 py-8 bg-slate-900/60 backdrop-blur-xs transition-opacity overflow-y-auto">
+          <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800/80 shadow-2xl p-6 relative animate-in fade-in zoom-in-95 duration-150 my-auto">
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <span>Cancel Appointment</span>
+                  <span className="text-[10px] bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 px-1.5 py-0.5 rounded font-mono select-all">
+                    {cancellingAppt.refNo}
+                  </span>
+                </h3>
+                <p className="text-xs text-slate-455 dark:text-slate-500 mt-1">
+                  Cancel appointment for <strong className="font-semibold text-slate-800 dark:text-slate-200">{cancellingAppt.name}</strong>
+                </p>
+              </div>
+              <button
+                onClick={() => setCancellingAppt(null)}
+                className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-slate-202 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="space-y-4">
+              <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                Please provide an optional cancellation remark. This will be stored for audit purposes.
+              </div>
+              <textarea
+                placeholder="Enter cancellation remark (optional)..."
+                value={quickCancelRemark}
+                onChange={(e) => setQuickCancelRemark(e.target.value)}
+                className="w-full p-3 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-hidden focus:ring-1 focus:ring-rose-500 placeholder-slate-400"
+                rows={3}
+              />
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => setCancellingAppt(null)}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              >
+                Go Back
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (onUpdateStatus) onUpdateStatus(cancellingAppt.id, 'Cancelled', quickCancelRemark)
+                  setCancellingAppt(null)
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 cursor-pointer transition-colors shadow-sm shadow-rose-500/10"
+              >
+                Confirm Cancellation
               </button>
             </div>
 

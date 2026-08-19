@@ -79,7 +79,7 @@ export default function DailyTab({ appointments, onConfirm, onDelete }) {
                     onClick={() => setSelectedDate(date)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-indigo-650 text-black shadow-sm'
+                        ? 'bg-indigo-650 text-black shadow-sm dark:text-white'
                         : 'bg-slate-50 text-slate-600 hover:bg-slate-100 dark:bg-slate-950 dark:text-slate-450 dark:hover:bg-slate-800/50'
                     }`}
                   >

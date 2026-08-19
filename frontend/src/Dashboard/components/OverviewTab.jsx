@@ -43,7 +43,7 @@ export default function OverviewTab({ appointments, setActiveTab }) {
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Stat 1: Total */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-all duration-200 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
+          <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/40 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Total Booked</p>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-3xl font-extrabold">{totalAppts}</span>
@@ -57,7 +57,7 @@ export default function OverviewTab({ appointments, setActiveTab }) {
 
         {/* Stat 2: Confirmed */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-all duration-200 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
+          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/40 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Confirmed</p>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">{confirmedAppts}</span>
@@ -71,7 +71,7 @@ export default function OverviewTab({ appointments, setActiveTab }) {
 
         {/* Stat 3: Pending */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-all duration-200 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
+          <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/40 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Pending Review</p>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-3xl font-extrabold text-amber-600 dark:text-amber-400">{pendingAppts}</span>
@@ -85,7 +85,7 @@ export default function OverviewTab({ appointments, setActiveTab }) {
 
         {/* Stat 4: Cancelled */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-all duration-200 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-rose-500/10 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
+          <div className="absolute top-0 right-0 w-24 h-24 bg-rose-500/40 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Cancelled</p>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-3xl font-extrabold text-rose-600 dark:text-rose-400">{cancelledAppts}</span>
@@ -196,7 +196,7 @@ export default function OverviewTab({ appointments, setActiveTab }) {
 
           <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
             <button
-              onClick={() => setActiveTab('book')}
+              onClick={() => setActiveTab('booking')}
               className="w-full py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">

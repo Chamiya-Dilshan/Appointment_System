@@ -9,18 +9,18 @@ import DailyTab from './components/DailyTab'
 
 // Mock initial appointments
 const INITIAL_APPOINTMENTS = [
-  { id: 1, name: 'Sarah Connor', reason: 'General Consultation', date: '2026-08-15', time: '10:00 AM', status: 'Confirmed', phone: '+1 555-0199', email: 'sarah.c@cyberdyne.com', refNo: 'APPT-5B9C2D', nic: '198412345678', district: 'Colombo', province: 'Western', council: 'Colombo Municipal Council', gsDivision: 'Fort', address: 'Cyberdyne HQ, Colombo', postalCode: '00100' },
-  { id: 2, name: 'John Doe', reason: 'Dental Cleaning', date: '2026-08-15', time: '11:30 AM', status: 'Pending', phone: '+1 555-0143', email: 'john.doe@gmail.com', refNo: 'APPT-9X4E1F', nic: '199098765432', district: 'Kandy', province: 'Central', council: 'Kandy Municipal Council', gsDivision: 'Katugastota', address: '45, Peradeniya Rd, Kandy', postalCode: '20000' },
-  { id: 3, name: 'Bruce Wayne', reason: 'Therapy Session', date: '2026-08-16', time: '03:00 PM', status: 'Confirmed', phone: '+1 555-0100', email: 'bruce@waynecorp.com', refNo: 'APPT-2A7D8K', nic: '197544332211', district: 'Galle', province: 'Southern', council: 'Galle Municipal Council', gsDivision: 'Fort', address: 'Wayne Manor, Galle', postalCode: '80000' },
-  { id: 4, name: 'Clark Kent', reason: 'Eye Examination', date: '2026-08-17', time: '09:00 AM', status: 'Cancelled', phone: '+1 555-0112', email: 'clark.k@dailyplanet.com', refNo: 'APPT-3H8J9P', nic: '198088776655', district: 'Gampaha', province: 'Western', council: 'Gampaha Municipal Council', gsDivision: 'Kadawatha', address: '32, Kandy Rd, Kadawatha', postalCode: '11850' },
-  { id: 5, name: 'Diana Prince', reason: 'Cardiology Check', date: '2026-08-18', time: '02:00 PM', status: 'Pending', phone: '+1 555-0125', email: 'diana@themyscira.gov', refNo: 'APPT-4Y9L0Q', nic: '198555443322', district: 'Jaffna', province: 'Northern', council: 'Jaffna Municipal Council', gsDivision: 'Nallur', address: 'Temple Rd, Nallur, Jaffna', postalCode: '40000' },
+  { id: 1, name: 'Sarah Connor', reason: 'General Consultation', date: '2026-08-15', time: '10:00 AM', status: 'Confirmed', phone: '+1 555-0199', email: 'sarah.c@cyberdyne.com', refNo: 'APPT-5B9C2D', nic: '198412345678', district: 'Colombo', province: 'Western', council: 'Colombo Municipal Council', gsDivision: 'Fort', address: 'Cyberdyne HQ, Colombo', postalCode: '00100', officer: 'Secretary' },
+  { id: 2, name: 'John Doe', reason: 'Dental Cleaning', date: '2026-08-15', time: '11:30 AM', status: 'Pending', phone: '+1 555-0143', email: 'john.doe@gmail.com', refNo: 'APPT-9X4E1F', nic: '199098765432', district: 'Kandy', province: 'Central', council: 'Kandy Municipal Council', gsDivision: 'Katugastota', address: '45, Peradeniya Rd, Kandy', postalCode: '20000', officer: 'Deputy Minister' },
+  { id: 3, name: 'Bruce Wayne', reason: 'Therapy Session', date: '2026-08-16', time: '03:00 PM', status: 'Confirmed', phone: '+1 555-0100', email: 'bruce@waynecorp.com', refNo: 'APPT-2A7D8K', nic: '197544332211', district: 'Galle', province: 'Southern', council: 'Galle Municipal Council', gsDivision: 'Fort', address: 'Wayne Manor, Galle', postalCode: '80000', officer: 'Minister' },
+  { id: 4, name: 'Clark Kent', reason: 'Eye Examination', date: '2026-08-17', time: '09:00 AM', status: 'Cancelled', phone: '+1 555-0112', email: 'clark.k@dailyplanet.com', refNo: 'APPT-3H8J9P', nic: '198088776655', district: 'Gampaha', province: 'Western', council: 'Gampaha Municipal Council', gsDivision: 'Kadawatha', address: '32, Kandy Rd, Kadawatha', postalCode: '11850', officer: 'Secretary', cancellationRemark: 'Urgent assignment at the Daily Planet' },
+  { id: 5, name: 'Diana Prince', reason: 'Cardiology Check', date: '2026-08-18', time: '02:00 PM', status: 'Pending', phone: '+1 555-0125', email: 'diana@themyscira.gov', refNo: 'APPT-4Y9L0Q', nic: '198555443322', district: 'Jaffna', province: 'Northern', council: 'Jaffna Municipal Council', gsDivision: 'Nallur', address: 'Temple Rd, Nallur, Jaffna', postalCode: '40000', officer: 'Minister' },
 ]
 
-export default function Dashboard({ onLogout }) {
+export default function Dashboard({ currentUser, onLogout }) {
   const [appointments, setAppointments] = useState(INITIAL_APPOINTMENTS)
   const [allowedDates, setAllowedDates] = useState(['2026-08-20', '2026-08-21', '2026-08-25', '2026-08-29', '2026-08-30'])
 
-  // Navigation active tab: 'overview' | 'appointments' | 'schedule' | 'book'
+  // Navigation active tab: 'overview' | 'appointments' | 'schedule' | 'booking'
   const [activeTab, setActiveTab] = useState('overview')
   const [isMobileOpen, setIsMobileOpen] = useState(false)
 
@@ -73,13 +73,17 @@ export default function Dashboard({ onLogout }) {
   }
 
   // Handle status updates from Details Modal (Option 2)
-  const handleUpdateStatus = (id, newStatus) => {
+  const handleUpdateStatus = (id, newStatus, remark = '') => {
     setAppointments(prev => prev.map(appt => {
       if (appt.id === id) {
         if (newStatus === 'Confirmed' && appt.status !== 'Confirmed') {
           triggerNotification(appt)
         }
-        return { ...appt, status: newStatus }
+        return {
+          ...appt,
+          status: newStatus,
+          cancellationRemark: newStatus === 'Cancelled' ? remark : undefined
+        }
       }
       return appt
     }))
@@ -102,8 +106,16 @@ export default function Dashboard({ onLogout }) {
     return `${year}-${month}-${day}`
   })()
 
+  // Filter appointments for the current user's authorized ministerial role
+  const authorizedAppointments = appointments.filter(appt => {
+    if (currentUser && currentUser.role) {
+      return appt.officer === currentUser.role
+    }
+    return true
+  })
+
   // Auto-cancel past pending appointments dynamically
-  const processedAppointments = appointments.map(appt => {
+  const processedAppointments = authorizedAppointments.map(appt => {
     if (appt.date < todayStr && appt.status === 'Pending') {
       return { ...appt, status: 'Cancelled' }
     }
@@ -154,13 +166,14 @@ export default function Dashboard({ onLogout }) {
             onRemoveDate={handleRemoveDate}
           />
         )
-      case 'book':
+      case 'booking':
         return (
           <BookTab
             appointments={processedAppointments}
             allowedDates={allowedDates}
             onAddAppointment={handleAddAppointment}
             setActiveTab={setActiveTab}
+            currentUser={currentUser}
           />
         )
       case 'daily':
@@ -187,6 +200,7 @@ export default function Dashboard({ onLogout }) {
         onLogout={onLogout}
         isMobileOpen={isMobileOpen}
         setIsMobileOpen={setIsMobileOpen}
+        currentUser={currentUser}
       />
 
       {/* Main Content Area */}
@@ -234,14 +248,17 @@ export default function Dashboard({ onLogout }) {
             {/* Quick stats / profile bar for desktop */}
             <div className="hidden sm:flex items-center gap-3">
               <div className="text-right">
-                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Admin Session</p>
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">{currentUser.username} Session</p>
                 <p className="text-[9px] text-emerald-500 font-extrabold flex items-center gap-1 justify-end">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
                   Live Sync
                 </p>
               </div>
               <div className="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900 flex items-center justify-center text-indigo-650 dark:text-indigo-400 font-bold text-xs uppercase select-none">
-                AD
+                {currentUser?.name
+                  ? currentUser.name.split(' ').map(n => n[0]).join('').slice(0, 2)
+                  : 'AD'
+                }
               </div>
             </div>
           </div>

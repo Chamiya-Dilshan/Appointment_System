@@ -22,7 +22,7 @@ const TIME_SLOTS = [
   { value: "17:00", label: "05:00 PM" }
 ]
 
-export default function BookTab({ appointments, allowedDates, onAddAppointment, setActiveTab }) {
+export default function BookTab({ appointments, allowedDates, onAddAppointment, setActiveTab, currentUser }) {
   // New appointment form state
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
@@ -70,12 +70,6 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
       })
       if (hasConflict) return false
 
-      // 2. Lead time check (must be booked at least 24 hours in advance)
-      const now = new Date()
-      const selectedDateTime = new Date(`${newDate}T${slot.value}`)
-      const diffHours = (selectedDateTime - now) / (1000 * 60 * 60)
-      if (diffHours < 24) return false
-
       return true
     })
   }
@@ -110,15 +104,6 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
       return
     }
 
-    // Ensure booking is made at least 24 hours in advance
-    const now = new Date()
-    const selectedDateTime = new Date(`${newDate}T${newTime}`)
-    const diffHours = (selectedDateTime - now) / (1000 * 60 * 60)
-    if (diffHours < 24) {
-      alert("Invalid Booking: Appointments must be booked at least 24 hours in advance.")
-      return
-    }
-
     // Double booking & 30 minutes gap check
     const newTimeMinutes = parseInputTimeToMinutes(newTime)
     const timeConflict = appointments.some(appt => {
@@ -150,7 +135,8 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
       council: newCouncil,
       gsDivision: newGsDivision,
       address: newAddress,
-      postalCode: newPostalCode
+      postalCode: newPostalCode,
+      officer: currentUser?.role || 'Secretary'
     }
 
     onAddAppointment(newAppt)
@@ -367,7 +353,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
               3. Booking Schedule
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
               {/* Date selection with floating custom Calendar Picker */}
               <div className="space-y-1 relative">
@@ -432,6 +418,20 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                 </select>
               </div>
 
+              {/* Appointment With (Read-only Confirmation) */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  Appointment With
+                </label>
+                <input
+                  type="text"
+                  readOnly
+                  disabled
+                  value={currentUser?.name || 'Secretary to the Ministry'}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 text-sm cursor-not-allowed select-none"
+                />
+              </div>
+
             </div>
 
             {/* Initial Status */}
@@ -462,13 +462,13 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
             <button
               type="button"
               onClick={() => setActiveTab('appointments')}
-              className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 bg-slate-100 hover:bg-slate-205 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 bg-slate-200 hover:bg-slate-205 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-50 dark:hover:bg-white dark:text-slate-950 transition-colors cursor-pointer shadow-sm shadow-indigo-500/10"
+              className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-white dark:text-slate-950 transition-colors cursor-pointer shadow-sm shadow-indigo-500/10"
             >
               Submit Booking
             </button>
