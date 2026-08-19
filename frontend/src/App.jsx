@@ -2,26 +2,52 @@ import { useState } from 'react'
 import ThemeToggle from './components/ThemeToggle'
 import Dashboard from './Dashboard/Dashboard.jsx'
 
+// Mock 3 authorized administrative users with ministerial roles
+const USERS = {
+  secretary: { username: 'secretary', name: 'Secretary to the Ministry', role: 'Secretary' },
+  deputy_minister: { username: 'deputy_minister', name: 'Deputy Minister', role: 'Deputy Minister' },
+  minister: { username: 'minister', name: 'Hon. Minister', role: 'Minister' }
+}
+
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('currentUser') !== null
+  })
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('currentUser')
+    return saved ? JSON.parse(saved) : null
+  })
 
   const handleLogin = (e) => {
     e.preventDefault()
-    // Mock login verification (allows any username/password)
-    if (username.trim() && password.trim()) {
+    const nameKey = username.trim().toLowerCase()
+    const foundUser = USERS[nameKey]
+    if (foundUser && password.trim() === 'password123') {
+      setCurrentUser(foundUser)
       setIsLoggedIn(true)
+      localStorage.setItem('currentUser', JSON.stringify(foundUser))
+    } else {
+      alert("Invalid Credentials")
     }
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem('currentUser')
+    setCurrentUser(null)
+    setIsLoggedIn(false)
+    setUsername('')
+    setPassword('')
+  }
+
   if (isLoggedIn) {
-    return <Dashboard onLogout={() => setIsLoggedIn(false)} />
+    return <Dashboard currentUser={currentUser} onLogout={handleLogout} />
   }
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-slate-300 dark:bg-slate-950 font-sans antialiased p-4 sm:p-6 md:p-8 relative transition-colors duration-300">
-      
+
       {/* Dark Mode Toggle Component */}
       <ThemeToggle className="absolute top-4 right-4" />
 
@@ -98,6 +124,32 @@ function App() {
                 Login
               </button>
             </form>
+
+            {/* Quick Logins for the 3 Ministerial Roles */}
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80 space-y-2">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Authorized Admin Logins</p>
+              <div className="grid grid-cols-1 gap-2">
+                {Object.values(USERS).map(u => (
+                  <button
+                    key={u.username}
+                    type="button"
+                    onClick={() => {
+                      setUsername(u.username)
+                      setPassword('password123')
+                    }}
+                    className="p-2.5 rounded-xl border border-slate-205 dark:border-slate-800 text-left hover:bg-slate-50 dark:hover:bg-slate-950/40 text-xs flex items-center justify-between cursor-pointer transition-all hover:border-slate-350 dark:hover:border-slate-750"
+                  >
+                    <div>
+                      <strong className="text-slate-800 dark:text-slate-205 block font-semibold">{u.name}</strong>
+                      <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono">User: {u.username}</span>
+                    </div>
+                    <span className="text-[9px] font-extrabold uppercase bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded shrink-0">
+                      {u.role}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
