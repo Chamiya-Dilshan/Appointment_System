@@ -4,7 +4,7 @@ import Dashboard from './Dashboard/Dashboard.jsx'
 
 // Mock 3 authorized administrative users with ministerial roles
 const USERS = {
-  secretary: { username: 'secretary', name: 'Secretary to the Ministry', role: 'Secretary' },
+  secretary: { username: 'secretary', name: 'Secretary of Ministry', role: 'Secretary' },
   deputy_minister: { username: 'deputy_minister', name: 'Deputy Minister', role: 'Deputy Minister' },
   minister: { username: 'minister', name: 'Hon. Minister', role: 'Minister' }
 }
@@ -48,10 +48,10 @@ function App() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-slate-300 dark:bg-slate-950 font-sans antialiased p-4 sm:p-6 md:p-8 relative transition-colors duration-300">
 
-      {/* Dark Mode Toggle Component */}
-      <ThemeToggle className="absolute top-4 right-4" />
+      <div className="w-full max-w-4xl bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800/80 overflow-hidden flex flex-col md:flex-row min-h-[500px] relative">
 
-      <div className="w-full max-w-4xl bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800/80 overflow-hidden flex flex-col md:flex-row min-h-[500px]">
+        {/* Dark Mode Toggle Component inside card */}
+        <ThemeToggle className="absolute top-4 right-4 z-50" />
 
         {/* Left Column: Welcome */}
         <div className="w-full md:w-1/2 bg-slate-50 dark:bg-slate-950/30 p-8 sm:p-12 flex flex-col justify-center items-center text-center border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-800/80">

@@ -1,14 +1,26 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
-export default function DailyTab({ appointments, onConfirm, onDelete }) {
-  // Default to today's date in local time YYYY-MM-DD
-  const [selectedDate, setSelectedDate] = useState(() => {
+export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateStatus }) {
+  // Get today's local date string (YYYY-MM-DD)
+  const todayStr = (() => {
     const today = new Date()
     const year = today.getFullYear()
     const month = String(today.getMonth() + 1).padStart(2, '0')
     const day = String(today.getDate()).padStart(2, '0')
     return `${year}-${month}-${day}`
-  })
+  })()
+
+  // Default to today's date in local time YYYY-MM-DD
+  const [selectedDate, setSelectedDate] = useState(todayStr)
+
+  const [selectedDetailedAppt, setSelectedDetailedAppt] = useState(null)
+  const [isCancelling, setIsCancelling] = useState(false)
+  const [cancellationRemark, setCancellationRemark] = useState('')
+
+  useEffect(() => {
+    setIsCancelling(false)
+    setCancellationRemark('')
+  }, [selectedDetailedAppt])
 
   // State to control display limit of active booking dates
   const [showAllDates, setShowAllDates] = useState(false)
@@ -80,7 +92,7 @@ export default function DailyTab({ appointments, onConfirm, onDelete }) {
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-indigo-650 text-black shadow-sm dark:text-white'
-                        : 'bg-slate-50 text-slate-600 hover:bg-slate-100 dark:bg-slate-950 dark:text-slate-450 dark:hover:bg-slate-800/50'
+                        : 'bg-slate-50 text-slate-600 hover:bg-slate-100 dark:bg-slate-950 dark:text-slate-455 dark:hover:bg-slate-800/50'
                     }`}
                   >
                     <span>{date}</span>
@@ -140,7 +152,7 @@ export default function DailyTab({ appointments, onConfirm, onDelete }) {
               {/* Cancelled */}
               <div className="flex justify-between items-center py-1 border-t border-slate-50 dark:border-slate-800/50">
                 <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Cancelled</span>
-                <span className="text-sm font-extrabold text-rose-600 dark:text-rose-400">{cancelledDaily}</span>
+                <span className="text-sm font-extrabold text-rose-650 dark:text-rose-400">{cancelledDaily}</span>
               </div>
             </div>
           </div>
@@ -186,9 +198,11 @@ export default function DailyTab({ appointments, onConfirm, onDelete }) {
                           <p>
                             Reason: <strong className="font-semibold text-slate-850 dark:text-slate-200">{appt.reason}</strong>
                           </p>
-                          <p className="text-[10px] text-slate-450 dark:text-slate-500">
-                            Contact: {appt.phone} / {appt.email}
-                          </p>
+                          <div className="text-[10px] text-slate-455 dark:text-slate-500 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                            <span>Phone: {appt.phone}</span>
+                            <span className="hidden sm:inline text-slate-300 dark:text-slate-700">|</span>
+                            <span className="break-all">Email: {appt.email}</span>
+                          </div>
                           {appt.nic && (
                             <div className="text-[11px] text-slate-500 dark:text-slate-400 flex flex-wrap gap-1.5 items-center">
                               <span className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-semibold font-mono">NIC: {appt.nic}</span>
@@ -199,30 +213,35 @@ export default function DailyTab({ appointments, onConfirm, onDelete }) {
                         </div>
 
                         {/* Inline Management Actions */}
-                        <div className="flex justify-between items-center pt-3 border-t border-slate-100 dark:border-slate-800/40">
-                          <span className={`px-2 py-0.5 rounded-full font-bold text-[9px] inline-flex items-center gap-1 ${
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/40">
+                          <span className={`w-fit px-2 py-0.5 rounded-full font-bold text-[9px] inline-flex items-center gap-1 ${
                             isConfirmed
                               ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-450'
                               : isPending
-                                ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-450'
+                                ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-455'
                                 : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-455'
                           }`}>
                             <span className={`w-1 h-1 rounded-full ${dotColor}`} />
                             {appt.status}
                           </span>
-
-                          <div className="flex gap-2">
+                          <div className="flex items-center gap-2 w-full sm:w-auto justify-start sm:justify-end">
+                            <button
+                              onClick={() => setSelectedDetailedAppt(appt)}
+                              className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-indigo-100/80 text-indigo-700 border border-indigo-200/80 hover:bg-indigo-200/80 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/50 dark:hover:bg-indigo-900/40 transition-all font-bold cursor-pointer text-xs"
+                            >
+                              View
+                            </button>
                             {isPending && (
                               <button
                                 onClick={() => onConfirm(appt.id)}
-                                className="px-3 py-1.5 rounded-lg bg-emerald-100/80 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-200/80 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50 dark:hover:bg-emerald-900/40 transition-all font-bold cursor-pointer text-xs"
+                                className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-emerald-100/80 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-200/80 dark:bg-emerald-950/30 dark:text-emerald-455 dark:border-emerald-900/50 dark:hover:bg-emerald-900/40 transition-all font-bold cursor-pointer text-xs"
                               >
                                 Confirm
                               </button>
                             )}
                              <button
                                onClick={() => onDelete(appt.id)}
-                               className="px-3 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
+                               className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
                              >
                                Delete
                              </button>
@@ -243,6 +262,239 @@ export default function DailyTab({ appointments, onConfirm, onDelete }) {
         </div>
 
       </div>
+
+      {/* Details Modal */}
+      {selectedDetailedAppt && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center p-4 py-8 bg-slate-900/60 backdrop-blur-xs transition-opacity overflow-y-auto">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800/80 shadow-2xl p-6 relative animate-in fade-in zoom-in-95 duration-150 my-auto">
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <span>Appointment Details</span>
+                  <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded font-mono select-all">
+                    {selectedDetailedAppt.refNo}
+                  </span>
+                </h3>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Audit log view of past scheduled slot.</p>
+              </div>
+              <button
+                onClick={() => setSelectedDetailedAppt(null)}
+                className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="space-y-4 text-sm text-slate-750 dark:text-slate-355">
+              
+              {/* Client Info Block */}
+              <div className="space-y-2.5 p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-950/20 border border-slate-100/80 dark:border-slate-800/80">
+                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-500 dark:text-indigo-400">1. Client Profile</h4>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="text-slate-400 dark:text-slate-500 block">Full Name</span>
+                    <strong className="font-semibold text-slate-850 dark:text-white">{selectedDetailedAppt.name}</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 dark:text-slate-500 block">NIC (Identity Card)</span>
+                    <strong className="font-semibold font-mono text-slate-850 dark:text-white">{selectedDetailedAppt.nic || 'N/A'}</strong>
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-slate-400 dark:text-slate-500 block">Contact Number</span>
+                    <strong className="font-semibold text-slate-850 dark:text-white">{selectedDetailedAppt.phone}</strong>
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-slate-400 dark:text-slate-500 block">Email Address</span>
+                    <strong className="font-semibold break-all text-slate-850 dark:text-white">{selectedDetailedAppt.email}</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Schedule Info Block */}
+              <div className="space-y-2.5 p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-950/20 border border-slate-100/80 dark:border-slate-800/80">
+                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-500 dark:text-indigo-400">2. Schedule Details</h4>
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div>
+                    <span className="text-slate-400 dark:text-slate-500 block">Date</span>
+                    <strong className="font-semibold text-slate-850 dark:text-white">{selectedDetailedAppt.date}</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 dark:text-slate-500 block">Time Slot</span>
+                    <strong className="font-semibold text-indigo-650 dark:text-indigo-400">{selectedDetailedAppt.time}</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 dark:text-slate-500 block">Booking Status</span>
+                    <span className={`inline-block px-2 py-0.5 rounded font-extrabold text-[9px] mt-0.5 uppercase ${
+                      selectedDetailedAppt.status === 'Confirmed'
+                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-450'
+                        : selectedDetailedAppt.status === 'Pending'
+                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-450'
+                          : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-455'
+                    }`}>
+                      {selectedDetailedAppt.status}
+                    </span>
+                  </div>
+                </div>
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs flex justify-between gap-4">
+                  <div>
+                    <span className="text-slate-400 dark:text-slate-500 block">Assigned Officer</span>
+                    <strong className="font-semibold text-slate-850 dark:text-white">{selectedDetailedAppt.officer || 'N/A'}</strong>
+                  </div>
+                  <div className="flex-1">
+                    <span className="text-slate-400 dark:text-slate-500 block">Reason for Visit</span>
+                    <p className="font-medium text-slate-800 dark:text-slate-200 mt-0.5">{selectedDetailedAppt.reason}</p>
+                  </div>
+                </div>
+                {selectedDetailedAppt.status === 'Cancelled' && (
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
+                    <span className="text-slate-400 dark:text-slate-500 block">Cancellation Remark</span>
+                    <p className="font-medium text-rose-600 dark:text-rose-400 mt-0.5 bg-rose-50/50 dark:bg-rose-950/10 p-2.5 rounded-xl border border-rose-100/50 dark:border-rose-950/20 italic">
+                      {selectedDetailedAppt.cancellationRemark || 'No remark provided.'}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Location Block */}
+              <div className="space-y-2.5 p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-950/20 border border-slate-100/80 dark:border-slate-800/80">
+                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-500 dark:text-indigo-400">3. Address & Regional Info</h4>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="text-slate-400 dark:text-slate-500 block">GS Division</span>
+                    <strong className="font-semibold text-slate-850 dark:text-white">{selectedDetailedAppt.gsDivision || 'N/A'}</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 dark:text-slate-500 block">Local Council</span>
+                    <strong className="font-semibold text-slate-850 dark:text-white">{selectedDetailedAppt.council || 'N/A'}</strong>
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-slate-400 dark:text-slate-500 block">District</span>
+                    <strong className="font-semibold text-slate-850 dark:text-white">{selectedDetailedAppt.district || 'N/A'}</strong>
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-slate-400 dark:text-slate-500 block">Province</span>
+                    <strong className="font-semibold text-slate-850 dark:text-white">{selectedDetailedAppt.province || 'N/A'}</strong>
+                  </div>
+                </div>
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
+                  <span className="text-slate-400 dark:text-slate-500 block">Address & Postal Code</span>
+                  <p className="font-medium text-slate-800 dark:text-slate-200 mt-0.5">
+                    📍 {selectedDetailedAppt.address}{selectedDetailedAppt.postalCode ? ` (${selectedDetailedAppt.postalCode})` : ''}
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Modal Footer with Status control actions */}
+            <div className="flex flex-wrap items-center justify-between gap-3 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+              {/* Left Side: Status actions for admin (Active/Future only) */}
+              {selectedDetailedAppt.date >= todayStr && (
+                <div className="flex flex-wrap gap-2 flex-1">
+                  {isCancelling ? (
+                    <div className="w-full space-y-3 p-3 bg-rose-50/30 dark:bg-rose-950/10 rounded-2xl border border-rose-100/50 dark:border-rose-950/20">
+                      <div className="text-xs font-bold text-rose-600 dark:text-rose-400">
+                        Are you sure you want to cancel this appointment?
+                      </div>
+                      <textarea
+                        placeholder="Enter cancellation remark (optional)..."
+                        value={cancellationRemark}
+                        onChange={(e) => setCancellationRemark(e.target.value)}
+                        className="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-905 text-slate-850 dark:text-slate-200 focus:outline-hidden focus:ring-1 focus:ring-rose-500 placeholder-slate-400"
+                        rows={2}
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setIsCancelling(false)}
+                          className="px-3 py-2 rounded-xl text-xs font-bold bg-slate-100/80 text-slate-700 border border-slate-200 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-205 dark:border-slate-700 dark:hover:bg-slate-700 cursor-pointer transition-all"
+                        >
+                          Go Back
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Cancelled', cancellationRemark)
+                            setSelectedDetailedAppt({
+                              ...selectedDetailedAppt,
+                              status: 'Cancelled',
+                              cancellationRemark: cancellationRemark
+                            })
+                            setIsCancelling(false)
+                          }}
+                          className="px-3 py-2 rounded-xl text-xs font-bold bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 cursor-pointer transition-all"
+                        >
+                          Confirm Cancellation
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      {selectedDetailedAppt.status === 'Confirmed' && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Pending')
+                              setSelectedDetailedAppt({ ...selectedDetailedAppt, status: 'Pending' })
+                            }}
+                            className="px-3 py-2 rounded-xl text-xs font-bold bg-amber-100/80 text-amber-700 border border-amber-200/80 hover:bg-amber-200/80 dark:bg-amber-950/30 dark:text-amber-450 dark:border-amber-900/50 dark:hover:bg-amber-900/40 cursor-pointer transition-all"
+                          >
+                            Revert to Pending
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsCancelling(true)}
+                            className="px-3 py-2 rounded-xl text-xs font-bold bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 cursor-pointer transition-all"
+                          >
+                            Cancel Appointment
+                          </button>
+                        </>
+                      )}
+
+                      {selectedDetailedAppt.status === 'Pending' && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Confirmed')
+                              setSelectedDetailedAppt({ ...selectedDetailedAppt, status: 'Confirmed' })
+                            }}
+                            className="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-100/80 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-200/80 dark:bg-emerald-950/30 dark:text-emerald-450 dark:border-emerald-900/50 dark:hover:bg-emerald-900/40 cursor-pointer transition-all"
+                          >
+                            Confirm Appointment
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsCancelling(true)}
+                            className="px-3 py-2 rounded-xl text-xs font-bold bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 cursor-pointer transition-all"
+                          >
+                            Cancel Appointment
+                          </button>
+                        </>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Right Side: Close button */}
+              <button
+                type="button"
+                onClick={() => setSelectedDetailedAppt(null)}
+                className="px-5 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-300 hover:text-white bg-slate-200 hover:bg-slate-400 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer transition-all ml-auto"
+              >
+                Close View
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

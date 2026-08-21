@@ -51,6 +51,9 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
   const [newAddress, setNewAddress] = useState('')
   const [newPostalCode, setNewPostalCode] = useState('')
   const [showDatePicker, setShowDatePicker] = useState(false)
+  const [showProvinceDropdown, setShowProvinceDropdown] = useState(false)
+  const [showDistrictDropdown, setShowDistrictDropdown] = useState(false)
+  const [showTimeDropdown, setShowTimeDropdown] = useState(false)
 
   // Parse input time string in 24h format (e.g. "14:30") to minutes from midnight
   const parseInputTimeToMinutes = (timeStr) => {
@@ -169,6 +172,9 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
     setNewPostalCode('')
     setNewStatus('Pending')
     setShowDatePicker(false)
+    setShowProvinceDropdown(false)
+    setShowDistrictDropdown(false)
+    setShowTimeDropdown(false)
 
     // Switch to appointments listing tab
     setActiveTab('appointments')
@@ -271,32 +277,48 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="space-y-1 ">
+              <div className="space-y-1">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                   Province *
                 </label>
                 <div className="relative">
-                  <select
-                    required
-                    value={newProvince}
-                    onChange={(e) => {
-                      setNewProvince(e.target.value)
-                      setNewDistrict('')
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowProvinceDropdown(!showProvinceDropdown)
+                      setShowDistrictDropdown(false)
+                      setShowTimeDropdown(false)
+                      setShowDatePicker(false)
                     }}
-                    className="w-full appearance-none px-4 py-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm cursor-pointer"
+                    className="w-full text-left px-4 py-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm cursor-pointer font-semibold flex justify-between items-center"
                   >
-                    <option value="">Select Province</option>
-                    {Object.keys(PROVINCES_AND_DISTRICTS).map((prov) => (
-                      <option key={prov} value={prov}>
-                        {prov}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 dark:text-slate-500">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <span className="truncate">{newProvince || "Select Province"}</span>
+                    <svg className="h-4 w-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
-                  </div>
+                  </button>
+                  {showProvinceDropdown && (
+                    <div className="absolute left-0 right-0 mt-2 z-30 bg-white dark:bg-slate-900 p-2 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl max-h-60 overflow-y-auto space-y-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                      {Object.keys(PROVINCES_AND_DISTRICTS).map((prov) => (
+                        <button
+                          key={prov}
+                          type="button"
+                          onClick={() => {
+                            setNewProvince(prov)
+                            setNewDistrict('')
+                            setShowProvinceDropdown(false)
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                            newProvince === prov
+                              ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/25'
+                              : 'text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                          }`}
+                        >
+                          {prov}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -305,28 +327,45 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                   District *
                 </label>
                 <div className="relative">
-                  <select
-                    required
-                    value={newDistrict}
-                    onChange={(e) => setNewDistrict(e.target.value)}
+                  <button
+                    type="button"
                     disabled={!newProvince}
-                    className="w-full appearance-none px-4 py-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={() => {
+                      setShowDistrictDropdown(!showDistrictDropdown)
+                      setShowProvinceDropdown(false)
+                      setShowTimeDropdown(false)
+                      setShowDatePicker(false)
+                    }}
+                    className="w-full text-left px-4 py-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm cursor-pointer font-semibold flex justify-between items-center disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <option value="">
-                      {!newProvince ? "Select Province First" : "Select District"}
-                    </option>
-                    {newProvince &&
-                      PROVINCES_AND_DISTRICTS[newProvince].map((dist) => (
-                        <option key={dist} value={dist}>
-                          {dist}
-                        </option>
-                      ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 dark:text-slate-500">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <span className="truncate">
+                      {!newProvince ? "Select Province First" : newDistrict || "Select District"}
+                    </span>
+                    <svg className="h-4 w-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
-                  </div>
+                  </button>
+                  {newProvince && showDistrictDropdown && (
+                    <div className="absolute left-0 right-0 mt-2 z-30 bg-white dark:bg-slate-900 p-2 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl max-h-60 overflow-y-auto space-y-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                      {PROVINCES_AND_DISTRICTS[newProvince].map((dist) => (
+                        <button
+                          key={dist}
+                          type="button"
+                          onClick={() => {
+                            setNewDistrict(dist)
+                            setShowDistrictDropdown(false)
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                            newDistrict === dist
+                              ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/25'
+                              : 'text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                          }`}
+                        >
+                          {dist}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -437,33 +476,56 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                   Available Time Slot *
                 </label>
                 <div className="relative">
-                  <select
-                    required
-                    value={newTime}
+                  <button
+                    type="button"
                     disabled={!newDate}
-                    onChange={(e) => setNewTime(e.target.value)}
-                    className="w-full appearance-none px-4 py-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={() => {
+                      setShowTimeDropdown(!showTimeDropdown)
+                      setShowProvinceDropdown(false)
+                      setShowDistrictDropdown(false)
+                      setShowDatePicker(false)
+                    }}
+                    className="w-full text-left px-4 py-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm cursor-pointer font-semibold flex justify-between items-center disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {!newDate ? (
-                      <option value="">Please select a date first</option>
-                    ) : getAvailableTimeSlots().length === 0 ? (
-                      <option value="">No time slots available for this date</option>
-                    ) : (
-                      <>
-                        <option value="">Choose a time slot</option>
-                        {getAvailableTimeSlots().map(slot => (
-                          <option key={slot.value} value={slot.value}>
-                            {slot.label}
-                          </option>
-                        ))}
-                      </>
-                    )}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 dark:text-slate-500">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <span className="truncate">
+                      {!newDate
+                        ? "Please select a date first"
+                        : newTime
+                          ? formatTime(newTime)
+                          : "Choose a time slot"
+                      }
+                    </span>
+                    <svg className="h-4 w-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
-                  </div>
+                  </button>
+                  {newDate && showTimeDropdown && (
+                    <div className="absolute left-0 right-0 mt-2 z-30 bg-white dark:bg-slate-900 p-2 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl max-h-60 overflow-y-auto space-y-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                      {getAvailableTimeSlots().length === 0 ? (
+                        <div className="px-3 py-2 text-xs text-slate-400 dark:text-slate-500 text-center font-medium">
+                          No time slots available for this date
+                        </div>
+                      ) : (
+                        getAvailableTimeSlots().map(slot => (
+                          <button
+                            key={slot.value}
+                            type="button"
+                            onClick={() => {
+                              setNewTime(slot.value)
+                              setShowTimeDropdown(false)
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                              newTime === slot.value
+                                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/25'
+                                : 'text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                            }`}
+                          >
+                            {slot.label}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -511,7 +573,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
             <button
               type="button"
               onClick={() => setActiveTab('appointments')}
-              className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 dark:text-slate-400 bg-slate-200 hover:bg-slate-205 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              className="px-5 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-300 hover:text-white bg-slate-200 hover:bg-slate-400 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer transition-all ml-auto"
             >
               Cancel
             </button>

@@ -40,10 +40,10 @@ export default function OverviewTab({ appointments, setActiveTab }) {
       </div>
 
       {/* Statistics Cards Grid */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Stat 1: Total */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-all duration-200 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/40 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-all duration-200 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/40 to-purple-600/10 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Total Booked</p>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-3xl font-extrabold">{totalAppts}</span>
@@ -56,8 +56,8 @@ export default function OverviewTab({ appointments, setActiveTab }) {
         </div>
 
         {/* Stat 2: Confirmed */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-all duration-200 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/40 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-all duration-200 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-500/40 to-teal-600/10 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Confirmed</p>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">{confirmedAppts}</span>
@@ -70,8 +70,8 @@ export default function OverviewTab({ appointments, setActiveTab }) {
         </div>
 
         {/* Stat 3: Pending */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-all duration-200 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/40 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-all duration-200 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-amber-500/40 to-orange-600/10 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Pending Review</p>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-3xl font-extrabold text-amber-600 dark:text-amber-400">{pendingAppts}</span>
@@ -84,8 +84,8 @@ export default function OverviewTab({ appointments, setActiveTab }) {
         </div>
 
         {/* Stat 4: Cancelled */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-all duration-200 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-rose-500/40 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md transition-all duration-200 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-rose-500/40 to-red-600/10 rounded-full translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-300" />
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Cancelled</p>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-3xl font-extrabold text-rose-600 dark:text-rose-400">{cancelledAppts}</span>
@@ -129,12 +129,12 @@ export default function OverviewTab({ appointments, setActiveTab }) {
                     <span className={`absolute -left-7.5 top-1.5 w-4 h-4 rounded-full border-4 border-white dark:border-slate-900 ring-1 ring-slate-200 dark:ring-slate-800 ${dotColor.split(' ')[0]} flex items-center justify-center`} />
 
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-800 dark:text-slate-100">{appt.name}</span>
+                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                        <span className="text-xs font-extrabold text-slate-800 dark:text-slate-100">{appt.name}</span>
                         <span className="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded font-mono font-bold select-all">
                           {appt.refNo}
                         </span>
-                        <span className={`px-2 py-0.5 rounded-full font-bold text-[8px] ml-auto ${appt.status === 'Confirmed'
+                        <span className={`px-2 py-0.5 rounded-full font-bold text-[8px] sm:ml-auto ${appt.status === 'Confirmed'
                             ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-450'
                             : appt.status === 'Pending'
                               ? 'bg-amber-50 text-amber-755 dark:bg-amber-950/30 dark:text-amber-450'

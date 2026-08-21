@@ -39,7 +39,7 @@ export default function AppointmentsTab({
         (appt.district && appt.district.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (appt.gsDivision && appt.gsDivision.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (appt.address && appt.address.toLowerCase().includes(searchTerm.toLowerCase()))
-      
+
       const matchesStatus = statusFilter === 'All' || appt.status === statusFilter
       return matchesSearch && matchesStatus
     })
@@ -78,7 +78,7 @@ export default function AppointmentsTab({
 
       {/* Filter and Table Card */}
       <section className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm overflow-hidden">
-        
+
         {/* Controls Bar */}
         <div className="p-6 border-b border-slate-200/80 dark:border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-900/50">
           {/* Left side: Search & Filters */}
@@ -98,15 +98,15 @@ export default function AppointmentsTab({
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200/30 dark:border-slate-800/30">
+            <div className="flex w-full sm:w-auto overflow-x-auto scrollbar-none flex-nowrap bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200/30 dark:border-slate-800/30">
               {['All', 'Confirmed', 'Pending', 'Cancelled'].map((status) => (
                 <button
                   key={status}
                   onClick={() => setStatusFilter(status)}
-                  className={`px-3.5 py-1.5 rounded-lg text-sm font-bold transition-all cursor-pointer ${statusFilter === status
+                  className={`flex-1 text-center whitespace-nowrap px-2.5 py-1.5 sm:px-3.5 sm:py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${statusFilter === status
                     ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
                     : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                  }`}
+                    }`}
                 >
                   {status}
                 </button>
@@ -151,10 +151,10 @@ export default function AppointmentsTab({
                             </div>
                           )}
                           {appt.address && (
-                             <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 italic max-w-xs truncate" title={`${appt.address}${appt.postalCode ? `, ${appt.postalCode}` : ''}`}>
-                               📍 {appt.address}{appt.postalCode ? ` (${appt.postalCode})` : ''}
-                             </div>
-                           )}
+                            <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 italic max-w-xs truncate" title={`${appt.address}${appt.postalCode ? `, ${appt.postalCode}` : ''}`}>
+                              📍 {appt.address}{appt.postalCode ? ` (${appt.postalCode})` : ''}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -181,13 +181,13 @@ export default function AppointmentsTab({
                         : appt.status === 'Pending'
                           ? 'bg-amber-50 text-amber-705 dark:bg-amber-950/40 dark:text-amber-400'
                           : 'bg-rose-50 text-rose-755 dark:bg-rose-950/40 dark:text-rose-400'
-                      }`}>
+                        }`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${appt.status === 'Confirmed'
                           ? 'bg-emerald-500'
                           : appt.status === 'Pending'
                             ? 'bg-amber-500'
                             : 'bg-rose-500'
-                        }`} />
+                          }`} />
                         {appt.status}
                       </span>
                     </td>
@@ -255,9 +255,6 @@ export default function AppointmentsTab({
                 <div className="flex items-start justify-between gap-4">
                   {/* Left side: Avatar & Name/Reason */}
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 font-extrabold uppercase text-sm">
-                      {appt.name.split(' ').map(n => n[0]).join('')}
-                    </div>
                     <div>
                       <div className="flex items-center gap-2">
                         <h4 className="font-bold text-slate-900 dark:text-white text-sm leading-tight">{appt.name}</h4>
@@ -288,13 +285,13 @@ export default function AppointmentsTab({
                     : appt.status === 'Pending'
                       ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
                       : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400'
-                  }`}>
+                    }`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${appt.status === 'Confirmed'
                       ? 'bg-emerald-500'
                       : appt.status === 'Pending'
                         ? 'bg-amber-500'
                         : 'bg-rose-500'
-                    }`} />
+                      }`} />
                     {appt.status}
                   </span>
                 </div>
@@ -358,7 +355,7 @@ export default function AppointmentsTab({
       {selectedDetailedAppt && (
         <div className="fixed inset-0 z-50 flex items-start justify-center p-4 py-8 bg-slate-900/60 backdrop-blur-xs transition-opacity overflow-y-auto">
           <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800/80 shadow-2xl p-6 relative animate-in fade-in zoom-in-95 duration-150 my-auto">
-            
+
             {/* Modal Header */}
             <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
               <div>
@@ -382,7 +379,7 @@ export default function AppointmentsTab({
 
             {/* Modal Body */}
             <div className="space-y-4 text-sm text-slate-750 dark:text-slate-355">
-              
+
               {/* Client Info Block */}
               <div className="space-y-2.5 p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-950/20 border border-slate-100/80 dark:border-slate-800/80">
                 <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-500 dark:text-indigo-400">1. Client Profile</h4>
@@ -420,13 +417,12 @@ export default function AppointmentsTab({
                   </div>
                   <div>
                     <span className="text-slate-400 dark:text-slate-500 block">Booking Status</span>
-                    <span className={`inline-block px-2 py-0.5 rounded font-extrabold text-[9px] mt-0.5 uppercase ${
-                      selectedDetailedAppt.status === 'Confirmed'
+                    <span className={`inline-block px-2 py-0.5 rounded font-extrabold text-[9px] mt-0.5 uppercase ${selectedDetailedAppt.status === 'Confirmed'
                         ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-450'
                         : selectedDetailedAppt.status === 'Pending'
                           ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-450'
                           : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-455'
-                    }`}>
+                      }`}>
                       {selectedDetailedAppt.status}
                     </span>
                   </div>
@@ -572,7 +568,7 @@ export default function AppointmentsTab({
               <button
                 type="button"
                 onClick={() => setSelectedDetailedAppt(null)}
-                className="px-5 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-200 hover:bg-slate-205 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer transition-all ml-auto"
+                className="px-5 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-300 hover:text-white bg-slate-200 hover:bg-slate-400 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer transition-all ml-auto"
               >
                 Close View
               </button>
@@ -585,7 +581,7 @@ export default function AppointmentsTab({
       {cancellingAppt && (
         <div className="fixed inset-0 z-50 flex items-start justify-center p-4 py-8 bg-slate-900/60 backdrop-blur-xs transition-opacity overflow-y-auto">
           <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800/80 shadow-2xl p-6 relative animate-in fade-in zoom-in-95 duration-150 my-auto">
-            
+
             {/* Modal Header */}
             <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
               <div>
