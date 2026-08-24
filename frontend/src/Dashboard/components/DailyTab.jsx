@@ -50,7 +50,7 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      
+
       {/* Tab Header */}
       <div>
         <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">Daily Agenda</h2>
@@ -64,7 +64,7 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
             <h3 className="text-sm font-extrabold tracking-tight">Select Agenda Date</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">Choose any date to see scheduled sessions.</p>
           </div>
-          
+
           <div className="w-full md:w-auto min-w-[200px]">
             <input
               type="date"
@@ -89,16 +89,14 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                   <button
                     key={date}
                     onClick={() => setSelectedDate(date)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-indigo-650 text-black shadow-sm dark:text-white'
-                        : 'bg-slate-50 text-slate-600 hover:bg-slate-100 dark:bg-slate-950 dark:text-slate-455 dark:hover:bg-slate-800/50'
-                    }`}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${isSelected
+                      ? 'bg-indigo-650 text-black shadow-sm dark:text-white'
+                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 dark:bg-slate-950 dark:text-slate-455 dark:hover:bg-slate-800/50'
+                      }`}
                   >
                     <span>{date}</span>
-                    <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold ${
-                      isSelected ? 'bg-indigo-700 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                    }`}>
+                    <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold ${isSelected ? 'bg-indigo-700 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                      }`}>
                       {count}
                     </span>
                   </button>
@@ -122,7 +120,7 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
 
       {/* Grid: Daily Stats & List */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        
+
         {/* Left Side: Daily stats breakdown */}
         <div className="space-y-4 lg:col-span-1">
           <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs space-y-4">
@@ -136,7 +134,7 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                 <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Total Booked</span>
                 <span className="text-sm font-extrabold">{totalDaily}</span>
               </div>
-              
+
               {/* Confirmed */}
               <div className="flex justify-between items-center py-1 border-t border-slate-50 dark:border-slate-800/50">
                 <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Confirmed</span>
@@ -214,14 +212,13 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
 
                         {/* Inline Management Actions */}
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/40">
-                          <span className={`w-fit px-2 py-0.5 rounded-full font-bold text-[9px] inline-flex items-center gap-1 ${
-                            isConfirmed
-                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-450'
-                              : isPending
-                                ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-455'
-                                : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-455'
-                          }`}>
-                            <span className={`w-1 h-1 rounded-full ${dotColor}`} />
+                          <span className={`w-fit px-2 py-0.5 rounded-xl text-[12px] inline-flex items-center gap-1.5 ${isConfirmed
+                            ? 'bg-emerald-100 text-emerald-500 dark:bg-emerald-950 dark:text-emerald-450'
+                            : isPending
+                              ? 'bg-amber-100 text-amber-500 dark:bg-amber-950 dark:text-amber-450'
+                              : 'bg-rose-100 text-rose-500 dark:bg-rose-950 dark:text-rose-450'
+                            }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${isConfirmed ? 'bg-emerald-500' : isPending ? 'bg-amber-500' : 'bg-rose-500'}`} />
                             {appt.status}
                           </span>
                           <div className="flex items-center gap-2 w-full sm:w-auto justify-start sm:justify-end">
@@ -239,12 +236,12 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                                 Confirm
                               </button>
                             )}
-                             <button
-                               onClick={() => onDelete(appt.id)}
-                               className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
-                             >
-                               Delete
-                             </button>
+                            <button
+                              onClick={() => onDelete(appt.id)}
+                              className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
+                            >
+                              Delete
+                            </button>
                           </div>
                         </div>
 
@@ -267,7 +264,7 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
       {selectedDetailedAppt && (
         <div className="fixed inset-0 z-50 flex items-start justify-center p-4 py-8 bg-slate-900/60 backdrop-blur-xs transition-opacity overflow-y-auto">
           <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800/80 shadow-2xl p-6 relative animate-in fade-in zoom-in-95 duration-150 my-auto">
-            
+
             {/* Modal Header */}
             <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
               <div>
@@ -291,7 +288,7 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
 
             {/* Modal Body */}
             <div className="space-y-4 text-sm text-slate-750 dark:text-slate-355">
-              
+
               {/* Client Info Block */}
               <div className="space-y-2.5 p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-950/20 border border-slate-100/80 dark:border-slate-800/80">
                 <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-500 dark:text-indigo-400">1. Client Profile</h4>
@@ -329,13 +326,18 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                   </div>
                   <div>
                     <span className="text-slate-400 dark:text-slate-500 block">Booking Status</span>
-                    <span className={`inline-block px-2 py-0.5 rounded font-extrabold text-[9px] mt-0.5 uppercase ${
-                      selectedDetailedAppt.status === 'Confirmed'
-                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-450'
+                    <span className={`px-2 py-0.5 rounded-xl text-[12px] inline-flex items-center gap-1.5 ${selectedDetailedAppt.status === 'Confirmed'
+                        ? 'bg-emerald-100 text-emerald-500 dark:bg-emerald-950 dark:text-emerald-450'
                         : selectedDetailedAppt.status === 'Pending'
-                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-450'
-                          : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-455'
-                    }`}>
+                          ? 'bg-amber-100 text-amber-500 dark:bg-amber-950 dark:text-amber-450'
+                          : 'bg-rose-100 text-rose-500 dark:bg-rose-950 dark:text-rose-450'
+                      }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${selectedDetailedAppt.status === 'Confirmed'
+                        ? 'bg-emerald-500'
+                        : selectedDetailedAppt.status === 'Pending'
+                          ? 'bg-amber-500'
+                          : 'bg-rose-500'
+                        }`} />
                       {selectedDetailedAppt.status}
                     </span>
                   </div>
