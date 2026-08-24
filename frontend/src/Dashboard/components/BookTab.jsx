@@ -54,6 +54,9 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
   const [showProvinceDropdown, setShowProvinceDropdown] = useState(false)
   const [showDistrictDropdown, setShowDistrictDropdown] = useState(false)
   const [showTimeDropdown, setShowTimeDropdown] = useState(false)
+  const [formError, setFormError] = useState('')
+  const [phoneError, setPhoneError] = useState('')
+  const [nicError, setNicError] = useState('')
 
   // Parse input time string in 24h format (e.g. "14:30") to minutes from midnight
   const parseInputTimeToMinutes = (timeStr) => {
@@ -105,17 +108,40 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    setFormError('')
+    setPhoneError('')
+    setNicError('')
 
     if (!newName.trim() || !newPhone.trim() || !newEmail.trim() || !newReason.trim() || !newDate || !newTime ||
       !newNic.trim() || !newDistrict.trim() || !newProvince.trim() || !newCouncil.trim() ||
       !newGsDivision.trim() || !newAddress.trim()) {
-      alert("Please fill in all required fields.")
+      setFormError("Please fill in all required fields.")
+      return
+    }
+
+    // Validate NIC / Passport and Phone formats simultaneously to display all errors at once
+    let hasValidationError = false
+
+    const nicRegex = /^(?:\d{9}[vVxX]|\d{12}|[a-zA-Z]{1,2}\d{6,8})$/
+    if (!nicRegex.test(newNic.trim())) {
+      setNicError("Invalid format. Must be a valid Sri Lankan NIC (e.g. 951234567V or 199512345678) or Passport (e.g. N1234567).")
+      hasValidationError = true
+    }
+
+    const phoneRegex = /^\+?[0-9\s\-()]{7,20}$/
+    if (!phoneRegex.test(newPhone.trim())) {
+      setPhoneError("Invalid format.")
+      hasValidationError = true
+    }
+
+    if (hasValidationError) {
+      setFormError("Please correct the validation errors in the form before submitting.")
       return
     }
 
     // Ensure selected date is within the set of allowed booking dates
     if (!allowedDates.includes(newDate)) {
-      alert("Invalid Booking: The selected date is not available for booking.")
+      setFormError("Invalid Booking: The selected date is not available for booking.")
       return
     }
 
@@ -129,7 +155,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
     })
 
     if (timeConflict) {
-      alert("Scheduling Conflict: Another appointment is already booked at or within 30 minutes of this slot on the same day.")
+      setFormError("Scheduling Conflict: Another appointment is already booked at or within 30 minutes of this slot on the same day.")
       return
     }
 
@@ -171,6 +197,9 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
     setNewAddress('')
     setNewPostalCode('')
     setNewStatus('Pending')
+    setFormError('')
+    setPhoneError('')
+    setNicError('')
     setShowDatePicker(false)
     setShowProvinceDropdown(false)
     setShowDistrictDropdown(false)
@@ -214,16 +243,35 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
 
               <div className="space-y-1">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  NIC (National Identity Card) *
+                  NIC / Passport Number *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. 199512345678 or 951234567V"
+                  placeholder="e.g. 951234567V or N1234567"
                   value={newNic}
-                  onChange={(e) => setNewNic(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm"
+                  onChange={(e) => {
+                    setNewNic(e.target.value)
+                    if (nicError) {
+                      const nicRegex = /^(?:\d{9}[vVxX]|\d{12}|[a-zA-Z]{1,2}\d{6,8})$/
+                      if (nicRegex.test(e.target.value.trim()) || e.target.value.trim() === '') {
+                        setNicError('')
+                      }
+                    }
+                  }}
+                  pattern="^(?:\d{9}[vVxX]|\d{12}|[a-zA-Z]{1,2}\d{6,8})$"
+                  title="Please enter a valid Sri Lankan NIC (9 digits + V/X or 12 digits) or Passport (1-2 letters + 6-8 digits)"
+                  className={`w-full px-4 py-2.5 rounded-xl border bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 transition-all text-sm ${
+                    nicError
+                      ? 'border-red-500 dark:border-red-500 focus:ring-red-500/20 focus:border-red-500'
+                      : 'border-slate-200 dark:border-slate-800 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400'
+                  }`}
                 />
+                {nicError && (
+                  <p className="text-[11px] text-red-550 dark:text-red-400 font-bold animate-in fade-in duration-200 mt-1">
+                    {nicError}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1">
@@ -233,11 +281,30 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                 <input
                   type="tel"
                   required
-                  placeholder="+94 7X XXX XXXX"
+                  placeholder="e.g. +94 7X XXX XXXX or any format"
                   value={newPhone}
-                  onChange={(e) => setNewPhone(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm"
+                  onChange={(e) => {
+                    setNewPhone(e.target.value)
+                    if (phoneError) {
+                      const phoneRegex = /^\+?[0-9\s\-()]{7,20}$/
+                      if (phoneRegex.test(e.target.value.trim()) || e.target.value.trim() === '') {
+                        setPhoneError('')
+                      }
+                    }
+                  }}
+                  pattern="^\+?[0-9\s\-()]{7,20}$"
+                  title="Please enter a valid phone number)"
+                  className={`w-full px-4 py-2.5 rounded-xl border bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 transition-all text-sm ${
+                    phoneError
+                      ? 'border-red-500 dark:border-red-500 focus:ring-red-500/20 focus:border-red-500'
+                      : 'border-slate-200 dark:border-slate-800 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400'
+                  }`}
                 />
+                {phoneError && (
+                  <p className="text-[11px] text-red-550 dark:text-red-400 font-bold animate-in fade-in duration-200 mt-1">
+                    {phoneError}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1">
@@ -567,6 +634,16 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
               </div>
             </div>
           </div>
+
+          {/* General Form Error Alert */}
+          {formError && (
+            <div className="p-4 rounded-2xl bg-red-550/10 dark:bg-red-950/20 border border-red-200/50 dark:border-red-900/50 text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
+              <svg className="w-4 h-4 shrink-0 text-red-500 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span>{formError}</span>
+            </div>
+          )}
 
           {/* Form Actions */}
           <div className="flex gap-3 justify-end pt-4 border-t border-slate-100 dark:border-slate-800/80">

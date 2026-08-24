@@ -9,11 +9,11 @@ import DailyTab from './components/DailyTab'
 
 // Mock initial appointments
 const INITIAL_APPOINTMENTS = [
-  { id: 1, name: 'Sarah Connor', reason: 'General Consultation', date: '2026-08-21', time: '10:00 AM', status: 'Confirmed', phone: '+1 555-0199', email: 'sarah.c@cyberdyne.com', refNo: 'APPT-5B9C2D', nic: '198412345678', district: 'Colombo', province: 'Western', council: 'Colombo Municipal Council', gsDivision: 'Fort', address: 'Cyberdyne HQ, Colombo', postalCode: '00100', officer: 'Secretary' },
-  { id: 2, name: 'John Doe', reason: 'Dental Cleaning', date: '2026-08-22', time: '11:30 AM', status: 'Pending', phone: '+1 555-0143', email: 'john.doe@gmail.com', refNo: 'APPT-9X4E1F', nic: '199098765432', district: 'Kandy', province: 'Central', council: 'Kandy Municipal Council', gsDivision: 'Katugastota', address: '45, Peradeniya Rd, Kandy', postalCode: '20000', officer: 'Deputy Minister' },
-  { id: 3, name: 'Bruce Wayne', reason: 'Therapy Session', date: '2026-08-21', time: '03:00 PM', status: 'Confirmed', phone: '+1 555-0100', email: 'bruce@waynecorp.com', refNo: 'APPT-2A7D8K', nic: '197544332211', district: 'Galle', province: 'Southern', council: 'Galle Municipal Council', gsDivision: 'Fort', address: 'Wayne Manor, Galle', postalCode: '80000', officer: 'Minister' },
+  { id: 1, name: 'Sarah Connor', reason: 'General Consultation', date: '2026-08-24', time: '10:00 AM', status: 'Confirmed', phone: '+1 555-0199', email: 'sarah.c@cyberdyne.com', refNo: 'APPT-5B9C2D', nic: '198412345678', district: 'Colombo', province: 'Western', council: 'Colombo Municipal Council', gsDivision: 'Fort', address: 'Cyberdyne HQ, Colombo', postalCode: '00100', officer: 'Secretary' },
+  { id: 2, name: 'John Doe', reason: 'Dental Cleaning', date: '2026-08-24', time: '11:30 AM', status: 'Pending', phone: '+1 555-0143', email: 'john.doe@gmail.com', refNo: 'APPT-9X4E1F', nic: '199098765432', district: 'Kandy', province: 'Central', council: 'Kandy Municipal Council', gsDivision: 'Katugastota', address: '45, Peradeniya Rd, Kandy', postalCode: '20000', officer: 'Secretary' },
+  { id: 3, name: 'Bruce Wayne', reason: 'Therapy Session', date: '2026-08-25', time: '03:00 PM', status: 'Confirmed', phone: '+1 555-0100', email: 'bruce@waynecorp.com', refNo: 'APPT-2A7D8K', nic: '197544332211', district: 'Galle', province: 'Southern', council: 'Galle Municipal Council', gsDivision: 'Fort', address: 'Wayne Manor, Galle', postalCode: '80000', officer: 'Secretary' },
   { id: 4, name: 'Clark Kent', reason: 'Eye Examination', date: '2026-08-23', time: '09:00 AM', status: 'Cancelled', phone: '+1 555-0112', email: 'clark.k@dailyplanet.com', refNo: 'APPT-3H8J9P', nic: '198088776655', district: 'Gampaha', province: 'Western', council: 'Gampaha Municipal Council', gsDivision: 'Kadawatha', address: '32, Kandy Rd, Kadawatha', postalCode: '11850', officer: 'Secretary', cancellationRemark: 'Urgent assignment at the Daily Planet' },
-  { id: 5, name: 'Diana Prince', reason: 'Cardiology Check', date: '2026-08-25', time: '02:00 PM', status: 'Pending', phone: '+1 555-0125', email: 'diana@themyscira.gov', refNo: 'APPT-4Y9L0Q', nic: '198555443322', district: 'Jaffna', province: 'Northern', council: 'Jaffna Municipal Council', gsDivision: 'Nallur', address: 'Temple Rd, Nallur, Jaffna', postalCode: '40000', officer: 'Minister' },
+  { id: 5, name: 'Diana Prince', reason: 'Cardiology Check', date: '2026-08-25', time: '02:00 PM', status: 'Pending', phone: '+1 555-0125', email: 'diana@themyscira.gov', refNo: 'APPT-4Y9L0Q', nic: '198555443322', district: 'Jaffna', province: 'Northern', council: 'Jaffna Municipal Council', gsDivision: 'Nallur', address: 'Temple Rd, Nallur, Jaffna', postalCode: '40000', officer: 'Secretary' },
 ]
 
 export default function Dashboard({ currentUser, onLogout }) {
@@ -302,7 +302,7 @@ export default function Dashboard({ currentUser, onLogout }) {
               <div className="mt-2 md:mt-1.5 text-[10px] md:text-[9px] bg-slate-800 dark:bg-slate-100 text-slate-350 dark:text-slate-650 px-2 py-0.5 rounded font-mono inline-block">
                 Ref: {toast.refNo}
               </div>
-              
+
               {/* Got It Button (Mobile Only) */}
               <button
                 onClick={() => setToast(null)}
