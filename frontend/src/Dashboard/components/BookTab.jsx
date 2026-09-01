@@ -292,7 +292,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                       }
                     }
                   }}
-                  pattern="^\+?[0-9\s\-()]{7,20}$"
+                  pattern="^\+?[0-9 \-()]{7,20}$"
                   title="Please enter a valid phone number)"
                   className={`w-full px-4 py-2.5 rounded-xl border bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 transition-all text-sm ${
                     phoneError

@@ -20,16 +20,31 @@ function App() {
     return saved ? JSON.parse(saved) : null
   })
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
-    const nameKey = username.trim().toLowerCase()
-    const foundUser = USERS[nameKey]
-    if (foundUser && password.trim() === 'password123') {
-      setCurrentUser(foundUser)
-      setIsLoggedIn(true)
-      localStorage.setItem('currentUser', JSON.stringify(foundUser))
-    } else {
-      alert("Invalid Credentials")
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+          password: password.trim()
+        })
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setCurrentUser(data)
+        setIsLoggedIn(true)
+        localStorage.setItem('currentUser', JSON.stringify(data))
+      } else {
+        const errorData = await response.json()
+        alert(errorData.error || "Invalid Credentials")
+      }
+    } catch (err) {
+      console.error("Login error:", err)
+      alert("Cannot connect to the backend server. Please make sure the backend is running on port 5000.")
     }
   }
 

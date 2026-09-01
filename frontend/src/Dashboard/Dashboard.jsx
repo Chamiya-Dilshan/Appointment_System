@@ -14,11 +14,53 @@ const INITIAL_APPOINTMENTS = [
   { id: 3, name: 'Bruce Wayne', reason: 'Therapy Session', date: '2026-08-25', time: '03:00 PM', status: 'Confirmed', phone: '+1 555-0100', email: 'bruce@waynecorp.com', refNo: 'APPT-2A7D8K', nic: '197544332211', district: 'Galle', province: 'Southern', council: 'Galle Municipal Council', gsDivision: 'Fort', address: 'Wayne Manor, Galle', postalCode: '80000', officer: 'Secretary' },
   { id: 4, name: 'Clark Kent', reason: 'Eye Examination', date: '2026-08-23', time: '09:00 AM', status: 'Cancelled', phone: '+1 555-0112', email: 'clark.k@dailyplanet.com', refNo: 'APPT-3H8J9P', nic: '198088776655', district: 'Gampaha', province: 'Western', council: 'Gampaha Municipal Council', gsDivision: 'Kadawatha', address: '32, Kandy Rd, Kadawatha', postalCode: '11850', officer: 'Secretary', cancellationRemark: 'Urgent assignment at the Daily Planet' },
   { id: 5, name: 'Diana Prince', reason: 'Cardiology Check', date: '2026-08-25', time: '02:00 PM', status: 'Pending', phone: '+1 555-0125', email: 'diana@themyscira.gov', refNo: 'APPT-4Y9L0Q', nic: '198555443322', district: 'Jaffna', province: 'Northern', council: 'Jaffna Municipal Council', gsDivision: 'Nallur', address: 'Temple Rd, Nallur, Jaffna', postalCode: '40000', officer: 'Secretary' },
+  // Deputy Minister Initial Appointments
+  { id: 6, name: 'Arthur Dent', reason: 'Sandwich Making consultation', date: '2026-08-27', time: '09:30 AM', status: 'Confirmed', phone: '+44 7700 900077', email: 'arthur.dent@prefect.com', refNo: 'APPT-6F8G9H', nic: '197943210987', district: 'Colombo', province: 'Western', council: 'Colombo Municipal Council', gsDivision: 'Kollupitiya', address: '12, Galle Rd, Colombo', postalCode: '00300', officer: 'Deputy Minister' },
+  { id: 7, name: 'Tricia McMillan', reason: 'Astrophysics Discussion', date: '2026-08-28', time: '11:00 AM', status: 'Pending', phone: '+44 7700 900088', email: 'trillian@heartofgold.org', refNo: 'APPT-7I9J0K', nic: '198112345098', district: 'Kandy', province: 'Central', council: 'Kandy Municipal Council', gsDivision: 'Peradeniya', address: 'Royal Botanic Gardens, Kandy', postalCode: '20400', officer: 'Deputy Minister' },
+  // Minister Initial Appointments
+  { id: 8, name: 'Ford Prefect', reason: 'Guide Entry Updates', date: '2026-08-28', time: '02:00 PM', status: 'Confirmed', phone: '+1 555-4242', email: 'ford@hitchhikers.guide', refNo: 'APPT-8L0M1N', nic: '197822446688', district: 'Galle', province: 'Southern', council: 'Galle Municipal Council', gsDivision: 'Fort', address: 'Light House Street, Galle Fort', postalCode: '80000', officer: 'Minister' },
+  { id: 9, name: 'Zaphod Beeblebrox', reason: 'Ego Boost Interview', date: '2026-08-31', time: '04:00 PM', status: 'Pending', phone: '+1 555-9999', email: 'president@galaxy.gov', refNo: 'APPT-9O1P2Q', nic: '197011335577', district: 'Jaffna', province: 'Northern', council: 'Jaffna Municipal Council', gsDivision: 'Chunnakam', address: 'Kankesanthurai Rd, Jaffna', postalCode: '40000', officer: 'Minister' }
 ]
 
 export default function Dashboard({ currentUser, onLogout }) {
-  const [appointments, setAppointments] = useState(INITIAL_APPOINTMENTS)
-  const [allowedDates, setAllowedDates] = useState(['2026-08-20', '2026-08-21', '2026-08-25', '2026-08-29', '2026-08-30'])
+  const [appointments, setAppointments] = useState([])
+  const [allowedDatesByRole, setAllowedDatesByRole] = useState({
+    'Secretary': [],
+    'Deputy Minister': [],
+    'Minister': []
+  })
+
+  // Load appointments and allowed dates from backend API on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [apptsRes, scheduleRes] = await Promise.all([
+          fetch('/api/appointments'),
+          fetch('/api/schedule')
+        ])
+        
+        if (apptsRes.ok) {
+          const appts = await apptsRes.json()
+          setAppointments(appts)
+        } else {
+          console.error("Failed to load appointments from backend")
+        }
+        
+        if (scheduleRes.ok) {
+          const schedule = await scheduleRes.json()
+          setAllowedDatesByRole(schedule)
+        } else {
+          console.error("Failed to load schedule from backend")
+        }
+      } catch (err) {
+        console.error("Error fetching dashboard data:", err)
+      }
+    }
+    fetchData()
+  }, [])
+
+  const currentRole = currentUser?.role || 'Secretary'
+  const allowedDates = allowedDatesByRole[currentRole] || []
 
   // Navigation active tab: 'overview' | 'appointments' | 'schedule' | 'booking'
   const [activeTab, setActiveTab] = useState('overview')
@@ -48,53 +90,143 @@ export default function Dashboard({ currentUser, onLogout }) {
   }, [toastTimeoutId])
 
   // Handle adding new appointment (constructed by BookTab)
-  const handleAddAppointment = (newAppt) => {
-    // Auto trigger notification toast if confirmed immediately
-    if (newAppt.status === 'Confirmed') {
-      triggerNotification(newAppt)
+  const handleAddAppointment = async (newAppt) => {
+    try {
+      const response = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newAppt)
+      })
+      if (response.ok) {
+        const createdAppt = await response.json()
+        if (createdAppt.status === 'Confirmed') {
+          triggerNotification(createdAppt)
+        }
+        setAppointments([createdAppt, ...appointments])
+      } else {
+        const errData = await response.json()
+        alert("Failed to book appointment: " + (errData.error || "Server error"))
+      }
+    } catch (err) {
+      console.error("Booking error:", err)
+      alert("Network error: Could not reach the server to book the appointment.")
     }
-    setAppointments([newAppt, ...appointments])
   }
 
   // Handle canceling/deleting appointment
-  const handleDeleteAppointment = (id) => {
-    setAppointments(appointments.filter(appt => appt.id !== id))
+  const handleDeleteAppointment = async (id) => {
+    try {
+      const response = await fetch(`/api/appointments/${id}`, {
+        method: 'DELETE'
+      })
+      if (response.ok) {
+        setAppointments(appointments.filter(appt => appt.id !== id))
+      } else {
+        const errData = await response.json()
+        alert("Failed to delete appointment: " + (errData.error || "Server error"))
+      }
+    } catch (err) {
+      console.error("Delete error:", err)
+      alert("Network error: Could not reach the server to delete the appointment.")
+    }
   }
 
   // Handle status toggle / confirm appointment
-  const handleConfirmAppointment = (id) => {
-    setAppointments(appointments.map(appt => {
-      if (appt.id === id) {
-        triggerNotification(appt)
-        return { ...appt, status: 'Confirmed' }
+  const handleConfirmAppointment = async (id) => {
+    try {
+      const response = await fetch(`/api/appointments/${id}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: 'Confirmed' })
+      })
+      if (response.ok) {
+        const updatedAppt = await response.json()
+        triggerNotification(updatedAppt)
+        setAppointments(appointments.map(appt => appt.id === id ? updatedAppt : appt))
+      } else {
+        const errData = await response.json()
+        alert("Failed to confirm appointment: " + (errData.error || "Server error"))
       }
-      return appt
-    }))
+    } catch (err) {
+      console.error("Confirm error:", err)
+      alert("Network error: Could not reach the server to confirm the appointment.")
+    }
   }
 
   // Handle status updates from Details Modal (Option 2)
-  const handleUpdateStatus = (id, newStatus, remark = '') => {
-    setAppointments(prev => prev.map(appt => {
-      if (appt.id === id) {
-        if (newStatus === 'Confirmed' && appt.status !== 'Confirmed') {
-          triggerNotification(appt)
+  const handleUpdateStatus = async (id, newStatus, remark = '') => {
+    try {
+      const response = await fetch(`/api/appointments/${id}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus, cancellationRemark: remark })
+      })
+      if (response.ok) {
+        const updatedAppt = await response.json()
+        if (newStatus === 'Confirmed') {
+          triggerNotification(updatedAppt)
         }
-        return {
-          ...appt,
-          status: newStatus,
-          cancellationRemark: newStatus === 'Cancelled' ? remark : undefined
-        }
+        setAppointments(appointments.map(appt => appt.id === id ? updatedAppt : appt))
+      } else {
+        const errData = await response.json()
+        alert("Failed to update status: " + (errData.error || "Server error"))
       }
-      return appt
-    }))
+    } catch (err) {
+      console.error("Update status error:", err)
+      alert("Network error: Could not reach the server to update the appointment status.")
+    }
   }
 
-  const handleAddDate = (date) => {
-    setAllowedDates([...allowedDates, date].sort())
+  const handleAddDate = async (date) => {
+    const currentRole = currentUser?.role || 'Secretary'
+    try {
+      const response = await fetch('/api/schedule', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ role: currentRole, date: date })
+      })
+      if (response.ok) {
+        setAllowedDatesByRole(prev => ({
+          ...prev,
+          [currentRole]: [...(prev[currentRole] || []), date].sort()
+        }))
+      } else {
+        const errData = await response.json()
+        alert("Failed to add date: " + (errData.error || "Server error"))
+      }
+    } catch (err) {
+      console.error("Add date error:", err)
+      alert("Network error: Could not reach the server to add date.")
+    }
   }
 
-  const handleRemoveDate = (date) => {
-    setAllowedDates(allowedDates.filter(d => d !== date))
+  const handleRemoveDate = async (date) => {
+    const currentRole = currentUser?.role || 'Secretary'
+    try {
+      const response = await fetch(`/api/schedule?role=${encodeURIComponent(currentRole)}&date=${encodeURIComponent(date)}`, {
+        method: 'DELETE'
+      })
+      if (response.ok) {
+        setAllowedDatesByRole(prev => ({
+          ...prev,
+          [currentRole]: (prev[currentRole] || []).filter(d => d !== date)
+        }))
+      } else {
+        const errData = await response.json()
+        alert("Failed to remove date: " + (errData.error || "Server error"))
+      }
+    } catch (err) {
+      console.error("Remove date error:", err)
+      alert("Network error: Could not reach the server to remove date.")
+    }
   }
 
   // Get today's local date string (YYYY-MM-DD)
