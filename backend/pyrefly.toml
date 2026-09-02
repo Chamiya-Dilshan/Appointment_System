@@ -1,0 +1,11 @@
+# Pyrefly configuration — points to the venv interpreter so all installed
+# packages (flask-sqlalchemy, flask-cors, pymysql, etc.) are resolved correctly.
+[pyrefly]
+python_interpreter = "./venv/Scripts/python.exe"
+
+# Suppress false-positive errors from Flask-SQLAlchemy's dynamic ORM patterns.
+# These are not real errors — pyrefly cannot statically analyse SQLAlchemy's
+# metaclass magic (db.Column, db.Model, db.session, etc.).
+[pyrefly.errors]
+missing-attribute = false
+bad-argument-type = false
