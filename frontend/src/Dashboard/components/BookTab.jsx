@@ -114,7 +114,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
 
     if (!newName.trim() || !newPhone.trim() || !newEmail.trim() || !newReason.trim() || !newDate || !newTime ||
       !newNic.trim() || !newDistrict.trim() || !newProvince.trim() || !newCouncil.trim() ||
-      !newGsDivision.trim() || !newAddress.trim()) {
+      !newAddress.trim()) {
       setFormError("Please fill in all required fields.")
       return
     }
@@ -329,7 +329,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
               <input
                 type="text"
                 required
-                placeholder="e.g. Dental cleaning / General checkup / Therapy session"
+                placeholder="Enter the reason for the appointment"
                 value={newReason}
                 onChange={(e) => setNewReason(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm"
@@ -438,12 +438,12 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
 
               <div className="space-y-1">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  Local Council *
+                  District Secretariat *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Municipal Council"
+                  placeholder="e.g. Colombo District Secretariat"
                   value={newCouncil}
                   onChange={(e) => setNewCouncil(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm"
@@ -452,12 +452,11 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
 
               <div className="space-y-1">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  GS Division *
+                  GS Division
                 </label>
                 <input
                   type="text"
-                  required
-                  placeholder="e.g. Colombo Fort"
+                  placeholder="e.g. Colombo Fort (Optional)"
                   value={newGsDivision}
                   onChange={(e) => setNewGsDivision(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm"
@@ -468,12 +467,12 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="md:col-span-3 space-y-1">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  Street Address *
+                  Permanent Address *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Enter full street address details"
+                  placeholder="Enter permanent address details"
                   value={newAddress}
                   onChange={(e) => setNewAddress(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm"

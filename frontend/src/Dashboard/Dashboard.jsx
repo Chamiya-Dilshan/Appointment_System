@@ -160,7 +160,7 @@ export default function Dashboard({ currentUser, onLogout }) {
     }
   }
 
-  // Handle status updates from Details Modal
+  // Handle status updates from Details Modal & Action buttons
   const handleUpdateStatus = async (id, newStatus, remark = '') => {
     try {
       const response = await fetch(`/api/appointments/${id}/status`, {
@@ -168,7 +168,12 @@ export default function Dashboard({ currentUser, onLogout }) {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ status: newStatus, cancellationRemark: remark })
+        body: JSON.stringify({
+          status: newStatus,
+          cancellationRemark: newStatus === 'Cancelled' ? remark : undefined,
+          completionRemark: newStatus === 'Completed' ? remark : undefined,
+          remark: remark
+        })
       })
       if (response.ok) {
         const updatedAppt = await response.json()
@@ -176,6 +181,8 @@ export default function Dashboard({ currentUser, onLogout }) {
           triggerNotification(updatedAppt, 'confirmed')
         } else if (newStatus === 'Cancelled') {
           triggerNotification(updatedAppt, 'cancelled')
+        } else if (newStatus === 'Completed') {
+          triggerNotification(updatedAppt, 'completed')
         } else if (newStatus === 'Pending') {
           triggerNotification(updatedAppt, 'reverted')
         }
@@ -286,9 +293,12 @@ export default function Dashboard({ currentUser, onLogout }) {
     return appt
   })
 
-  // Partition appointments into active/upcoming and past history
-  const activeAppointments = processedAppointments.filter(a => a.date >= todayStr)
-  const pastAppointments = processedAppointments.filter(a => a.date < todayStr)
+  // Partition appointments into active/upcoming and past history:
+  // Active appointments retain confirmed and pending sessions until manually completed or cancelled
+  const activeAppointments = processedAppointments.filter(a => a.status !== 'Completed' && (a.status !== 'Cancelled' || a.date >= todayStr))
+  const pastAppointments = processedAppointments
+    .filter(a => a.status === 'Completed' || a.date < todayStr)
+    .sort((a, b) => b.date.localeCompare(a.date))
 
   // Get count of pending active appointments for sidebar badge
   const pendingCount = activeAppointments.filter(a => a.status === 'Pending').length
@@ -453,6 +463,10 @@ export default function Dashboard({ currentUser, onLogout }) {
           title = 'Appointment Confirmed'
           bgIconClass = 'bg-emerald-500 text-white'
           statusText = 'Official confirmation letter & SMS dispatched.'
+        } else if (type === 'completed') {
+          title = 'Appointment Completed'
+          bgIconClass = 'bg-blue-600 text-white'
+          statusText = 'Appointment marked as completed and session notes recorded.'
         } else if (type === 'cancelled') {
           title = 'Cancellation Dispatched'
           bgIconClass = 'bg-rose-500 text-white'

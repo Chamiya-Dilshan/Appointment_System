@@ -36,3 +36,15 @@
 [2026-09-02 14:54:43] [SIMULATED SMS] To: +1 555-0125 | Msg: Appointment CANCELLED. Ref: APPT-4Y9L0Q on 2026-08-25. Reason: Auto-cancelled: Appointment date expired. You may book a new slot via the portal. - Ministry Portal
 [2026-09-02 14:54:44] [LIVE EMAIL SENT] To: bruce@waynecorp.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Confirmed - Ref: APPT-2A7D8K'
 [2026-09-02 14:54:48] [LIVE EMAIL SENT] To: diana@themyscira.gov | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Cancelled - Ref: APPT-4Y9L0Q'
+[2026-09-03 11:05:57] [SIMULATED SMS] To: +94 77 123 4567 | Msg: Appointment request received. Ref: APPT-TEST01. Officer: Secretary, Date: 2026-09-02 10:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-03 11:06:03] [LIVE EMAIL SENT] To: test@example.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-TEST01'
+[2026-09-03 12:00:07] [SIMULATED SMS] To: 0771234567 | Msg: Appointment request received. Ref: APT-2026-TEST99. Officer: Mrs. K. Silva (Divisional Officer), Date: 2026-09-04 10:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-03 12:00:18] [LIVE EMAIL SENT] To: dilshan@example.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Request Received - Ref: APT-2026-TEST99'
+[2026-09-03 12:01:36] [SIMULATED SMS] To: 0771234567 | Msg: Appointment request received. Ref: APT-1788417094. Officer: Mrs. K. Silva (Divisional Officer), Date: 2026-09-04 10:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-03 12:01:38] [SIMULATED SMS] To: 0771234567 | Msg: Appointment CONFIRMED. Ref: APT-1788417094. With: Mrs. K. Silva (Divisional Officer) on 2026-09-04 at 10:00 AM. Please bring your NIC/Passport (199512345678) and arrive 10m early. - Ministry Portal
+[2026-09-03 12:01:41] [LIVE EMAIL SENT] To: dilshan@example.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Request Received - Ref: APT-1788417094'
+[2026-09-03 12:01:42] [LIVE EMAIL SENT] To: dilshan@example.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-1788417094'
+[2026-09-03 12:02:05] [SIMULATED SMS] To: 0771234567 | Msg: Appointment request received. Ref: APT-1788417123. Officer: Mrs. K. Silva (Divisional Officer), Date: 2026-09-04 10:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-03 12:02:07] [SIMULATED SMS] To: 0771234567 | Msg: Appointment CONFIRMED. Ref: APT-1788417123. With: Mrs. K. Silva (Divisional Officer) on 2026-09-04 at 10:00 AM. Please bring your NIC/Passport (199512345678) and arrive 10m early. - Ministry Portal
+[2026-09-03 12:02:10] [LIVE EMAIL SENT] To: dilshan@example.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Request Received - Ref: APT-1788417123'
+[2026-09-03 12:02:13] [LIVE EMAIL SENT] To: dilshan@example.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-1788417123'

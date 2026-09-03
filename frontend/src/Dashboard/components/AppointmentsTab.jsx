@@ -14,6 +14,8 @@ export default function AppointmentsTab({
   const [selectedDetailedAppt, setSelectedDetailedAppt] = useState(null)
   const [isCancelling, setIsCancelling] = useState(false)
   const [cancellationRemark, setCancellationRemark] = useState('')
+  const [isCompleting, setIsCompleting] = useState(false)
+  const [completionRemark, setCompletionRemark] = useState('')
   const [resendingId, setResendingId] = useState(null)
 
   const handleResend = async (apptId) => {
@@ -28,19 +30,29 @@ export default function AppointmentsTab({
 
   useEffect(() => {
     setIsCancelling(false)
+    setIsCompleting(false)
     setCancellationRemark('')
+    setCompletionRemark('')
   }, [selectedDetailedAppt])
 
   const [cancellingAppt, setCancellingAppt] = useState(null)
   const [quickCancelRemark, setQuickCancelRemark] = useState('')
+  const [completingAppt, setCompletingAppt] = useState(null)
+  const [quickCompleteRemark, setQuickCompleteRemark] = useState('')
 
   useEffect(() => {
     setQuickCancelRemark('')
   }, [cancellingAppt])
+
+  useEffect(() => {
+    setQuickCompleteRemark('')
+  }, [completingAppt])
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
 
-  // Filtered and sorted appointments (most recent to future)
+  // Filtered and sorted appointments:
+  // In history view (isHistory === true), display from the latest date to past days (descending).
+  // In active view (isHistory === false), display from the nearest upcoming date into the future (ascending).
   const filteredAppointments = appointments
     .filter(appt => {
       const matchesSearch = appt.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -56,17 +68,29 @@ export default function AppointmentsTab({
       return matchesSearch && matchesStatus
     })
     .sort((a, b) => {
-      if (a.date !== b.date) {
-        return a.date.localeCompare(b.date)
-      }
       const getMinutes = (timeStr) => {
+        if (!timeStr) return 0
         const [time, modifier] = timeStr.split(' ')
+        if (!time) return 0
         let [hours, minutes] = time.split(':').map(Number)
         if (modifier === 'PM' && hours < 12) hours += 12
         if (modifier === 'AM' && hours === 12) hours = 0
-        return hours * 60 + minutes
+        return (hours || 0) * 60 + (minutes || 0)
       }
-      return getMinutes(a.time) - getMinutes(b.time)
+
+      if (isHistory) {
+        // Latest date to past days
+        if (a.date !== b.date) {
+          return b.date.localeCompare(a.date)
+        }
+        return getMinutes(b.time) - getMinutes(a.time)
+      } else {
+        // Active / upcoming: nearest date to future
+        if (a.date !== b.date) {
+          return a.date.localeCompare(b.date)
+        }
+        return getMinutes(a.time) - getMinutes(b.time)
+      }
     })
 
   return (
@@ -111,7 +135,7 @@ export default function AppointmentsTab({
 
             {/* Filter Tabs */}
             <div className="flex w-full sm:w-auto overflow-x-auto scrollbar-none flex-nowrap bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200/30 dark:border-slate-800/30">
-              {['All', 'Confirmed', 'Pending', 'Cancelled'].map((status) => (
+              {['All', 'Confirmed', 'Pending', 'Completed', 'Cancelled'].map((status) => (
                 <button
                   key={status}
                   onClick={() => setStatusFilter(status)}
@@ -190,15 +214,19 @@ export default function AppointmentsTab({
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-1 rounded-full font-bold text-[10px] inline-flex items-center gap-1.5 ${appt.status === 'Confirmed'
                         ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
-                        : appt.status === 'Pending'
-                          ? 'bg-amber-50 text-amber-705 dark:bg-amber-950/40 dark:text-amber-400'
-                          : 'bg-rose-50 text-rose-755 dark:bg-rose-950/40 dark:text-rose-400'
+                        : appt.status === 'Completed'
+                          ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400'
+                          : appt.status === 'Pending'
+                            ? 'bg-amber-50 text-amber-705 dark:bg-amber-950/40 dark:text-amber-400'
+                            : 'bg-rose-50 text-rose-755 dark:bg-rose-950/40 dark:text-rose-400'
                         }`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${appt.status === 'Confirmed'
                           ? 'bg-emerald-500'
-                          : appt.status === 'Pending'
-                            ? 'bg-amber-500'
-                            : 'bg-rose-500'
+                          : appt.status === 'Completed'
+                            ? 'bg-blue-500'
+                            : appt.status === 'Pending'
+                              ? 'bg-amber-500'
+                              : 'bg-rose-500'
                           }`} />
                         {appt.status}
                       </span>
@@ -239,13 +267,24 @@ export default function AppointmentsTab({
                           )}
                         </button>
                         {isHistory ? (
-                          <button
-                            onClick={() => onDelete(appt.id)}
-                            className="px-2.5 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
-                            title="Delete Appointment"
-                          >
-                            Delete
-                          </button>
+                          <div className="flex items-center gap-1.5">
+                            {appt.status === 'Confirmed' && (
+                              <button
+                                onClick={() => setCompletingAppt(appt)}
+                                className="px-2.5 py-1.5 rounded-lg bg-blue-100/80 text-blue-700 border border-blue-200/80 hover:bg-blue-200/80 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/50 dark:hover:bg-blue-900/40 transition-all font-bold cursor-pointer text-xs flex items-center gap-1"
+                                title="Mark as Completed"
+                              >
+                                <span>Complete</span>
+                              </button>
+                            )}
+                            <button
+                              onClick={() => onDelete(appt.id)}
+                              className="px-2.5 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
+                              title="Delete Appointment"
+                            >
+                              Delete
+                            </button>
+                          </div>
                         ) : (
                           <>
                             {appt.status === 'Pending' && (
@@ -257,7 +296,19 @@ export default function AppointmentsTab({
                                 Confirm
                               </button>
                             )}
-                            {appt.status !== 'Cancelled' && (
+                            {appt.status === 'Confirmed' && (
+                              <button
+                                onClick={() => setCompletingAppt(appt)}
+                                className="px-2.5 py-1.5 rounded-lg bg-blue-100/80 text-blue-700 border border-blue-200/80 hover:bg-blue-200/80 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/50 dark:hover:bg-blue-900/40 transition-all font-bold cursor-pointer text-xs flex items-center gap-1"
+                                title="Mark as Completed"
+                              >
+                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Complete</span>
+                              </button>
+                            )}
+                            {appt.status !== 'Cancelled' && appt.status !== 'Completed' && (
                               <button
                                 onClick={() => setCancellingAppt(appt)}
                                 className="px-2.5 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
@@ -318,15 +369,19 @@ export default function AppointmentsTab({
                   {/* Status Badge */}
                   <span className={`px-2 py-0.5 rounded-xl text-[12px] inline-flex items-center gap-1.5 ${appt.status === 'Confirmed'
                     ? 'bg-emerald-100 text-emerald-500 dark:bg-emerald-950 dark:text-emerald-450'
-                    : appt.status === 'Pending'
-                      ? 'bg-amber-100 text-amber-500 dark:bg-amber-950 dark:text-amber-450'
-                      : 'bg-rose-100 text-rose-500 dark:bg-rose-950 dark:text-rose-450'
+                    : appt.status === 'Completed'
+                      ? 'bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
+                      : appt.status === 'Pending'
+                        ? 'bg-amber-100 text-amber-500 dark:bg-amber-950 dark:text-amber-450'
+                        : 'bg-rose-100 text-rose-500 dark:bg-rose-950 dark:text-rose-450'
                     }`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${appt.status === 'Confirmed'
                       ? 'bg-emerald-500'
-                      : appt.status === 'Pending'
-                        ? 'bg-amber-500'
-                        : 'bg-rose-500'
+                      : appt.status === 'Completed'
+                        ? 'bg-blue-500'
+                        : appt.status === 'Pending'
+                          ? 'bg-amber-500'
+                          : 'bg-rose-500'
                       }`} />
                     {appt.status}
                   </span>
@@ -368,12 +423,22 @@ export default function AppointmentsTab({
                       <span>Alert</span>
                     </button>
                     {isHistory ? (
-                      <button
-                        onClick={() => onDelete(appt.id)}
-                        className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
-                      >
-                        Delete
-                      </button>
+                      <div className="flex items-center gap-2">
+                        {appt.status === 'Confirmed' && (
+                          <button
+                            onClick={() => setCompletingAppt(appt)}
+                            className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-blue-100/80 text-blue-700 border border-blue-200/80 hover:bg-blue-200/80 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/50 dark:hover:bg-blue-900/40 transition-all font-bold cursor-pointer text-xs"
+                          >
+                            Complete
+                          </button>
+                        )}
+                        <button
+                          onClick={() => onDelete(appt.id)}
+                          className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     ) : (
                       <>
                         {appt.status === 'Pending' && (
@@ -384,7 +449,15 @@ export default function AppointmentsTab({
                             Confirm
                           </button>
                         )}
-                        {appt.status !== 'Cancelled' && (
+                        {appt.status === 'Confirmed' && (
+                          <button
+                            onClick={() => setCompletingAppt(appt)}
+                            className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-blue-100/80 text-blue-700 border border-blue-200/80 hover:bg-blue-200/80 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/50 dark:hover:bg-blue-900/40 transition-all font-bold cursor-pointer text-xs"
+                          >
+                            Complete
+                          </button>
+                        )}
+                        {appt.status !== 'Cancelled' && appt.status !== 'Completed' && (
                           <button
                             onClick={() => setCancellingAppt(appt)}
                             className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
@@ -474,9 +547,11 @@ export default function AppointmentsTab({
                     <span className="text-slate-400 dark:text-slate-500 block">Booking Status</span>
                     <span className={`inline-block px-2 py-0.5 rounded font-extrabold text-[9px] mt-0.5 uppercase ${selectedDetailedAppt.status === 'Confirmed'
                       ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-450'
-                      : selectedDetailedAppt.status === 'Pending'
-                        ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-450'
-                        : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-455'
+                      : selectedDetailedAppt.status === 'Completed'
+                        ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-450'
+                        : selectedDetailedAppt.status === 'Pending'
+                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-450'
+                          : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-455'
                       }`}>
                       {selectedDetailedAppt.status}
                     </span>
@@ -486,6 +561,14 @@ export default function AppointmentsTab({
                   <span className="text-slate-400 dark:text-slate-500 block">Reason for Visit</span>
                   <p className="font-medium text-slate-800 dark:text-slate-200 mt-0.5">{selectedDetailedAppt.reason}</p>
                 </div>
+                {selectedDetailedAppt.status === 'Completed' && (
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
+                    <span className="text-blue-600 dark:text-blue-400 font-bold block">Completion Remark / Session Notes</span>
+                    <p className="font-medium text-slate-800 dark:text-slate-200 mt-0.5 bg-blue-50/50 dark:bg-blue-950/20 p-2.5 rounded-xl border border-blue-100/70 dark:border-blue-900/40">
+                      {selectedDetailedAppt.completionRemark || 'No remark provided.'}
+                    </p>
+                  </div>
+                )}
                 {selectedDetailedAppt.status === 'Cancelled' && (
                   <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
                     <span className="text-slate-400 dark:text-slate-500 block">Cancellation Remark</span>
@@ -505,7 +588,7 @@ export default function AppointmentsTab({
                     <strong className="font-semibold text-slate-850 dark:text-white">{selectedDetailedAppt.gsDivision || 'N/A'}</strong>
                   </div>
                   <div>
-                    <span className="text-slate-400 dark:text-slate-500 block">Local Council</span>
+                    <span className="text-slate-400 dark:text-slate-500 block">District Secretariat</span>
                     <strong className="font-semibold text-slate-850 dark:text-white">{selectedDetailedAppt.council || 'N/A'}</strong>
                   </div>
                   <div className="mt-2">
@@ -576,10 +659,47 @@ export default function AppointmentsTab({
 
             {/* Modal Footer with Status control actions (Option 2) */}
             <div className="flex flex-wrap items-center justify-between gap-3 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
-              {/* Left Side: Status actions for admin (Active/Future only) */}
-              {!isHistory && (
+              {/* Left Side: Status actions for admin */}
+              {selectedDetailedAppt.status !== 'Cancelled' && selectedDetailedAppt.status !== 'Completed' && (
                 <div className="flex flex-wrap gap-2 flex-1">
-                  {isCancelling ? (
+                  {isCompleting ? (
+                    <div className="w-full space-y-3 p-3 bg-blue-50/40 dark:bg-blue-950/20 rounded-2xl border border-blue-100/60 dark:border-blue-900/40">
+                      <div className="text-xs font-bold text-blue-700 dark:text-blue-400">
+                        Mark Appointment as Completed
+                      </div>
+                      <textarea
+                        placeholder="Enter appointment remark / consultation notes..."
+                        value={completionRemark}
+                        onChange={(e) => setCompletionRemark(e.target.value)}
+                        className="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-1 focus:ring-blue-500 placeholder-slate-400"
+                        rows={2}
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setIsCompleting(false)}
+                          className="px-5 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-300 hover:text-white bg-slate-200 hover:bg-slate-400 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer transition-all"
+                        >
+                          Go Back
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Completed', completionRemark)
+                            setSelectedDetailedAppt({
+                              ...selectedDetailedAppt,
+                              status: 'Completed',
+                              completionRemark: completionRemark
+                            })
+                            setIsCompleting(false)
+                          }}
+                          className="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white cursor-pointer transition-all shadow-xs flex items-center gap-1.5"
+                        >
+                          Confirm Completion
+                        </button>
+                      </div>
+                    </div>
+                  ) : isCancelling ? (
                     <div className="w-full space-y-3 p-3 bg-rose-50/30 dark:bg-rose-950/10 rounded-2xl border border-rose-100/50 dark:border-rose-950/20">
                       <div className="text-xs font-bold text-rose-600 dark:text-rose-400">
                         Are you sure you want to cancel this appointment?
@@ -620,6 +740,16 @@ export default function AppointmentsTab({
                     <>
                       {selectedDetailedAppt.status === 'Confirmed' && (
                         <>
+                          <button
+                            type="button"
+                            onClick={() => setIsCompleting(true)}
+                            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white cursor-pointer transition-all shadow-xs flex items-center gap-1.5"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Mark as Completed</span>
+                          </button>
                           <button
                             type="button"
                             onClick={() => {
@@ -736,9 +866,76 @@ export default function AppointmentsTab({
                   if (onUpdateStatus) onUpdateStatus(cancellingAppt.id, 'Cancelled', quickCancelRemark)
                   setCancellingAppt(null)
                 }}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 cursor-pointer transition-all"
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white cursor-pointer transition-all shadow-xs"
               >
                 Confirm Cancellation
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* Quick Complete Modal */}
+      {completingAppt && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center p-4 py-8 bg-slate-900/60 backdrop-blur-xs transition-opacity overflow-y-auto">
+          <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800/80 shadow-2xl p-6 relative animate-in fade-in zoom-in-95 duration-150 my-auto">
+
+            {/* Modal Header */}
+            <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <span>Complete Appointment</span>
+                  <span className="text-[10px] bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded font-mono select-all">
+                    {completingAppt.refNo}
+                  </span>
+                </h3>
+                <p className="text-xs text-slate-455 dark:text-slate-500 mt-1">
+                  Mark session as completed for <strong className="font-semibold text-slate-800 dark:text-slate-200">{completingAppt.name}</strong>
+                </p>
+              </div>
+              <button
+                onClick={() => setCompletingAppt(null)}
+                className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-slate-202 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="space-y-4">
+              <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                Please provide an optional remark or consultation notes about this appointment.
+              </div>
+              <textarea
+                placeholder="Enter appointment remark / visit outcome notes..."
+                value={quickCompleteRemark}
+                onChange={(e) => setQuickCompleteRemark(e.target.value)}
+                className="w-full p-3 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-1 focus:ring-blue-500 placeholder-slate-400"
+                rows={3}
+              />
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => setCompletingAppt(null)}
+                className="px-5 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-300 hover:text-white bg-slate-200 hover:bg-slate-400 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer transition-all ml-auto"
+              >
+                Go Back
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (onUpdateStatus) onUpdateStatus(completingAppt.id, 'Completed', quickCompleteRemark)
+                  setCompletingAppt(null)
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white cursor-pointer transition-all shadow-xs flex items-center gap-1.5"
+              >
+                Confirm Completion
               </button>
             </div>
 

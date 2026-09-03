@@ -104,10 +104,19 @@ def init_db_with_retry(app) -> bool:  # type: ignore[type-arg]
         # Create tables for all registered models
         db.create_all()
 
-        # Ensure appointments.id is BIGINT in MySQL (handles existing legacy tables)
+        # Ensure appointments.id is BIGINT and gsDivision is nullable in MySQL
         try:
             from sqlalchemy import text
             db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN id BIGINT NOT NULL;"))
+            db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN gsDivision VARCHAR(100) NULL;"))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
+        # Ensure completionRemark column exists in MySQL
+        try:
+            from sqlalchemy import text
+            db.session.execute(text("ALTER TABLE appointments ADD COLUMN completionRemark TEXT NULL;"))
             db.session.commit()
         except Exception:
             db.session.rollback()

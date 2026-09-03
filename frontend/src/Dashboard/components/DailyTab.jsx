@@ -16,6 +16,8 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
   const [selectedDetailedAppt, setSelectedDetailedAppt] = useState(null)
   const [isCancelling, setIsCancelling] = useState(false)
   const [cancellationRemark, setCancellationRemark] = useState('')
+  const [isCompleting, setIsCompleting] = useState(false)
+  const [completionRemark, setCompletionRemark] = useState('')
   const [resendingId, setResendingId] = useState(null)
 
   const handleResend = async (apptId) => {
@@ -30,7 +32,9 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
 
   useEffect(() => {
     setIsCancelling(false)
+    setIsCompleting(false)
     setCancellationRemark('')
+    setCompletionRemark('')
   }, [selectedDetailedAppt])
 
   // State to control display limit of active booking dates
@@ -57,6 +61,7 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
   const totalDaily = dailyAppointments.length
   const confirmedDaily = dailyAppointments.filter(a => a.status === 'Confirmed').length
   const pendingDaily = dailyAppointments.filter(a => a.status === 'Pending').length
+  const completedDaily = dailyAppointments.filter(a => a.status === 'Completed').length
   const cancelledDaily = dailyAppointments.filter(a => a.status === 'Cancelled').length
 
   return (
@@ -158,6 +163,12 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                 <span className="text-sm font-extrabold text-amber-600 dark:text-amber-400">{pendingDaily}</span>
               </div>
 
+              {/* Completed */}
+              <div className="flex justify-between items-center py-1 border-t border-slate-50 dark:border-slate-800/50">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Completed</span>
+                <span className="text-sm font-extrabold text-blue-600 dark:text-blue-400">{completedDaily}</span>
+              </div>
+
               {/* Cancelled */}
               <div className="flex justify-between items-center py-1 border-t border-slate-50 dark:border-slate-800/50">
                 <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Cancelled</span>
@@ -177,12 +188,15 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                 dailyAppointments.map((appt) => {
                   const isPending = appt.status === 'Pending'
                   const isConfirmed = appt.status === 'Confirmed'
+                  const isCompleted = appt.status === 'Completed'
 
-                  const dotColor = isConfirmed
-                    ? 'bg-emerald-500'
-                    : isPending
-                      ? 'bg-amber-500'
-                      : 'bg-rose-500'
+                  const dotColor = isCompleted
+                    ? 'bg-blue-500'
+                    : isConfirmed
+                      ? 'bg-emerald-500'
+                      : isPending
+                        ? 'bg-amber-500'
+                        : 'bg-rose-500'
 
                   return (
                     <div key={appt.id} className="relative group">
@@ -223,13 +237,15 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
 
                         {/* Inline Management Actions */}
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/40">
-                          <span className={`w-fit px-2 py-0.5 rounded-xl text-[12px] inline-flex items-center gap-1.5 ${isConfirmed
-                            ? 'bg-emerald-100 text-emerald-500 dark:bg-emerald-950 dark:text-emerald-450'
-                            : isPending
-                              ? 'bg-amber-100 text-amber-500 dark:bg-amber-950 dark:text-amber-450'
-                              : 'bg-rose-100 text-rose-500 dark:bg-rose-950 dark:text-rose-450'
+                          <span className={`w-fit px-2 py-0.5 rounded-xl text-[12px] inline-flex items-center gap-1.5 ${isCompleted
+                            ? 'bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
+                            : isConfirmed
+                              ? 'bg-emerald-100 text-emerald-500 dark:bg-emerald-950 dark:text-emerald-450'
+                              : isPending
+                                ? 'bg-amber-100 text-amber-500 dark:bg-amber-950 dark:text-amber-450'
+                                : 'bg-rose-100 text-rose-500 dark:bg-rose-950 dark:text-rose-450'
                             }`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${isConfirmed ? 'bg-emerald-500' : isPending ? 'bg-amber-500' : 'bg-rose-500'}`} />
+                            <span className={`w-1.5 h-1.5 rounded-full ${isCompleted ? 'bg-blue-500' : isConfirmed ? 'bg-emerald-500' : isPending ? 'bg-amber-500' : 'bg-rose-500'}`} />
                             {appt.status}
                           </span>
                           <div className="flex flex-wrap items-center gap-2 w-full">
@@ -264,6 +280,18 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                                 className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-emerald-100/80 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-200/80 dark:bg-emerald-950/30 dark:text-emerald-455 dark:border-emerald-900/50 dark:hover:bg-emerald-900/40 transition-all font-bold cursor-pointer text-xs"
                               >
                                 Confirm
+                              </button>
+                            )}
+                            {isConfirmed && (
+                              <button
+                                onClick={() => setSelectedDetailedAppt(appt)}
+                                className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-blue-100/80 text-blue-700 border border-blue-200/80 hover:bg-blue-200/80 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/50 dark:hover:bg-blue-900/40 transition-all font-bold cursor-pointer text-xs flex items-center justify-center gap-1"
+                                title="Mark this appointment as Completed"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Complete</span>
                               </button>
                             )}
                             <button
@@ -358,15 +386,19 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                     <span className="text-slate-400 dark:text-slate-500 block">Booking Status</span>
                     <span className={`px-2 py-0.5 rounded-xl text-[12px] inline-flex items-center gap-1.5 ${selectedDetailedAppt.status === 'Confirmed'
                       ? 'bg-emerald-100 text-emerald-500 dark:bg-emerald-950 dark:text-emerald-450'
-                      : selectedDetailedAppt.status === 'Pending'
-                        ? 'bg-amber-100 text-amber-500 dark:bg-amber-950 dark:text-amber-450'
-                        : 'bg-rose-100 text-rose-500 dark:bg-rose-950 dark:text-rose-450'
+                      : selectedDetailedAppt.status === 'Completed'
+                        ? 'bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
+                        : selectedDetailedAppt.status === 'Pending'
+                          ? 'bg-amber-100 text-amber-500 dark:bg-amber-950 dark:text-amber-450'
+                          : 'bg-rose-100 text-rose-500 dark:bg-rose-950 dark:text-rose-450'
                       }`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${selectedDetailedAppt.status === 'Confirmed'
                         ? 'bg-emerald-500'
-                        : selectedDetailedAppt.status === 'Pending'
-                          ? 'bg-amber-500'
-                          : 'bg-rose-500'
+                        : selectedDetailedAppt.status === 'Completed'
+                          ? 'bg-blue-500'
+                          : selectedDetailedAppt.status === 'Pending'
+                            ? 'bg-amber-500'
+                            : 'bg-rose-500'
                         }`} />
                       {selectedDetailedAppt.status}
                     </span>
@@ -382,6 +414,14 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                     <p className="font-medium text-slate-800 dark:text-slate-200 mt-0.5">{selectedDetailedAppt.reason}</p>
                   </div>
                 </div>
+                {selectedDetailedAppt.status === 'Completed' && (
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
+                    <span className="text-blue-600 dark:text-blue-400 font-bold block">Completion Remark / Session Notes</span>
+                    <p className="font-medium text-slate-800 dark:text-slate-200 mt-0.5 bg-blue-50/50 dark:bg-blue-950/20 p-2.5 rounded-xl border border-blue-100/70 dark:border-blue-900/40">
+                      {selectedDetailedAppt.completionRemark || 'No remark provided.'}
+                    </p>
+                  </div>
+                )}
                 {selectedDetailedAppt.status === 'Cancelled' && (
                   <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
                     <span className="text-slate-400 dark:text-slate-500 block">Cancellation Remark</span>
@@ -401,7 +441,7 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                     <strong className="font-semibold text-slate-850 dark:text-white">{selectedDetailedAppt.gsDivision || 'N/A'}</strong>
                   </div>
                   <div>
-                    <span className="text-slate-400 dark:text-slate-500 block">Local Council</span>
+                    <span className="text-slate-400 dark:text-slate-500 block">District Secretariat</span>
                     <strong className="font-semibold text-slate-850 dark:text-white">{selectedDetailedAppt.council || 'N/A'}</strong>
                   </div>
                   <div className="mt-2">
@@ -414,7 +454,7 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                   </div>
                 </div>
                 <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
-                  <span className="text-slate-400 dark:text-slate-500 block">Address & Postal Code</span>
+                  <span className="text-slate-400 dark:text-slate-500 block">Permanent Address & Postal Code</span>
                   <p className="font-medium text-slate-800 dark:text-slate-200 mt-0.5">
                     📍 {selectedDetailedAppt.address}{selectedDetailedAppt.postalCode ? ` (${selectedDetailedAppt.postalCode})` : ''}
                   </p>
@@ -472,10 +512,47 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
 
             {/* Modal Footer with Status control actions */}
             <div className="flex flex-wrap items-center justify-between gap-3 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
-              {/* Left Side: Status actions for admin (Active/Future only) */}
-              {selectedDetailedAppt.date >= todayStr && (
+              {/* Left Side: Status actions for admin */}
+              {selectedDetailedAppt.status !== 'Cancelled' && selectedDetailedAppt.status !== 'Completed' && (
                 <div className="flex flex-wrap gap-2 flex-1">
-                  {isCancelling ? (
+                  {isCompleting ? (
+                    <div className="w-full space-y-3 p-3 bg-blue-50/40 dark:bg-blue-950/20 rounded-2xl border border-blue-100/60 dark:border-blue-900/40">
+                      <div className="text-xs font-bold text-blue-700 dark:text-blue-400">
+                        Mark Appointment as Completed
+                      </div>
+                      <textarea
+                        placeholder="Enter appointment remark / consultation notes..."
+                        value={completionRemark}
+                        onChange={(e) => setCompletionRemark(e.target.value)}
+                        className="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-1 focus:ring-blue-500 placeholder-slate-400"
+                        rows={2}
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setIsCompleting(false)}
+                          className="px-5 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-300 hover:text-white bg-slate-200 hover:bg-slate-400 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer transition-all"
+                        >
+                          Go Back
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onUpdateStatus) onUpdateStatus(selectedDetailedAppt.id, 'Completed', completionRemark)
+                            setSelectedDetailedAppt({
+                              ...selectedDetailedAppt,
+                              status: 'Completed',
+                              completionRemark: completionRemark
+                            })
+                            setIsCompleting(false)
+                          }}
+                          className="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white cursor-pointer transition-all shadow-xs flex items-center gap-1.5"
+                        >
+                          Confirm Completion
+                        </button>
+                      </div>
+                    </div>
+                  ) : isCancelling ? (
                     <div className="w-full space-y-3 p-3 bg-rose-50/30 dark:bg-rose-950/10 rounded-2xl border border-rose-100/50 dark:border-rose-950/20">
                       <div className="text-xs font-bold text-rose-600 dark:text-rose-400">
                         Are you sure you want to cancel this appointment?
@@ -516,6 +593,16 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                     <>
                       {selectedDetailedAppt.status === 'Confirmed' && (
                         <>
+                          <button
+                            type="button"
+                            onClick={() => setIsCompleting(true)}
+                            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white cursor-pointer transition-all shadow-xs flex items-center gap-1.5"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Mark as Completed</span>
+                          </button>
                           <button
                             type="button"
                             onClick={() => {

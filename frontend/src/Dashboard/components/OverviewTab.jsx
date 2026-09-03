@@ -118,6 +118,7 @@ export default function OverviewTab({ appointments, setActiveTab }) {
               todayAppointments.map((appt) => {
                 const statusColors = {
                   Confirmed: 'bg-emerald-500 text-emerald-500',
+                  Completed: 'bg-blue-500 text-blue-500',
                   Pending: 'bg-amber-500 text-amber-500',
                   Cancelled: 'bg-rose-500 text-rose-500'
                 }
@@ -136,15 +137,19 @@ export default function OverviewTab({ appointments, setActiveTab }) {
                         </span>
                         <span className={`px-2 py-0.5 rounded-xl text-[12px] sm:ml-auto inline-flex items-center gap-1 ${appt.status === 'Confirmed'
                           ? 'bg-emerald-100 text-emerald-500 dark:bg-emerald-950 dark:text-emerald-450'
-                          : appt.status === 'Pending'
-                            ? 'bg-amber-100 text-amber-500 dark:bg-amber-950 dark:text-amber-450'
-                            : 'bg-rose-100 text-rose-500 dark:bg-rose-950 dark:text-rose-450'
+                          : appt.status === 'Completed'
+                            ? 'bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
+                            : appt.status === 'Pending'
+                              ? 'bg-amber-100 text-amber-500 dark:bg-amber-950 dark:text-amber-450'
+                              : 'bg-rose-100 text-rose-500 dark:bg-rose-950 dark:text-rose-450'
                           }`}>
                           <span className={`w-1 h-1 rounded-full ${appt.status === 'Confirmed'
                             ? 'bg-emerald-500'
-                            : appt.status === 'Pending'
-                              ? 'bg-amber-500'
-                              : 'bg-rose-500'
+                            : appt.status === 'Completed'
+                              ? 'bg-blue-500'
+                              : appt.status === 'Pending'
+                                ? 'bg-amber-500'
+                                : 'bg-rose-500'
                             }`} />
                           {appt.status}
                         </span>

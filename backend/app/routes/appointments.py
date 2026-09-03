@@ -26,12 +26,12 @@ from app.services.notification_service import (
 
 appointments_bp = Blueprint("appointments", __name__)
 
-VALID_STATUSES = {"Pending", "Confirmed", "Cancelled"}
+VALID_STATUSES = {"Pending", "Confirmed", "Cancelled", "Completed"}
 
 REQUIRED_FIELDS = [
     "name", "reason", "phone", "email", "date", "time",
     "refNo", "nic", "district", "province", "council",
-    "gsDivision", "address", "postalCode", "officer",
+    "address", "postalCode", "officer",
 ]
 
 
@@ -114,10 +114,10 @@ def create_appointment():
             nic=data["nic"],
             district=data["district"],
             province=data["province"],
-            council=data["council"],
-            gsDivision=data["gsDivision"],
-            address=data["address"],
-            postalCode=data["postalCode"],
+            council=data.get("council") or data.get("districtSecretariat", ""),
+            gsDivision=data.get("gsDivision", "").strip() if data.get("gsDivision") else "",
+            address=data.get("address") or data.get("permanentAddress", ""),
+            postalCode=data.get("postalCode", ""),
             officer=data["officer"],
         )
         db.session.add(appt)
@@ -162,10 +162,15 @@ def update_appointment_status(appt_id: int):
         if appt is None:
             return jsonify({"error": "Appointment not found"}), 404
 
-        remark = data.get("cancellationRemark", "") if new_status == "Cancelled" else None
-        appt.status = new_status
-        appt.cancellationRemark = remark
+        remark = None
+        if new_status == "Cancelled":
+            remark = data.get("cancellationRemark") or data.get("remark") or ""
+            appt.cancellationRemark = remark
+        elif new_status == "Completed":
+            remark = data.get("completionRemark") or data.get("remark") or ""
+            appt.completionRemark = remark
 
+        appt.status = new_status
         db.session.commit()
 
         # Asynchronously notify user about confirmation or cancellation

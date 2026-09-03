@@ -34,15 +34,16 @@ class Appointment(db.Model):  # type: ignore[name-defined]
     district = db.Column(db.String(50), nullable=False)
     province = db.Column(db.String(50), nullable=False)
     council = db.Column(db.String(100), nullable=False)
-    gsDivision = db.Column(db.String(100), nullable=False)
+    gsDivision = db.Column(db.String(100), nullable=True, default="")
     address = db.Column(db.Text, nullable=False)
     postalCode = db.Column(db.String(20), nullable=False)
 
     # Which ministerial officer this appointment is with
     officer = db.Column(db.String(50), nullable=False)
 
-    # Populated only when status == 'Cancelled'
+    # Populated only when status == 'Cancelled' or 'Completed'
     cancellationRemark = db.Column(db.Text, nullable=True)
+    completionRemark = db.Column(db.Text, nullable=True)
 
     def __init__(
         self,
@@ -64,6 +65,7 @@ class Appointment(db.Model):  # type: ignore[name-defined]
         postalCode: str = "",
         officer: str = "",
         cancellationRemark: str | None = None,
+        completionRemark: str | None = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -86,6 +88,7 @@ class Appointment(db.Model):  # type: ignore[name-defined]
         self.postalCode = postalCode
         self.officer = officer
         self.cancellationRemark = cancellationRemark
+        self.completionRemark = completionRemark
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -107,4 +110,5 @@ class Appointment(db.Model):  # type: ignore[name-defined]
             "postalCode": self.postalCode,
             "officer": self.officer,
             "cancellationRemark": self.cancellationRemark,
+            "completionRemark": self.completionRemark,
         }
