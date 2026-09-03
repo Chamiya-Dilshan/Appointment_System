@@ -21,7 +21,8 @@ VALID_ROLES = {"Secretary", "Deputy Minister", "Minister"}
 # GET /api/schedule
 # ──────────────────────────────────────────────────────────────────────────────
 
-@schedule_bp.get("/")
+@schedule_bp.route("", methods=["GET"])
+@schedule_bp.route("/", methods=["GET"])
 def get_schedule():
     """
     Return all allowed booking dates grouped by officer role.
@@ -58,7 +59,8 @@ def get_schedule():
 # POST /api/schedule
 # ──────────────────────────────────────────────────────────────────────────────
 
-@schedule_bp.post("/")
+@schedule_bp.route("", methods=["POST"])
+@schedule_bp.route("/", methods=["POST"])
 def add_allowed_date():
     """
     Enable a new booking date for a role.
@@ -93,7 +95,8 @@ def add_allowed_date():
 # DELETE /api/schedule?role=Secretary&date=2026-09-10
 # ──────────────────────────────────────────────────────────────────────────────
 
-@schedule_bp.delete("/")
+@schedule_bp.route("", methods=["DELETE"])
+@schedule_bp.route("/", methods=["DELETE"])
 def remove_allowed_date():
     """
     Disable a booking date for a role.

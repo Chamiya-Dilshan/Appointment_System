@@ -14,7 +14,7 @@ class Appointment(db.Model):  # type: ignore[name-defined]
 
     __tablename__ = "appointments"
 
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=False)
     name = db.Column(db.String(100), nullable=False)
     reason = db.Column(db.String(255), nullable=False)
     phone = db.Column(db.String(50), nullable=False)

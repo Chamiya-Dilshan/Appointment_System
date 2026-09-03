@@ -141,10 +141,10 @@ export default function OverviewTab({ appointments, setActiveTab }) {
                             : 'bg-rose-100 text-rose-500 dark:bg-rose-950 dark:text-rose-450'
                           }`}>
                           <span className={`w-1 h-1 rounded-full ${appt.status === 'Confirmed'
-                              ? 'bg-emerald-500'
-                              : appt.status === 'Pending'
-                                ? 'bg-amber-500'
-                                : 'bg-rose-500'
+                            ? 'bg-emerald-500'
+                            : appt.status === 'Pending'
+                              ? 'bg-amber-500'
+                              : 'bg-rose-500'
                             }`} />
                           {appt.status}
                         </span>

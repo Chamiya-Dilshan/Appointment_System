@@ -88,8 +88,8 @@ export default function Sidebar({ activeTab, setActiveTab, pendingCount, onLogou
                 setIsMobileOpen(false) // Close mobile drawer on selection
               }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 cursor-pointer ${isActive
-                  ? 'bg-black text-white dark:bg-white dark:text-black shadow-sm shadow-indigo-500/5'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800/40'
+                ? 'bg-black text-white dark:bg-white dark:text-black shadow-sm shadow-indigo-500/5'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800/40'
                 }`}
             >
               <span className={`transition-transform duration-200 ${isActive ? 'scale-110' : 'opacity-80'}`}>

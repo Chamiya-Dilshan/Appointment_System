@@ -32,6 +32,7 @@ def create_app(env: str | None = None) -> Flask:
         env = os.getenv("FLASK_ENV", "development")
 
     flask_app = Flask(__name__)
+    flask_app.url_map.strict_slashes = False
 
     # ── Load config ──────────────────────────────────────────────────────────
     cfg_class = config_map.get(env, config_map["development"])
@@ -52,7 +53,7 @@ def create_app(env: str | None = None) -> Flask:
 
     # ── Initialise extensions ────────────────────────────────────────────────
     db.init_app(flask_app)
-    cors.init_app(flask_app, resources={r"/api/*": {"origins": "*"}})
+    cors.init_app(flask_app, resources={r"/api/*": {"origins": "*"}})  # type: ignore[arg-type]
 
     # ── Register blueprints ──────────────────────────────────────────────────
     from app.routes.auth import auth_bp

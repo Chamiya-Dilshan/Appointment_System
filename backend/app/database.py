@@ -104,6 +104,14 @@ def init_db_with_retry(app) -> bool:  # type: ignore[type-arg]
         # Create tables for all registered models
         db.create_all()
 
+        # Ensure appointments.id is BIGINT in MySQL (handles existing legacy tables)
+        try:
+            from sqlalchemy import text
+            db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN id BIGINT NOT NULL;"))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
         # Populate with initial mock data (no-op if data already exists)
         seed_database()
 

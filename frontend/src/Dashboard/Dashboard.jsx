@@ -38,14 +38,14 @@ export default function Dashboard({ currentUser, onLogout }) {
           fetch('/api/appointments'),
           fetch('/api/schedule')
         ])
-        
+
         if (apptsRes.ok) {
           const appts = await apptsRes.json()
           setAppointments(appts)
         } else {
           console.error("Failed to load appointments from backend")
         }
-        
+
         if (scheduleRes.ok) {
           const schedule = await scheduleRes.json()
           setAllowedDatesByRole(schedule)
@@ -66,19 +66,24 @@ export default function Dashboard({ currentUser, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview')
   const [isMobileOpen, setIsMobileOpen] = useState(false)
 
-  // Toast notifications for simulated Email / SMS confirmations
+  // Toast notifications for simulated/live Email & SMS confirmations
   const [toast, setToast] = useState(null)
   const [toastTimeoutId, setToastTimeoutId] = useState(null)
 
-  const triggerNotification = (appt) => {
+  const triggerNotification = (appt, type = 'confirmed', meta = {}) => {
+    if (!appt) return
     if (toastTimeoutId) {
       clearTimeout(toastTimeoutId)
     }
-    setToast(appt)
+    setToast({
+      ...appt,
+      type,
+      meta,
+    })
     const timer = setTimeout(() => {
       setToast(null)
       setToastTimeoutId(null)
-    }, 6000)
+    }, 6500)
     setToastTimeoutId(timer)
   }
 
@@ -101,9 +106,7 @@ export default function Dashboard({ currentUser, onLogout }) {
       })
       if (response.ok) {
         const createdAppt = await response.json()
-        if (createdAppt.status === 'Confirmed') {
-          triggerNotification(createdAppt)
-        }
+        triggerNotification(createdAppt, createdAppt.status === 'Confirmed' ? 'confirmed' : 'booked')
         setAppointments([createdAppt, ...appointments])
       } else {
         const errData = await response.json()
@@ -145,7 +148,7 @@ export default function Dashboard({ currentUser, onLogout }) {
       })
       if (response.ok) {
         const updatedAppt = await response.json()
-        triggerNotification(updatedAppt)
+        triggerNotification(updatedAppt, 'confirmed')
         setAppointments(appointments.map(appt => appt.id === id ? updatedAppt : appt))
       } else {
         const errData = await response.json()
@@ -157,7 +160,7 @@ export default function Dashboard({ currentUser, onLogout }) {
     }
   }
 
-  // Handle status updates from Details Modal (Option 2)
+  // Handle status updates from Details Modal
   const handleUpdateStatus = async (id, newStatus, remark = '') => {
     try {
       const response = await fetch(`/api/appointments/${id}/status`, {
@@ -170,7 +173,11 @@ export default function Dashboard({ currentUser, onLogout }) {
       if (response.ok) {
         const updatedAppt = await response.json()
         if (newStatus === 'Confirmed') {
-          triggerNotification(updatedAppt)
+          triggerNotification(updatedAppt, 'confirmed')
+        } else if (newStatus === 'Cancelled') {
+          triggerNotification(updatedAppt, 'cancelled')
+        } else if (newStatus === 'Pending') {
+          triggerNotification(updatedAppt, 'reverted')
         }
         setAppointments(appointments.map(appt => appt.id === id ? updatedAppt : appt))
       } else {
@@ -180,6 +187,31 @@ export default function Dashboard({ currentUser, onLogout }) {
     } catch (err) {
       console.error("Update status error:", err)
       alert("Network error: Could not reach the server to update the appointment status.")
+    }
+  }
+
+  // Handle manual notification re-dispatch / trigger
+  const handleResendNotification = async (id) => {
+    try {
+      const response = await fetch(`/api/appointments/${id}/resend-notification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      const data = await response.json()
+      if (response.ok) {
+        const appt = data.appointment || appointments.find(a => a.id === id)
+        triggerNotification(appt, 'resent', data)
+        return { success: true, message: data.message }
+      } else {
+        alert("Failed to dispatch notification: " + (data.error || "Server error"))
+        return { success: false, error: data.error }
+      }
+    } catch (err) {
+      console.error("Resend notification error:", err)
+      alert("Network error: Could not connect to the server.")
+      return { success: false, error: err.message }
     }
   }
 
@@ -272,6 +304,7 @@ export default function Dashboard({ currentUser, onLogout }) {
             onConfirm={handleConfirmAppointment}
             onDelete={handleDeleteAppointment}
             onUpdateStatus={handleUpdateStatus}
+            onResendNotification={handleResendNotification}
             setActiveTab={setActiveTab}
             title="Active Appointments"
             subtitle="Search, filter, and manage today's and upcoming client sessions."
@@ -284,6 +317,7 @@ export default function Dashboard({ currentUser, onLogout }) {
             onConfirm={handleConfirmAppointment}
             onDelete={handleDeleteAppointment}
             onUpdateStatus={handleUpdateStatus}
+            onResendNotification={handleResendNotification}
             setActiveTab={setActiveTab}
             title="Appointment History"
             subtitle="Browse and audit completed or past scheduled sessions."
@@ -315,6 +349,7 @@ export default function Dashboard({ currentUser, onLogout }) {
             onConfirm={handleConfirmAppointment}
             onDelete={handleDeleteAppointment}
             onUpdateStatus={handleUpdateStatus}
+            onResendNotification={handleResendNotification}
           />
         )
       default:
@@ -404,48 +439,94 @@ export default function Dashboard({ currentUser, onLogout }) {
       </div>
 
       {/* Global Toast / Pop-up Notification */}
-      {toast && (
-        <div className="fixed inset-0 md:inset-auto md:bottom-6 md:right-6 z-55 bg-slate-900/60 backdrop-blur-xs md:bg-transparent md:backdrop-blur-none flex items-center justify-center md:items-start md:justify-start p-4 md:p-0 transition-all duration-300">
-          <div className="relative bg-slate-900 text-white dark:bg-white dark:text-slate-900 p-6 md:p-4 rounded-3xl md:rounded-2xl shadow-2xl border border-slate-800/80 dark:border-slate-200/80 max-w-sm w-full md:w-auto flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-4 md:gap-3 animate-in zoom-in-95 md:zoom-in-100 md:slide-in-from-bottom-5 duration-200">
-            {/* Close Button */}
-            <button
-              onClick={() => setToast(null)}
-              className="absolute top-3 right-3 md:top-2 md:right-2 p-1.5 rounded-lg text-slate-455 hover:text-white dark:text-slate-500 dark:hover:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer"
-              title="Dismiss Notification"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+      {toast && (() => {
+        const type = toast.type || 'confirmed'
+        let title = 'Notifications Dispatched'
+        let bgIconClass = 'bg-emerald-500 text-white'
+        let statusText = 'Confirmation email and SMS alert dispatched.'
 
-            {/* Checkmark Icon */}
-            <div className="w-10 h-10 md:w-8 md:h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white shrink-0">
-              <svg className="w-5 h-5 md:w-4.5 md:h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
+        if (type === 'booked') {
+          title = 'Booking Request Received'
+          bgIconClass = 'bg-indigo-600 text-white'
+          statusText = 'Official booking acknowledgment sent.'
+        } else if (type === 'confirmed') {
+          title = 'Appointment Confirmed'
+          bgIconClass = 'bg-emerald-500 text-white'
+          statusText = 'Official confirmation letter & SMS dispatched.'
+        } else if (type === 'cancelled') {
+          title = 'Cancellation Dispatched'
+          bgIconClass = 'bg-rose-500 text-white'
+          statusText = 'Cancellation notice & SMS dispatched.'
+        } else if (type === 'resent') {
+          title = 'Notification Re-Dispatched'
+          bgIconClass = 'bg-sky-500 text-white'
+          statusText = 'Notification re-sent successfully.'
+        } else if (type === 'reverted') {
+          title = 'Status Changed to Pending'
+          bgIconClass = 'bg-amber-500 text-white'
+          statusText = 'Schedule status updated in ministerial registry.'
+        }
 
-            {/* Message Details */}
-            <div className="flex-1 space-y-1.5 md:space-y-1">
-              <h5 className="font-extrabold text-base md:text-sm tracking-tight">Simulated Notifications Sent</h5>
-              <p className="text-xs md:text-[10px] opacity-80 leading-normal">
-                An SMS has been dispatched to <strong>{toast.phone}</strong> and a confirmation email sent to <strong>{toast.email}</strong>.
-              </p>
-              <div className="mt-2 md:mt-1.5 text-[10px] md:text-[9px] bg-slate-800 dark:bg-slate-100 text-slate-350 dark:text-slate-650 px-2 py-0.5 rounded font-mono inline-block">
-                Ref: {toast.refNo}
-              </div>
-
-              {/* Got It Button (Mobile Only) */}
+        return (
+          <div className="fixed inset-0 md:inset-auto md:bottom-6 md:right-6 z-55 bg-slate-900/60 backdrop-blur-xs md:bg-transparent md:backdrop-blur-none flex items-center justify-center md:items-start md:justify-start p-4 md:p-0 transition-all duration-300">
+            <div className="relative bg-slate-900 text-white dark:bg-white dark:text-slate-900 p-6 md:p-4 rounded-3xl md:rounded-2xl shadow-2xl border border-slate-800/80 dark:border-slate-200/80 max-w-sm w-full md:w-auto flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-4 md:gap-3 animate-in zoom-in-95 md:zoom-in-100 md:slide-in-from-bottom-5 duration-200">
+              {/* Close Button */}
               <button
                 onClick={() => setToast(null)}
-                className="mt-4 w-full md:hidden py-2.5 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-600 text-white transition-colors cursor-pointer"
+                className="absolute top-3 right-3 md:top-2 md:right-2 p-1.5 rounded-lg text-slate-400 hover:text-white dark:text-slate-500 dark:hover:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer"
+                title="Dismiss Notification"
               >
-                Got It
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
+
+              {/* Status Icon */}
+              <div className={`w-10 h-10 md:w-8 md:h-8 rounded-full ${bgIconClass} flex items-center justify-center shrink-0 shadow-sm`}>
+                {type === 'cancelled' ? (
+                  <svg className="w-5 h-5 md:w-4.5 md:h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : type === 'resent' ? (
+                  <svg className="w-5 h-5 md:w-4.5 md:h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5 md:w-4.5 md:h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                )}
+              </div>
+
+              {/* Message Details */}
+              <div className="flex-1 space-y-1.5 md:space-y-1">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <h5 className="font-extrabold text-base md:text-sm tracking-tight">{title}</h5>
+                </div>
+                <p className="text-xs md:text-[10px] opacity-80 leading-normal">
+                  {statusText} Dispatched to <strong>{toast.phone || 'No phone'}</strong> and <strong>{toast.email || 'No email'}</strong>.
+                </p>
+                <div className="flex items-center gap-1.5 pt-1">
+                  <span className="text-[10px] md:text-[9px] bg-slate-800 dark:bg-slate-100 text-slate-300 dark:text-slate-700 px-2 py-0.5 rounded font-mono">
+                    Ref: {toast.refNo}
+                  </span>
+                  <span className="text-[9px] bg-indigo-500/20 text-indigo-300 dark:text-indigo-600 px-1.5 py-0.5 rounded font-bold uppercase">
+                    Auto-Dispatched
+                  </span>
+                </div>
+
+                {/* Got It Button (Mobile Only) */}
+                <button
+                  onClick={() => setToast(null)}
+                  className="mt-4 w-full md:hidden py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors cursor-pointer"
+                >
+                  Got It
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
 
     </div>
   )

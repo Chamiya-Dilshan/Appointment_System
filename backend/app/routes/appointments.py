@@ -16,6 +16,13 @@ import time
 from flask import Blueprint, request, jsonify
 from app.extensions import db
 from app.models.appointment import Appointment
+from app.services.notification_service import (
+    notify_appointment_created,
+    notify_appointment_status_updated,
+    is_smtp_configured,
+    is_sms_configured,
+    test_smtp_connection,
+)
 
 appointments_bp = Blueprint("appointments", __name__)
 
@@ -53,7 +60,8 @@ def auto_cancel_past_pending() -> int:
 # GET /api/appointments
 # ──────────────────────────────────────────────────────────────────────────────
 
-@appointments_bp.get("/")
+@appointments_bp.route("", methods=["GET"])
+@appointments_bp.route("/", methods=["GET"])
 def get_appointments():
     """
     Return all appointments ordered by id descending (newest first).
@@ -72,7 +80,8 @@ def get_appointments():
 # POST /api/appointments
 # ──────────────────────────────────────────────────────────────────────────────
 
-@appointments_bp.post("/")
+@appointments_bp.route("", methods=["POST"])
+@appointments_bp.route("/", methods=["POST"])
 def create_appointment():
     """
     Create a new appointment.
@@ -113,7 +122,12 @@ def create_appointment():
         )
         db.session.add(appt)
         db.session.commit()
-        return jsonify(appt.to_dict()), 201
+
+        # Asynchronously dispatch confirmation email & SMS
+        appt_dict = appt.to_dict()
+        notify_appointment_created(appt_dict)
+
+        return jsonify(appt_dict), 201
 
     except Exception as exc:  # noqa: BLE001
         db.session.rollback()
@@ -148,18 +162,75 @@ def update_appointment_status(appt_id: int):
         if appt is None:
             return jsonify({"error": "Appointment not found"}), 404
 
+        remark = data.get("cancellationRemark", "") if new_status == "Cancelled" else None
         appt.status = new_status
-        if new_status == "Cancelled":
-            appt.cancellationRemark = data.get("cancellationRemark", "")
-        else:
-            appt.cancellationRemark = None
+        appt.cancellationRemark = remark
 
         db.session.commit()
-        return jsonify(appt.to_dict()), 200
+
+        # Asynchronously notify user about confirmation or cancellation
+        appt_dict = appt.to_dict()
+        notify_appointment_status_updated(appt_dict, new_status=new_status, remark=remark or "")
+
+        return jsonify(appt_dict), 200
 
     except Exception as exc:  # noqa: BLE001
         db.session.rollback()
         return jsonify({"error": str(exc)}), 500
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# POST /api/appointments/<id>/resend-notification
+# ──────────────────────────────────────────────────────────────────────────────
+
+@appointments_bp.post("/<int:appt_id>/resend-notification")
+def resend_appointment_notification(appt_id: int):
+    """
+    Re-dispatch email and SMS confirmation notification for an existing appointment.
+    """
+    try:
+        appt = db.session.get(Appointment, appt_id)
+        if appt is None:
+            return jsonify({"error": "Appointment not found"}), 404
+
+        appt_dict = appt.to_dict()
+        if appt.status == "Confirmed":
+            notify_appointment_status_updated(appt_dict, new_status="Confirmed")
+        elif appt.status == "Cancelled":
+            notify_appointment_status_updated(appt_dict, new_status="Cancelled", remark=appt.cancellationRemark or "")
+        else:
+            notify_appointment_created(appt_dict)
+
+        return jsonify({
+            "success": True,
+            "message": f"Notification dispatched for appointment {appt.refNo}",
+            "appointment": appt_dict,
+            "isLiveEmail": is_smtp_configured(),
+            "isLiveSms": is_sms_configured(),
+        }), 200
+
+    except Exception as exc:  # noqa: BLE001
+        return jsonify({"error": str(exc)}), 500
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# POST /api/appointments/test-email
+# ──────────────────────────────────────────────────────────────────────────────
+
+@appointments_bp.post("/test-email")
+def test_email_endpoint():
+    """
+    Diagnostic endpoint to test live email delivery with currently configured SMTP credentials.
+    Optional JSON payload: { "email": "recipient@example.com" }
+    """
+    data = request.get_json(silent=True) or {}
+    target_email = data.get("email")
+    success, msg = test_smtp_connection(target_email)
+    return jsonify({
+        "success": success,
+        "message": msg,
+        "isLiveEmail": is_smtp_configured(),
+    }), (200 if success else 400)
 
 
 # ──────────────────────────────────────────────────────────────────────────────

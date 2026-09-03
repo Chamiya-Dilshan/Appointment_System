@@ -5,6 +5,7 @@ export default function AppointmentsTab({
   onConfirm,
   onDelete,
   onUpdateStatus,
+  onResendNotification,
   setActiveTab,
   title = "Appointments Directory",
   subtitle = "Search, filter, and manage booked client sessions.",
@@ -13,6 +14,17 @@ export default function AppointmentsTab({
   const [selectedDetailedAppt, setSelectedDetailedAppt] = useState(null)
   const [isCancelling, setIsCancelling] = useState(false)
   const [cancellationRemark, setCancellationRemark] = useState('')
+  const [resendingId, setResendingId] = useState(null)
+
+  const handleResend = async (apptId) => {
+    if (!onResendNotification) return
+    setResendingId(apptId)
+    try {
+      await onResendNotification(apptId)
+    } finally {
+      setResendingId(null)
+    }
+  }
 
   useEffect(() => {
     setIsCancelling(false)
@@ -194,13 +206,37 @@ export default function AppointmentsTab({
 
                     {/* Actions */}
                     <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
                         <button
                           onClick={() => setSelectedDetailedAppt(appt)}
                           className="px-2.5 py-1.5 rounded-lg bg-indigo-100/80 text-indigo-700 border border-indigo-200/80 hover:bg-indigo-200/80 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/50 dark:hover:bg-indigo-900/40 transition-all font-bold cursor-pointer text-xs"
                           title="View Complete Details"
                         >
                           View
+                        </button>
+                        <button
+                          type="button"
+                          disabled={resendingId === appt.id}
+                          onClick={() => handleResend(appt.id)}
+                          className="px-2.5 py-1.5 rounded-lg bg-sky-100/80 text-sky-700 border border-sky-200/80 hover:bg-sky-200/80 dark:bg-sky-950/30 dark:text-sky-400 dark:border-sky-900/50 dark:hover:bg-sky-900/40 transition-all font-bold cursor-pointer text-xs disabled:opacity-50 flex items-center gap-1"
+                          title="Dispatch / Resend Notification (Email & SMS)"
+                        >
+                          {resendingId === appt.id ? (
+                            <>
+                              <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              <span>Sending...</span>
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                              </svg>
+                              <span>Alert</span>
+                            </>
+                          )}
                         </button>
                         {isHistory ? (
                           <button
@@ -297,7 +333,7 @@ export default function AppointmentsTab({
                 </div>
 
                 {/* Bottom details and actions */}
-                <div className="flex justify-between items-center text-sm pt-2 border-t border-slate-105 dark:border-slate-800/40">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm pt-2 border-t border-slate-105 dark:border-slate-800/40">
                   {/* Date/Time */}
                   <div className="text-slate-500 dark:text-slate-400">
                     <p className="font-semibold text-slate-600 dark:text-slate-300">{appt.date}</p>
@@ -305,17 +341,36 @@ export default function AppointmentsTab({
                   </div>
 
                   {/* Action buttons */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={() => setSelectedDetailedAppt(appt)}
-                      className="px-3 py-1.5 rounded-lg bg-indigo-100/80 text-indigo-700 border border-indigo-200/80 hover:bg-indigo-200/80 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/50 dark:hover:bg-indigo-900/40 transition-all font-bold cursor-pointer text-xs"
+                      className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-indigo-100/80 text-indigo-700 border border-indigo-200/80 hover:bg-indigo-200/80 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/50 dark:hover:bg-indigo-900/40 transition-all font-bold cursor-pointer text-xs"
                     >
                       View
+                    </button>
+                    <button
+                      type="button"
+                      disabled={resendingId === appt.id}
+                      onClick={() => handleResend(appt.id)}
+                      className="flex-1 sm:flex-none text-center px-2.5 py-1.5 rounded-lg bg-sky-100/80 text-sky-700 border border-sky-200/80 hover:bg-sky-200/80 dark:bg-sky-950/30 dark:text-sky-400 dark:border-sky-900/50 dark:hover:bg-sky-900/40 transition-all font-bold cursor-pointer text-xs disabled:opacity-50 flex items-center justify-center gap-1"
+                      title="Dispatch / Resend Notification"
+                    >
+                      {resendingId === appt.id ? (
+                        <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      ) : (
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      )}
+                      <span>Alert</span>
                     </button>
                     {isHistory ? (
                       <button
                         onClick={() => onDelete(appt.id)}
-                        className="px-3 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
+                        className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
                       >
                         Delete
                       </button>
@@ -324,7 +379,7 @@ export default function AppointmentsTab({
                         {appt.status === 'Pending' && (
                           <button
                             onClick={() => onConfirm(appt.id)}
-                            className="px-3 py-1.5 rounded-lg bg-emerald-100/80 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-200/80 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50 dark:hover:bg-emerald-900/40 transition-all font-bold cursor-pointer text-xs"
+                            className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-emerald-100/80 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-200/80 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50 dark:hover:bg-emerald-900/40 transition-all font-bold cursor-pointer text-xs"
                           >
                             Confirm
                           </button>
@@ -332,7 +387,7 @@ export default function AppointmentsTab({
                         {appt.status !== 'Cancelled' && (
                           <button
                             onClick={() => setCancellingAppt(appt)}
-                            className="px-3 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
+                            className="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg bg-rose-100/80 text-rose-700 border border-rose-200/80 hover:bg-rose-200/80 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/40 transition-all font-bold cursor-pointer text-xs"
                           >
                             Cancel
                           </button>
@@ -470,6 +525,53 @@ export default function AppointmentsTab({
                 </div>
               </div>
 
+              {/* Notification & Communication Block */}
+              <div className="space-y-2.5 p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100/70 dark:border-indigo-900/50">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    4. Automated Notifications
+                  </h4>
+                  <button
+                    type="button"
+                    disabled={resendingId === selectedDetailedAppt.id}
+                    onClick={() => handleResend(selectedDetailedAppt.id)}
+                    className="w-full sm:w-auto px-3 py-1.5 sm:py-1 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-xs"
+                    title="Dispatch / Resend Live or Simulated Email & SMS"
+                  >
+                    {resendingId === selectedDetailedAppt.id ? (
+                      <>
+                        <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Dispatching...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                        <span>Dispatch / Resend Notification</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+                  <div>
+                    <span className="text-slate-400 dark:text-slate-500 block">Email Recipient</span>
+                    <span className="font-semibold text-slate-800 dark:text-white break-all">{selectedDetailedAppt.email || 'No email provided'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 dark:text-slate-500 block">SMS Phone Recipient</span>
+                    <span className="font-semibold text-slate-800 dark:text-white">{selectedDetailedAppt.phone || 'No phone provided'}</span>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             {/* Modal Footer with Status control actions (Option 2) */}
@@ -486,14 +588,14 @@ export default function AppointmentsTab({
                         placeholder="Enter cancellation remark (optional)..."
                         value={cancellationRemark}
                         onChange={(e) => setCancellationRemark(e.target.value)}
-                        className="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-905 text-slate-805 dark:text-slate-200 focus:outline-hidden focus:ring-1 focus:ring-rose-500 placeholder-slate-400"
+                        className="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-1 focus:ring-rose-500 placeholder-slate-400"
                         rows={2}
                       />
                       <div className="flex gap-2">
                         <button
                           type="button"
                           onClick={() => setIsCancelling(false)}
-                          className="px-3 py-2 rounded-xl text-xs font-bold bg-slate-100/80 text-slate-700 border border-slate-200 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-205 dark:border-slate-700 dark:hover:bg-slate-700 cursor-pointer transition-all"
+                          className="px-5 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-300 hover:text-white bg-slate-200 hover:bg-slate-400 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer transition-all"
                         >
                           Go Back
                         </button>
@@ -614,7 +716,7 @@ export default function AppointmentsTab({
                 placeholder="Enter cancellation remark (optional)..."
                 value={quickCancelRemark}
                 onChange={(e) => setQuickCancelRemark(e.target.value)}
-                className="w-full p-3 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-hidden focus:ring-1 focus:ring-rose-500 placeholder-slate-400"
+                className="w-full p-3 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-1 focus:ring-rose-500 placeholder-slate-400"
                 rows={3}
               />
             </div>
@@ -624,7 +726,7 @@ export default function AppointmentsTab({
               <button
                 type="button"
                 onClick={() => setCancellingAppt(null)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-200 hover:bg-slate-205 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer transition-all"
+                className="px-5 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-300 hover:text-white bg-slate-200 hover:bg-slate-400 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer transition-all ml-auto"
               >
                 Go Back
               </button>
