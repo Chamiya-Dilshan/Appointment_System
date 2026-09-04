@@ -48,3 +48,7 @@
 [2026-09-03 12:02:07] [SIMULATED SMS] To: 0771234567 | Msg: Appointment CONFIRMED. Ref: APT-1788417123. With: Mrs. K. Silva (Divisional Officer) on 2026-09-04 at 10:00 AM. Please bring your NIC/Passport (199512345678) and arrive 10m early. - Ministry Portal
 [2026-09-03 12:02:10] [LIVE EMAIL SENT] To: dilshan@example.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Request Received - Ref: APT-1788417123'
 [2026-09-03 12:02:13] [LIVE EMAIL SENT] To: dilshan@example.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-1788417123'
+[2026-09-04 13:11:37] [SIMULATED SMS] To: 071****543| Msg: Appointment request received. Ref: APT-SEC-1788507695. Officer: Secretary, Date: 2026-09-08 11:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-04 13:11:44] [LIVE EMAIL SENT] To: k****w@example.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APT-SEC-1788507695'
+[2026-09-04 13:12:39] [SIMULATED SMS] To: 071****543| Msg: Appointment CONFIRMED. Ref: APT-SEC-1788507695. With: Secretary on 2026-09-08 at 11:00 AM. Please bring your NIC/Passport (1992****01) and arrive 10m early. - Ministry Portal
+[2026-09-04 13:12:44] [LIVE EMAIL SENT] To: k****w@example.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-SEC-1788507695'

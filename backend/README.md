@@ -44,8 +44,6 @@ on first run. It will also seed 3 admin users and 9 demo appointments.
 python app.py
 ```
 
-Or just double-click `start.bat`.
-
 The server starts on **http://localhost:5000**.
 
 ## API Endpoints

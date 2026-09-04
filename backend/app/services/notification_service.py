@@ -29,16 +29,63 @@ ENV_PATH = Path(__file__).resolve().parent.parent.parent / ".env"
 logger = logging.getLogger("notification_service")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
+import re
+
+
+def mask_phone(phone: str) -> str:
+    """Mask phone number keeping leading and trailing digits, e.g. 077****567."""
+    clean = re.sub(r"[^\d+]", "", str(phone))
+    if len(clean) > 6:
+        return clean[:3] + "****" + clean[-3:]
+    return clean[:2] + "****"
+
+
+def mask_email(email_str: str) -> str:
+    """Mask email username, e.g. d****n@example.com."""
+    if "@" not in email_str:
+        return email_str
+    user, domain = email_str.split("@", 1)
+    if len(user) <= 2:
+        masked_user = user[0] + "*"
+    else:
+        masked_user = user[0] + "****" + user[-1]
+    return f"{masked_user}@{domain}"
+
+
+def _sanitize_log_entry(entry: str) -> str:
+    """Mask PII (NIC, phone, email) before writing to persistent logs."""
+    # Mask NIC occurrences (e.g. 199512345678 or 123456789V)
+    sanitized = re.sub(
+        r"(NIC(?:/Passport)?\s*\(?)([0-9]{9}[vVxX]|[0-9]{12})(\)?)",
+        lambda m: f"{m.group(1)}{m.group(2)[:4]}****{m.group(2)[-2:]}{m.group(3)}",
+        entry,
+        flags=re.IGNORECASE
+    )
+    # Mask email addresses in log entries
+    sanitized = re.sub(
+        r"\b([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)\b",
+        lambda m: mask_email(m.group(0)),
+        sanitized
+    )
+    # Mask phone numbers in To: <phone>
+    sanitized = re.sub(
+        r"(To:\s*)([\+0-9\s\-]{7,16})(\s*\|)",
+        lambda m: f"{m.group(1)}{mask_phone(m.group(2))}{m.group(3)}",
+        sanitized
+    )
+    return sanitized
+
 
 def _log_notification(entry: str) -> None:
-    """Append notification events to backend/logs/notifications.log for audit and diagnostics."""
+    """Append sanitized notification events to backend/logs/notifications.log."""
     try:
         log_dir = Path(__file__).resolve().parent.parent.parent / "logs"
         log_dir.mkdir(parents=True, exist_ok=True)
         log_file = log_dir / "notifications.log"
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        sanitized_entry = _sanitize_log_entry(entry)
         with open(log_file, "a", encoding="utf-8") as f:
-            f.write(f"[{now_str}] {entry}\n")
+            f.write(f"[{now_str}] {sanitized_entry}\n")
     except Exception:
         pass
 

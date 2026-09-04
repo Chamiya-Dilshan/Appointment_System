@@ -1,8 +1,9 @@
-"""Appointment model."""
+"""Appointment model with field-level encryption for sensitive citizen PII."""
 from __future__ import annotations
 
 from typing import Any
 from app.extensions import db
+from app.utils.crypto import encrypt_field, decrypt_field
 
 
 class Appointment(db.Model):  # type: ignore[name-defined]
@@ -24,11 +25,12 @@ class Appointment(db.Model):  # type: ignore[name-defined]
     date = db.Column(db.String(10), nullable=False)
     time = db.Column(db.String(20), nullable=False)
 
-    # Possible values: Pending | Confirmed | Cancelled
+    # Possible values: Pending | Confirmed | Cancelled | Completed
     status = db.Column(db.String(20), default="Pending", nullable=False)
 
     refNo = db.Column(db.String(50), unique=True, nullable=False)
-    nic = db.Column(db.String(20), nullable=False)
+    # Enlarged to VARCHAR(255) to hold Fernet encrypted ciphertext
+    nic = db.Column(db.String(255), nullable=False)
 
     # Sri Lanka regional fields
     district = db.Column(db.String(50), nullable=False)
@@ -79,16 +81,16 @@ class Appointment(db.Model):  # type: ignore[name-defined]
         self.time = time
         self.status = status
         self.refNo = refNo
-        self.nic = nic
+        self.nic = encrypt_field(nic)
         self.district = district
         self.province = province
         self.council = council
         self.gsDivision = gsDivision
-        self.address = address
+        self.address = encrypt_field(address)
         self.postalCode = postalCode
         self.officer = officer
         self.cancellationRemark = cancellationRemark
-        self.completionRemark = completionRemark
+        self.completionRemark = encrypt_field(completionRemark) if completionRemark else None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -101,14 +103,14 @@ class Appointment(db.Model):  # type: ignore[name-defined]
             "time": self.time,
             "status": self.status,
             "refNo": self.refNo,
-            "nic": self.nic,
+            "nic": decrypt_field(self.nic),
             "district": self.district,
             "province": self.province,
             "council": self.council,
             "gsDivision": self.gsDivision,
-            "address": self.address,
+            "address": decrypt_field(self.address),
             "postalCode": self.postalCode,
             "officer": self.officer,
             "cancellationRemark": self.cancellationRemark,
-            "completionRemark": self.completionRemark,
+            "completionRemark": decrypt_field(self.completionRemark) if self.completionRemark else None,
         }

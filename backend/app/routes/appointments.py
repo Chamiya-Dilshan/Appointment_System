@@ -14,8 +14,10 @@ import datetime
 import time
 
 from flask import Blueprint, request, jsonify
-from app.extensions import db
+from app.extensions import db, limiter
 from app.models.appointment import Appointment
+from app.utils.auth_guard import jwt_required
+from app.utils.crypto import encrypt_field
 from app.services.notification_service import (
     notify_appointment_created,
     notify_appointment_status_updated,
@@ -62,6 +64,7 @@ def auto_cancel_past_pending() -> int:
 
 @appointments_bp.route("", methods=["GET"])
 @appointments_bp.route("/", methods=["GET"])
+@jwt_required
 def get_appointments():
     """
     Return all appointments ordered by id descending (newest first).
@@ -82,6 +85,7 @@ def get_appointments():
 
 @appointments_bp.route("", methods=["POST"])
 @appointments_bp.route("/", methods=["POST"])
+@limiter.limit("15 per hour")
 def create_appointment():
     """
     Create a new appointment.
@@ -139,6 +143,7 @@ def create_appointment():
 # ──────────────────────────────────────────────────────────────────────────────
 
 @appointments_bp.put("/<int:appt_id>/status")
+@jwt_required
 def update_appointment_status(appt_id: int):
     """
     Update the status of an existing appointment.
@@ -168,7 +173,7 @@ def update_appointment_status(appt_id: int):
             appt.cancellationRemark = remark
         elif new_status == "Completed":
             remark = data.get("completionRemark") or data.get("remark") or ""
-            appt.completionRemark = remark
+            appt.completionRemark = encrypt_field(remark)
 
         appt.status = new_status
         db.session.commit()
@@ -189,6 +194,8 @@ def update_appointment_status(appt_id: int):
 # ──────────────────────────────────────────────────────────────────────────────
 
 @appointments_bp.post("/<int:appt_id>/resend-notification")
+@jwt_required
+@limiter.limit("10 per minute; 30 per hour")
 def resend_appointment_notification(appt_id: int):
     """
     Re-dispatch email and SMS confirmation notification for an existing appointment.
@@ -243,6 +250,7 @@ def test_email_endpoint():
 # ──────────────────────────────────────────────────────────────────────────────
 
 @appointments_bp.delete("/<int:appt_id>")
+@jwt_required
 def delete_appointment(appt_id: int):
     """Permanently remove an appointment record."""
     try:

@@ -30,18 +30,38 @@ export default function Dashboard({ currentUser, onLogout }) {
     'Minister': []
   })
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('authToken') || currentUser?.token
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    }
+  }
+
+  const handleAuthError = (status) => {
+    if (status === 401) {
+      alert("Your session has expired or is unauthorized. Please log in again.")
+      if (onLogout) onLogout()
+    }
+  }
+
   // Load appointments and allowed dates from backend API on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const token = localStorage.getItem('authToken') || currentUser?.token
         const [apptsRes, scheduleRes] = await Promise.all([
-          fetch('/api/appointments'),
+          fetch('/api/appointments', {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+          }),
           fetch('/api/schedule')
         ])
 
         if (apptsRes.ok) {
           const appts = await apptsRes.json()
           setAppointments(appts)
+        } else if (apptsRes.status === 401) {
+          handleAuthError(401)
         } else {
           console.error("Failed to load appointments from backend")
         }
@@ -122,8 +142,13 @@ export default function Dashboard({ currentUser, onLogout }) {
   const handleDeleteAppointment = async (id) => {
     try {
       const response = await fetch(`/api/appointments/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAuthHeaders()
       })
+      if (response.status === 401) {
+        handleAuthError(401)
+        return
+      }
       if (response.ok) {
         setAppointments(appointments.filter(appt => appt.id !== id))
       } else {
@@ -141,11 +166,13 @@ export default function Dashboard({ currentUser, onLogout }) {
     try {
       const response = await fetch(`/api/appointments/${id}/status`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ status: 'Confirmed' })
       })
+      if (response.status === 401) {
+        handleAuthError(401)
+        return
+      }
       if (response.ok) {
         const updatedAppt = await response.json()
         triggerNotification(updatedAppt, 'confirmed')
@@ -165,9 +192,7 @@ export default function Dashboard({ currentUser, onLogout }) {
     try {
       const response = await fetch(`/api/appointments/${id}/status`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           status: newStatus,
           cancellationRemark: newStatus === 'Cancelled' ? remark : undefined,
@@ -175,6 +200,10 @@ export default function Dashboard({ currentUser, onLogout }) {
           remark: remark
         })
       })
+      if (response.status === 401) {
+        handleAuthError(401)
+        return
+      }
       if (response.ok) {
         const updatedAppt = await response.json()
         if (newStatus === 'Confirmed') {
@@ -202,10 +231,12 @@ export default function Dashboard({ currentUser, onLogout }) {
     try {
       const response = await fetch(`/api/appointments/${id}/resend-notification`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: getAuthHeaders()
       })
+      if (response.status === 401) {
+        handleAuthError(401)
+        return { success: false, error: "Unauthorized" }
+      }
       const data = await response.json()
       if (response.ok) {
         const appt = data.appointment || appointments.find(a => a.id === id)
@@ -227,11 +258,13 @@ export default function Dashboard({ currentUser, onLogout }) {
     try {
       const response = await fetch('/api/schedule', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ role: currentRole, date: date })
       })
+      if (response.status === 401) {
+        handleAuthError(401)
+        return
+      }
       if (response.ok) {
         setAllowedDatesByRole(prev => ({
           ...prev,
@@ -251,8 +284,13 @@ export default function Dashboard({ currentUser, onLogout }) {
     const currentRole = currentUser?.role || 'Secretary'
     try {
       const response = await fetch(`/api/schedule?role=${encodeURIComponent(currentRole)}&date=${encodeURIComponent(date)}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAuthHeaders()
       })
+      if (response.status === 401) {
+        handleAuthError(401)
+        return
+      }
       if (response.ok) {
         setAllowedDatesByRole(prev => ({
           ...prev,

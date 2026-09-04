@@ -11,6 +11,7 @@ DELETE /api/schedule?role=&date=  — remove an allowed date for a role
 from flask import Blueprint, request, jsonify
 from app.extensions import db
 from app.models.allowed_date import AllowedDate
+from app.utils.auth_guard import jwt_required
 
 schedule_bp = Blueprint("schedule", __name__)
 
@@ -61,6 +62,7 @@ def get_schedule():
 
 @schedule_bp.route("", methods=["POST"])
 @schedule_bp.route("/", methods=["POST"])
+@jwt_required
 def add_allowed_date():
     """
     Enable a new booking date for a role.
@@ -97,6 +99,7 @@ def add_allowed_date():
 
 @schedule_bp.route("", methods=["DELETE"])
 @schedule_bp.route("/", methods=["DELETE"])
+@jwt_required
 def remove_allowed_date():
     """
     Disable a booking date for a role.

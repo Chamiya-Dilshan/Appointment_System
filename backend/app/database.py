@@ -104,11 +104,13 @@ def init_db_with_retry(app) -> bool:  # type: ignore[type-arg]
         # Create tables for all registered models
         db.create_all()
 
-        # Ensure appointments.id is BIGINT and gsDivision is nullable in MySQL
+        # Ensure appointments.id is BIGINT, gsDivision is nullable, and nic/address fit ciphertexts
         try:
             from sqlalchemy import text
             db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN id BIGINT NOT NULL;"))
             db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN gsDivision VARCHAR(100) NULL;"))
+            db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN nic VARCHAR(255) NOT NULL;"))
+            db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN address TEXT NOT NULL;"))
             db.session.commit()
         except Exception:
             db.session.rollback()

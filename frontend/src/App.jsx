@@ -38,6 +38,12 @@ function App() {
         setCurrentUser(data)
         setIsLoggedIn(true)
         localStorage.setItem('currentUser', JSON.stringify(data))
+        if (data.token) {
+          localStorage.setItem('authToken', data.token)
+        }
+      } else if (response.status === 429) {
+        const errorData = await response.json()
+        alert(errorData.message || "Too many failed attempts. Rate limit reached, please try again in a few minutes.")
       } else {
         const errorData = await response.json()
         alert(errorData.error || "Invalid Credentials")
@@ -50,6 +56,7 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem('currentUser')
+    localStorage.removeItem('authToken')
     setCurrentUser(null)
     setIsLoggedIn(false)
     setUsername('')

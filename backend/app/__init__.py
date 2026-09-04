@@ -14,7 +14,7 @@ import time
 from flask import Flask, jsonify
 
 from app.config import config_map, Config
-from app.extensions import db, cors
+from app.extensions import db, cors, limiter
 
 
 def create_app(env: str | None = None) -> Flask:
@@ -54,6 +54,15 @@ def create_app(env: str | None = None) -> Flask:
     # ── Initialise extensions ────────────────────────────────────────────────
     db.init_app(flask_app)
     cors.init_app(flask_app, resources={r"/api/*": {"origins": "*"}})  # type: ignore[arg-type]
+    limiter.init_app(flask_app)
+
+    @flask_app.errorhandler(429)
+    def ratelimit_handler(e):  # noqa: ANN001, ANN202
+        return jsonify({
+            "error": "Rate limit exceeded",
+            "message": "Too many requests. Please slow down and try again later.",
+            "details": str(e.description) if hasattr(e, "description") else "Rate limit reached"
+        }), 429
 
     # ── Register blueprints ──────────────────────────────────────────────────
     from app.routes.auth import auth_bp

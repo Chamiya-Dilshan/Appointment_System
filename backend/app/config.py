@@ -12,6 +12,12 @@ class Config:
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev_secret_key_appointment_system")
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
+    # Security & Encryption Configuration
+    JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", os.getenv("SECRET_KEY", "dev_secret_key_appointment_system"))
+    JWT_EXPIRY_HOURS: int = int(os.getenv("JWT_EXPIRY_HOURS", "8"))
+    FIELD_ENCRYPTION_KEY: str = os.getenv("FIELD_ENCRYPTION_KEY", "")
+    BACKUP_ENCRYPTION_KEY: str = os.getenv("BACKUP_ENCRYPTION_KEY", "")
+
     # Database Configuration
     DB_USER: str = os.getenv("DB_USER", "root")
     DB_PASSWORD: str = os.getenv("DB_PASSWORD", "")
