@@ -1,0 +1,9 @@
+# Pyrefly configuration for workspace root
+# Directs the language server to use the backend venv and include backend/ in search paths
+[pyrefly]
+python_interpreter = "backend/venv/Scripts/python.exe"
+search_paths = ["backend"]
+
+[pyrefly.errors]
+missing-attribute = false
+bad-argument-type = false
