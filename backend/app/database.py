@@ -104,11 +104,12 @@ def init_db_with_retry(app) -> bool:  # type: ignore[type-arg]
         # Create tables for all registered models
         db.create_all()
 
-        # Ensure appointments.id is BIGINT, gsDivision is nullable, and nic/address fit ciphertexts
+        # Ensure appointments.id is BIGINT, gsDivision is nullable, and phone/nic/address fit ciphertexts
         try:
             from sqlalchemy import text
             db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN id BIGINT NOT NULL;"))
             db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN gsDivision VARCHAR(100) NULL;"))
+            db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN phone VARCHAR(255) NOT NULL;"))
             db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN nic VARCHAR(255) NOT NULL;"))
             db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN address TEXT NOT NULL;"))
             db.session.commit()
@@ -120,6 +121,27 @@ def init_db_with_retry(app) -> bool:  # type: ignore[type-arg]
             from sqlalchemy import text
             db.session.execute(text("ALTER TABLE appointments ADD COLUMN completionRemark TEXT NULL;"))
             db.session.commit()
+        except Exception:
+            db.session.rollback()
+
+        # Encrypt any legacy unencrypted phone/nic/address values in MySQL
+        try:
+            from app.models.appointment import Appointment
+            from app.utils.crypto import encrypt_field
+            all_appts = Appointment.query.all()
+            migrated = False
+            for a in all_appts:
+                if a.phone and not a.phone.startswith("gAAAAA"):
+                    a.phone = encrypt_field(a.phone)
+                    migrated = True
+                if a.nic and not a.nic.startswith("gAAAAA"):
+                    a.nic = encrypt_field(a.nic)
+                    migrated = True
+                if a.address and not a.address.startswith("gAAAAA"):
+                    a.address = encrypt_field(a.address)
+                    migrated = True
+            if migrated:
+                db.session.commit()
         except Exception:
             db.session.rollback()
 

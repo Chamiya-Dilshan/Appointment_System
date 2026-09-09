@@ -1,54 +1,64 @@
-[2026-09-02 12:32:26] [SIMULATED SMS] To: 0771234567 | Msg: Appointment request received. Ref: APPT-VERIFIED-01. Officer: Secretary, Date: 2026-09-04 03:00 PM. Status: Pending review. - Ministry Portal
-[2026-09-02 12:32:34] [LIVE EMAIL SENT] To: pasindumadushan1219@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-VERIFIED-01'
-[2026-09-02 13:06:39] [SIMULATED SMS] To: 0771234567 | Msg: Appointment request received. Ref: APPT-LIVE-34597. Officer: Secretary, Date: 2026-09-10 10:00 AM. Status: Pending review. - Ministry Portal
-[2026-09-02 13:06:44] [LIVE EMAIL SENT] To: pasindumadushan1219@gmail.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-LIVE-34597'
-[2026-09-02 13:10:15] [SIMULATED SMS] To: 0761237166 | Msg: Appointment request received. Ref: APPT-K4XTKT. Officer: Secretary, Date: 2026-09-03 11:30 AM. Status: Pending review. - Ministry Portal
-[2026-09-02 13:10:20] [LIVE EMAIL SENT] To: pasindumadushan1219@gmail.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-K4XTKT'
-[2026-09-02 13:11:32] [SIMULATED SMS] To: 0761237166 | Msg: Appointment CONFIRMED. Ref: APPT-K4XTKT. With: Secretary on 2026-09-03 at 11:30 AM. Please bring your NIC/Passport (123456789311) and arrive 10m early. - Ministry Portal
-[2026-09-02 13:11:37] [LIVE EMAIL SENT] To: pasindumadushan1219@gmail.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Confirmed - Ref: APPT-K4XTKT'
-[2026-09-02 13:11:49] [SIMULATED SMS] To: 0761237166 | Msg: Appointment CONFIRMED. Ref: APPT-K4XTKT. With: Secretary on 2026-09-03 at 11:30 AM. Please bring your NIC/Passport (123456789311) and arrive 10m early. - Ministry Portal
-[2026-09-02 13:11:54] [LIVE EMAIL SENT] To: pasindumadushan1219@gmail.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Confirmed - Ref: APPT-K4XTKT'
-[2026-09-02 13:13:18] [SIMULATED SMS] To: 123456789 | Msg: Appointment request received. Ref: APPT-XKBTL8. Officer: Secretary, Date: 2026-09-03 10:30 AM. Status: Pending review. - Ministry Portal
-[2026-09-02 13:13:23] [LIVE EMAIL SENT] To: sewmini234@gmail.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-XKBTL8'
-[2026-09-02 13:13:48] [SIMULATED SMS] To: 123456789 | Msg: Appointment CONFIRMED. Ref: APPT-XKBTL8. With: Secretary on 2026-09-03 at 10:30 AM. Please bring your NIC/Passport (123456789987) and arrive 10m early. - Ministry Portal
-[2026-09-02 13:13:53] [LIVE EMAIL SENT] To: sewmini234@gmail.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Confirmed - Ref: APPT-XKBTL8'
-[2026-09-02 13:14:19] [SIMULATED SMS] To: 123456789 | Msg: Appointment CANCELLED. Ref: APPT-XKBTL8 on 2026-09-03. Reason: test 123
+[2026-09-02 12:32:26] [SIMULATED SMS] To: 077****567 | Msg: Appointment request received. Ref: APPT-VERIFIED-01. Officer: Secretary, Date: 2026-09-04 03:00 PM. Status: Pending review. - Ministry Portal
+[2026-09-02 12:32:34] [LIVE EMAIL SENT] To: p****9@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-VERIFIED-01'
+[2026-09-02 13:06:39] [SIMULATED SMS] To: 077****567 | Msg: Appointment request received. Ref: APPT-LIVE-34597. Officer: Secretary, Date: 2026-09-10 10:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-02 13:06:44] [LIVE EMAIL SENT] To: p****9@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-LIVE-34597'
+[2026-09-02 13:10:15] [SIMULATED SMS] To: 076****166 | Msg: Appointment request received. Ref: APPT-K4XTKT. Officer: Secretary, Date: 2026-09-03 11:30 AM. Status: Pending review. - Ministry Portal
+[2026-09-02 13:10:20] [LIVE EMAIL SENT] To: p****9@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-K4XTKT'
+[2026-09-02 13:11:32] [SIMULATED SMS] To: 076****166 | Msg: Appointment CONFIRMED. Ref: APPT-K4XTKT. With: Secretary on 2026-09-03 at 11:30 AM. Please bring your NIC/Passport (1234****11) and arrive 10m early. - Ministry Portal
+[2026-09-02 13:11:37] [LIVE EMAIL SENT] To: p****9@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APPT-K4XTKT'
+[2026-09-02 13:11:49] [SIMULATED SMS] To: 076****166 | Msg: Appointment CONFIRMED. Ref: APPT-K4XTKT. With: Secretary on 2026-09-03 at 11:30 AM. Please bring your NIC/Passport (1234****11) and arrive 10m early. - Ministry Portal
+[2026-09-02 13:11:54] [LIVE EMAIL SENT] To: p****9@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APPT-K4XTKT'
+[2026-09-02 13:13:18] [SIMULATED SMS] To: 123****789 | Msg: Appointment request received. Ref: APPT-XKBTL8. Officer: Secretary, Date: 2026-09-03 10:30 AM. Status: Pending review. - Ministry Portal
+[2026-09-02 13:13:23] [LIVE EMAIL SENT] To: s****4@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-XKBTL8'
+[2026-09-02 13:13:48] [SIMULATED SMS] To: 123****789 | Msg: Appointment CONFIRMED. Ref: APPT-XKBTL8. With: Secretary on 2026-09-03 at 10:30 AM. Please bring your NIC/Passport (1234****87) and arrive 10m early. - Ministry Portal
+[2026-09-02 13:13:53] [LIVE EMAIL SENT] To: s****4@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APPT-XKBTL8'
+[2026-09-02 13:14:19] [SIMULATED SMS] To: 123****789 | Msg: Appointment CANCELLED. Ref: APPT-XKBTL8 on 2026-09-03. Reason: test 123
 . You may book a new slot via the portal. - Ministry Portal
-[2026-09-02 13:14:24] [LIVE EMAIL SENT] To: sewmini234@gmail.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Cancelled - Ref: APPT-XKBTL8'
-[2026-09-02 13:14:56] [SIMULATED SMS] To: 0761237166 | Msg: Appointment CANCELLED. Ref: APPT-K4XTKT on 2026-09-03. Reason: lkjhb. You may book a new slot via the portal. - Ministry Portal
-[2026-09-02 13:15:02] [LIVE EMAIL SENT] To: pasindumadushan1219@gmail.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Cancelled - Ref: APPT-K4XTKT'
-[2026-09-02 13:16:57] [SIMULATED SMS] To: 123456789 | Msg: Appointment CANCELLED. Ref: APPT-XKBTL8 on 2026-09-03. Reason: test 123
+[2026-09-02 13:14:24] [LIVE EMAIL SENT] To: s****4@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Cancelled - Ref: APPT-XKBTL8'
+[2026-09-02 13:14:56] [SIMULATED SMS] To: 076****166 | Msg: Appointment CANCELLED. Ref: APPT-K4XTKT on 2026-09-03. Reason: lkjhb. You may book a new slot via the portal. - Ministry Portal
+[2026-09-02 13:15:02] [LIVE EMAIL SENT] To: p****9@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Cancelled - Ref: APPT-K4XTKT'
+[2026-09-02 13:16:57] [SIMULATED SMS] To: 123****789 | Msg: Appointment CANCELLED. Ref: APPT-XKBTL8 on 2026-09-03. Reason: test 123
 . You may book a new slot via the portal. - Ministry Portal
-[2026-09-02 13:17:02] [LIVE EMAIL SENT] To: sewmini234@gmail.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Cancelled - Ref: APPT-XKBTL8'
-[2026-09-02 13:56:31] [SIMULATED SMS] To: 0771234567 | Msg: Appointment request received. Ref: APPT-SPAM-7589. Officer: Secretary, Date: 2026-09-11 11:00 AM. Status: Pending review. - Ministry Portal
-[2026-09-02 13:56:37] [LIVE EMAIL SENT] To: pasindumadushan1219@gmail.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-SPAM-7589'
-[2026-09-02 14:02:22] [SIMULATED SMS] To: 0123456789 | Msg: Appointment request received. Ref: APPT-B65LV6. Officer: Secretary, Date: 2026-09-16 9:00 AM. Status: Pending review. - Ministry Portal
-[2026-09-02 14:02:27] [LIVE EMAIL SENT] To: sewmini234@gmail.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-B65LV6'
-[2026-09-02 14:54:29] [SIMULATED SMS] To: +1 555-0112 | Msg: Appointment CANCELLED. Ref: APPT-3H8J9P on 2026-08-23. Reason: Urgent assignment at the Daily Planet. You may book a new slot via the portal. - Ministry Portal
-[2026-09-02 14:54:32] [SIMULATED SMS] To: +1 555-0125 | Msg: Appointment CANCELLED. Ref: APPT-4Y9L0Q on 2026-08-25. Reason: Auto-cancelled: Appointment date expired. You may book a new slot via the portal. - Ministry Portal
-[2026-09-02 14:54:34] [LIVE EMAIL SENT] To: clark.k@dailyplanet.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Cancelled - Ref: APPT-3H8J9P'
-[2026-09-02 14:54:34] [SIMULATED SMS] To: +1 555-0143 | Msg: Appointment CANCELLED. Ref: APPT-9X4E1F on 2026-08-24. Reason: Auto-cancelled: Appointment date expired. You may book a new slot via the portal. - Ministry Portal
-[2026-09-02 14:54:36] [SIMULATED SMS] To: +1 555-0199 | Msg: Appointment CONFIRMED. Ref: APPT-5B9C2D. With: Secretary on 2026-08-24 at 10:00 AM. Please bring your NIC/Passport (198412345678) and arrive 10m early. - Ministry Portal
-[2026-09-02 14:54:37] [LIVE EMAIL SENT] To: diana@themyscira.gov | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Cancelled - Ref: APPT-4Y9L0Q'
-[2026-09-02 14:54:39] [SIMULATED SMS] To: +1 555-0100 | Msg: Appointment CONFIRMED. Ref: APPT-2A7D8K. With: Secretary on 2026-08-25 at 03:00 PM. Please bring your NIC/Passport (197544332211) and arrive 10m early. - Ministry Portal
-[2026-09-02 14:54:40] [LIVE EMAIL SENT] To: john.doe@gmail.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Cancelled - Ref: APPT-9X4E1F'
-[2026-09-02 14:54:41] [LIVE EMAIL SENT] To: sarah.c@cyberdyne.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Confirmed - Ref: APPT-5B9C2D'
-[2026-09-02 14:54:43] [SIMULATED SMS] To: +1 555-0125 | Msg: Appointment CANCELLED. Ref: APPT-4Y9L0Q on 2026-08-25. Reason: Auto-cancelled: Appointment date expired. You may book a new slot via the portal. - Ministry Portal
-[2026-09-02 14:54:44] [LIVE EMAIL SENT] To: bruce@waynecorp.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Confirmed - Ref: APPT-2A7D8K'
-[2026-09-02 14:54:48] [LIVE EMAIL SENT] To: diana@themyscira.gov | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Cancelled - Ref: APPT-4Y9L0Q'
-[2026-09-03 11:05:57] [SIMULATED SMS] To: +94 77 123 4567 | Msg: Appointment request received. Ref: APPT-TEST01. Officer: Secretary, Date: 2026-09-02 10:00 AM. Status: Pending review. - Ministry Portal
-[2026-09-03 11:06:03] [LIVE EMAIL SENT] To: test@example.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-TEST01'
-[2026-09-03 12:00:07] [SIMULATED SMS] To: 0771234567 | Msg: Appointment request received. Ref: APT-2026-TEST99. Officer: Mrs. K. Silva (Divisional Officer), Date: 2026-09-04 10:00 AM. Status: Pending review. - Ministry Portal
-[2026-09-03 12:00:18] [LIVE EMAIL SENT] To: dilshan@example.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Request Received - Ref: APT-2026-TEST99'
-[2026-09-03 12:01:36] [SIMULATED SMS] To: 0771234567 | Msg: Appointment request received. Ref: APT-1788417094. Officer: Mrs. K. Silva (Divisional Officer), Date: 2026-09-04 10:00 AM. Status: Pending review. - Ministry Portal
-[2026-09-03 12:01:38] [SIMULATED SMS] To: 0771234567 | Msg: Appointment CONFIRMED. Ref: APT-1788417094. With: Mrs. K. Silva (Divisional Officer) on 2026-09-04 at 10:00 AM. Please bring your NIC/Passport (199512345678) and arrive 10m early. - Ministry Portal
-[2026-09-03 12:01:41] [LIVE EMAIL SENT] To: dilshan@example.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Request Received - Ref: APT-1788417094'
-[2026-09-03 12:01:42] [LIVE EMAIL SENT] To: dilshan@example.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-1788417094'
-[2026-09-03 12:02:05] [SIMULATED SMS] To: 0771234567 | Msg: Appointment request received. Ref: APT-1788417123. Officer: Mrs. K. Silva (Divisional Officer), Date: 2026-09-04 10:00 AM. Status: Pending review. - Ministry Portal
-[2026-09-03 12:02:07] [SIMULATED SMS] To: 0771234567 | Msg: Appointment CONFIRMED. Ref: APT-1788417123. With: Mrs. K. Silva (Divisional Officer) on 2026-09-04 at 10:00 AM. Please bring your NIC/Passport (199512345678) and arrive 10m early. - Ministry Portal
-[2026-09-03 12:02:10] [LIVE EMAIL SENT] To: dilshan@example.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Request Received - Ref: APT-1788417123'
-[2026-09-03 12:02:13] [LIVE EMAIL SENT] To: dilshan@example.com | From: chamiyadhawan123@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-1788417123'
-[2026-09-04 13:11:37] [SIMULATED SMS] To: 071****543| Msg: Appointment request received. Ref: APT-SEC-1788507695. Officer: Secretary, Date: 2026-09-08 11:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-02 13:17:02] [LIVE EMAIL SENT] To: s****4@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Cancelled - Ref: APPT-XKBTL8'
+[2026-09-02 13:56:31] [SIMULATED SMS] To: 077****567 | Msg: Appointment request received. Ref: APPT-SPAM-7589. Officer: Secretary, Date: 2026-09-11 11:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-02 13:56:37] [LIVE EMAIL SENT] To: p****9@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-SPAM-7589'
+[2026-09-02 14:02:22] [SIMULATED SMS] To: 012****789 | Msg: Appointment request received. Ref: APPT-B65LV6. Officer: Secretary, Date: 2026-09-16 9:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-02 14:02:27] [LIVE EMAIL SENT] To: s****4@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-B65LV6'
+[2026-09-02 14:54:29] [SIMULATED SMS] To: +15****112 | Msg: Appointment CANCELLED. Ref: APPT-3H8J9P on 2026-08-23. Reason: Urgent assignment at the Daily Planet. You may book a new slot via the portal. - Ministry Portal
+[2026-09-02 14:54:32] [SIMULATED SMS] To: +15****125 | Msg: Appointment CANCELLED. Ref: APPT-4Y9L0Q on 2026-08-25. Reason: Auto-cancelled: Appointment date expired. You may book a new slot via the portal. - Ministry Portal
+[2026-09-02 14:54:34] [LIVE EMAIL SENT] To: c****k@dailyplanet.com | From: c****3@gmail.com | Subject: 'Appointment Cancelled - Ref: APPT-3H8J9P'
+[2026-09-02 14:54:34] [SIMULATED SMS] To: +15****143 | Msg: Appointment CANCELLED. Ref: APPT-9X4E1F on 2026-08-24. Reason: Auto-cancelled: Appointment date expired. You may book a new slot via the portal. - Ministry Portal
+[2026-09-02 14:54:36] [SIMULATED SMS] To: +15****199 | Msg: Appointment CONFIRMED. Ref: APPT-5B9C2D. With: Secretary on 2026-08-24 at 10:00 AM. Please bring your NIC/Passport (1984****78) and arrive 10m early. - Ministry Portal
+[2026-09-02 14:54:37] [LIVE EMAIL SENT] To: d****a@themyscira.gov | From: c****3@gmail.com | Subject: 'Appointment Cancelled - Ref: APPT-4Y9L0Q'
+[2026-09-02 14:54:39] [SIMULATED SMS] To: +15****100 | Msg: Appointment CONFIRMED. Ref: APPT-2A7D8K. With: Secretary on 2026-08-25 at 03:00 PM. Please bring your NIC/Passport (1975****11) and arrive 10m early. - Ministry Portal
+[2026-09-02 14:54:40] [LIVE EMAIL SENT] To: j****e@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Cancelled - Ref: APPT-9X4E1F'
+[2026-09-02 14:54:41] [LIVE EMAIL SENT] To: s****c@cyberdyne.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APPT-5B9C2D'
+[2026-09-02 14:54:43] [SIMULATED SMS] To: +15****125 | Msg: Appointment CANCELLED. Ref: APPT-4Y9L0Q on 2026-08-25. Reason: Auto-cancelled: Appointment date expired. You may book a new slot via the portal. - Ministry Portal
+[2026-09-02 14:54:44] [LIVE EMAIL SENT] To: b****e@waynecorp.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APPT-2A7D8K'
+[2026-09-02 14:54:48] [LIVE EMAIL SENT] To: d****a@themyscira.gov | From: c****3@gmail.com | Subject: 'Appointment Cancelled - Ref: APPT-4Y9L0Q'
+[2026-09-03 11:05:57] [SIMULATED SMS] To: +94****567 | Msg: Appointment request received. Ref: APPT-TEST01. Officer: Secretary, Date: 2026-09-02 10:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-03 11:06:03] [LIVE EMAIL SENT] To: t****t@example.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-TEST01'
+[2026-09-03 12:00:07] [SIMULATED SMS] To: 077****567 | Msg: Appointment request received. Ref: APT-2026-TEST99. Officer: Mrs. K. Silva (Divisional Officer), Date: 2026-09-04 10:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-03 12:00:18] [LIVE EMAIL SENT] To: d****n@example.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APT-2026-TEST99'
+[2026-09-03 12:01:36] [SIMULATED SMS] To: 077****567 | Msg: Appointment request received. Ref: APT-1788417094. Officer: Mrs. K. Silva (Divisional Officer), Date: 2026-09-04 10:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-03 12:01:38] [SIMULATED SMS] To: 077****567 | Msg: Appointment CONFIRMED. Ref: APT-1788417094. With: Mrs. K. Silva (Divisional Officer) on 2026-09-04 at 10:00 AM. Please bring your NIC/Passport (1995****78) and arrive 10m early. - Ministry Portal
+[2026-09-03 12:01:41] [LIVE EMAIL SENT] To: d****n@example.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APT-1788417094'
+[2026-09-03 12:01:42] [LIVE EMAIL SENT] To: d****n@example.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-1788417094'
+[2026-09-03 12:02:05] [SIMULATED SMS] To: 077****567 | Msg: Appointment request received. Ref: APT-1788417123. Officer: Mrs. K. Silva (Divisional Officer), Date: 2026-09-04 10:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-03 12:02:07] [SIMULATED SMS] To: 077****567 | Msg: Appointment CONFIRMED. Ref: APT-1788417123. With: Mrs. K. Silva (Divisional Officer) on 2026-09-04 at 10:00 AM. Please bring your NIC/Passport (1995****78) and arrive 10m early. - Ministry Portal
+[2026-09-03 12:02:10] [LIVE EMAIL SENT] To: d****n@example.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APT-1788417123'
+[2026-09-03 12:02:13] [LIVE EMAIL SENT] To: d****n@example.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-1788417123'
+[2026-09-04 13:11:37] [SIMULATED SMS] To: 071****543 | Msg: Appointment request received. Ref: APT-SEC-1788507695. Officer: Secretary, Date: 2026-09-08 11:00 AM. Status: Pending review. - Ministry Portal
 [2026-09-04 13:11:44] [LIVE EMAIL SENT] To: k****w@example.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APT-SEC-1788507695'
-[2026-09-04 13:12:39] [SIMULATED SMS] To: 071****543| Msg: Appointment CONFIRMED. Ref: APT-SEC-1788507695. With: Secretary on 2026-09-08 at 11:00 AM. Please bring your NIC/Passport (1992****01) and arrive 10m early. - Ministry Portal
+[2026-09-04 13:12:39] [SIMULATED SMS] To: 071****543 | Msg: Appointment CONFIRMED. Ref: APT-SEC-1788507695. With: Secretary on 2026-09-08 at 11:00 AM. Please bring your NIC/Passport (1992****01) and arrive 10m early. - Ministry Portal
 [2026-09-04 13:12:44] [LIVE EMAIL SENT] To: k****w@example.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-SEC-1788507695'
+[2026-09-08 09:19:28] [SIMULATED SMS] To: 077****567| Msg: Appointment request received. Ref: APT-TEST-1788839366. Officer: Secretary, Date: 2026-09-09 10:30 AM. Status: Pending review. - Ministry Portal
+[2026-09-08 09:19:34] [LIVE EMAIL SENT] To: n****p@example.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APT-TEST-1788839366'
+[2026-09-09 08:54:35] [SIMULATED SMS] To: 077****567| Msg: Appointment request received. Ref: APT-1788924272. Officer: Mrs. K. Silva (Divisional Officer), Date: 2026-09-04 10:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-09 08:54:40] [LIVE EMAIL SENT] To: d****n@example.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APT-1788924272'
+[2026-09-09 08:55:15] [SIMULATED SMS] To: 077****567| Msg: Appointment request received. Ref: APT-1788924313. Officer: Mrs. K. Silva (Divisional Officer), Date: 2026-09-04 10:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-09 08:55:20] [SIMULATED SMS] To: 077****567| Msg: Appointment CONFIRMED. Ref: APT-1788924313. With: Mrs. K. Silva (Divisional Officer) on 2026-09-04 at 10:00 AM. Please bring your NIC/Passport (1995****78) and arrive 10m early. - Ministry Portal
+[2026-09-09 08:55:21] [LIVE EMAIL SENT] To: d****n@example.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APT-1788924313'
+[2026-09-09 08:55:25] [LIVE EMAIL SENT] To: d****n@example.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-1788924313'
+[2026-09-09 08:58:59] [SIMULATED SMS] To: 077****567| Msg: Appointment CONFIRMED. Ref: APT-TEST-1788839366. With: Secretary on 2026-09-09 at 10:30 AM. Please bring your NIC/Passport (1994****44) and arrive 10m early. - Ministry Portal
+[2026-09-09 08:59:04] [LIVE EMAIL SENT] To: n****p@example.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-TEST-1788839366'

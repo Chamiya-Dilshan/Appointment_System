@@ -18,7 +18,8 @@ class Appointment(db.Model):  # type: ignore[name-defined]
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=False)
     name = db.Column(db.String(100), nullable=False)
     reason = db.Column(db.String(255), nullable=False)
-    phone = db.Column(db.String(50), nullable=False)
+    # Enlarged to VARCHAR(255) to hold Fernet encrypted ciphertext
+    phone = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(100), nullable=False)
 
     # Date stored as YYYY-MM-DD string; time stored as formatted string (e.g. "10:00 AM")
@@ -75,7 +76,7 @@ class Appointment(db.Model):  # type: ignore[name-defined]
             self.id = id
         self.name = name
         self.reason = reason
-        self.phone = phone
+        self.phone = encrypt_field(phone)
         self.email = email
         self.date = date
         self.time = time
@@ -97,7 +98,7 @@ class Appointment(db.Model):  # type: ignore[name-defined]
             "id": self.id,
             "name": self.name,
             "reason": self.reason,
-            "phone": self.phone,
+            "phone": decrypt_field(self.phone),
             "email": self.email,
             "date": self.date,
             "time": self.time,

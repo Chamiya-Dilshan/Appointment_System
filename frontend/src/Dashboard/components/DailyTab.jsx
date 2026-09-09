@@ -255,25 +255,27 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                             >
                               View
                             </button>
-                            <button
-                              type="button"
-                              disabled={resendingId === appt.id}
-                              onClick={() => handleResend(appt.id)}
-                              className="flex-1 sm:flex-none text-center px-2.5 py-1.5 rounded-lg bg-sky-100/80 text-sky-700 border border-sky-200/80 hover:bg-sky-200/80 dark:bg-sky-950/30 dark:text-sky-400 dark:border-sky-900/50 dark:hover:bg-sky-900/40 transition-all font-bold cursor-pointer text-xs disabled:opacity-50 flex items-center justify-center gap-1"
-                              title="Dispatch / Resend Notification (Email & SMS)"
-                            >
-                              {resendingId === appt.id ? (
-                                <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                              ) : (
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                              )}
-                              <span>Alert</span>
-                            </button>
+                            {appt.date >= todayStr && appt.status !== 'Completed' && appt.status !== 'Cancelled' && (
+                              <button
+                                type="button"
+                                disabled={resendingId === appt.id}
+                                onClick={() => handleResend(appt.id)}
+                                className="flex-1 sm:flex-none text-center px-2.5 py-1.5 rounded-lg bg-sky-100/80 text-sky-700 border border-sky-200/80 hover:bg-sky-200/80 dark:bg-sky-950/30 dark:text-sky-400 dark:border-sky-900/50 dark:hover:bg-sky-900/40 transition-all font-bold cursor-pointer text-xs disabled:opacity-50 flex items-center justify-center gap-1"
+                                title="Dispatch / Resend Notification (Email & SMS)"
+                              >
+                                {resendingId === appt.id ? (
+                                  <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                ) : (
+                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                  </svg>
+                                )}
+                                <span>Alert</span>
+                              </button>
+                            )}
                             {isPending && (
                               <button
                                 onClick={() => onConfirm(appt.id)}
@@ -470,30 +472,32 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                     </svg>
                     4. Automated Notifications
                   </h4>
-                  <button
-                    type="button"
-                    disabled={resendingId === selectedDetailedAppt.id}
-                    onClick={() => handleResend(selectedDetailedAppt.id)}
-                    className="w-full sm:w-auto px-3 py-1.5 sm:py-1 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-xs"
-                    title="Dispatch / Resend Live or Simulated Email & SMS"
-                  >
-                    {resendingId === selectedDetailedAppt.id ? (
-                      <>
-                        <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span>Dispatching...</span>
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                        </svg>
-                        <span>Dispatch / Resend Notification</span>
-                      </>
-                    )}
-                  </button>
+                  {selectedDetailedAppt.date >= todayStr && selectedDetailedAppt.status !== 'Completed' && selectedDetailedAppt.status !== 'Cancelled' && (
+                    <button
+                      type="button"
+                      disabled={resendingId === selectedDetailedAppt.id}
+                      onClick={() => handleResend(selectedDetailedAppt.id)}
+                      className="w-full sm:w-auto px-3 py-1.5 sm:py-1 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-xs"
+                      title="Dispatch / Resend Live or Simulated Email & SMS"
+                    >
+                      {resendingId === selectedDetailedAppt.id ? (
+                        <>
+                          <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          <span>Dispatching...</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                          </svg>
+                          <span>Dispatch / Resend Notification</span>
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">

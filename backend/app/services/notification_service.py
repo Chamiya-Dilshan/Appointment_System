@@ -69,7 +69,7 @@ def _sanitize_log_entry(entry: str) -> str:
     )
     # Mask phone numbers in To: <phone>
     sanitized = re.sub(
-        r"(To:\s*)([\+0-9\s\-]{7,16})(\s*\|)",
+        r"(To:\s*)([\+0-9\s\-]{7,16})(\s*(?:\||$|\n))",
         lambda m: f"{m.group(1)}{mask_phone(m.group(2))}{m.group(3)}",
         sanitized
     )
@@ -215,7 +215,7 @@ def send_email_async(
         if not smtp_server or not smtp_user or not smtp_password:
             sim_msg = (
                 f"\n[SIMULATED EMAIL DISPATCH]\n"
-                f"  To: {to_email}\n"
+                f"  To: {mask_email(to_email)}\n"
                 f"  Subject: {subject}\n"
                 f"  (To send live emails, configure SMTP_SERVER, SMTP_USER, and SMTP_PASSWORD in .env)\n"
             )
@@ -265,13 +265,13 @@ def send_email_async(
                     server.login(smtp_user, smtp_password)
                     server.sendmail(from_email, [to_email], msg.as_string())
 
-            success_log = f"[EMAIL SENT] To: {to_email} | From: {from_email} | Subject: '{subject}'"
+            success_log = f"[EMAIL SENT] To: {mask_email(to_email)} | From: {from_email} | Subject: '{subject}'"
             print(f"\n{success_log}\n", flush=True)
             logger.info(success_log)
             _log_notification(f"[LIVE EMAIL SENT] To: {to_email} | From: {from_email} | Subject: '{subject}'")
         except Exception as exc:
             import traceback
-            err_log = f"[EMAIL DISPATCH ERROR] Failed to send to {to_email}: {exc}\n{traceback.format_exc()}"
+            err_log = f"[EMAIL DISPATCH ERROR] Failed to send to {mask_email(to_email)}: {exc}\n{traceback.format_exc()}"
             print(f"\n{err_log}\n", flush=True)
             logger.error(err_log)
             _log_notification(f"[EMAIL FAILED] To: {to_email} | Error: {exc}")
@@ -305,7 +305,7 @@ def send_sms_async(phone: str, message: str) -> None:
                 "  To: %s\n"
                 "  Message: %s\n"
                 "  (To send live SMS, configure SMS_GATEWAY_URL / SMS_API_KEY in .env)",
-                cleaned_phone,
+                mask_phone(cleaned_phone),
                 message,
             )
             _log_notification(f"[SIMULATED SMS] To: {cleaned_phone} | Msg: {message}")
@@ -331,10 +331,10 @@ def send_sms_async(phone: str, message: str) -> None:
             with urllib.request.urlopen(req, timeout=10) as resp:
                 status_code = resp.getcode()
                 response_text = resp.read().decode("utf-8", errors="ignore")
-                logger.info("SMS dispatched to %s (Status %s): %s", cleaned_phone, status_code, response_text[:100])
+                logger.info("SMS dispatched to %s (Status %s): %s", mask_phone(cleaned_phone), status_code, response_text[:100])
                 _log_notification(f"[LIVE SMS SENT] To: {cleaned_phone} | Status: {status_code}")
         except Exception as exc:
-            logger.error("Failed to send SMS to %s: %s", cleaned_phone, exc)
+            logger.error("Failed to send SMS to %s: %s", mask_phone(cleaned_phone), exc)
             _log_notification(f"[SMS FAILED] To: {cleaned_phone} | Error: {exc}")
 
     thread = threading.Thread(target=_worker, daemon=False)
