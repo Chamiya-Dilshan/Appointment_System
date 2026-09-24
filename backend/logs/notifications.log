@@ -62,3 +62,18 @@
 [2026-09-09 08:55:25] [LIVE EMAIL SENT] To: d****n@example.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-1788924313'
 [2026-09-09 08:58:59] [SIMULATED SMS] To: 077****567| Msg: Appointment CONFIRMED. Ref: APT-TEST-1788839366. With: Secretary on 2026-09-09 at 10:30 AM. Please bring your NIC/Passport (1994****44) and arrive 10m early. - Ministry Portal
 [2026-09-09 08:59:04] [LIVE EMAIL SENT] To: n****p@example.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-TEST-1788839366'
+[2026-09-23 14:44:24] [SIMULATED SMS] To: 077****567| Msg: Appointment request received. Ref: APPT-TEST01. Officer: Secretary, Date: 2026-09-30 10:30 AM. Status: Pending review. - Ministry Portal
+[2026-09-23 14:55:23] [SIMULATED SMS] To: +94****407| Msg: Appointment request received. Ref: APT-GPFM7Q. Officer: Secretary, Date: 2026-09-24 9:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-23 14:55:38] [LIVE EMAIL SENT] To: d****o@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APT-GPFM7Q'
+[2026-09-24 09:51:13] [SIMULATED SMS] To: +94****407| Msg: Appointment CONFIRMED. Ref: APT-GPFM7Q. With: Secretary on 2026-09-24 at 9:00 AM. Please bring your NIC/Passport (2001****28) and arrive 10m early. - Ministry Portal
+[2026-09-24 09:51:16] [SIMULATED SMS] To: +94****407| Msg: Appointment CONFIRMED. Ref: APT-GPFM7Q. With: Secretary on 2026-09-24 at 9:00 AM. Please bring your NIC/Passport (2001****28) and arrive 10m early. - Ministry Portal
+[2026-09-24 09:51:17] [LIVE EMAIL SENT] To: d****o@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-GPFM7Q'
+[2026-09-24 09:51:21] [LIVE EMAIL SENT] To: d****o@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-GPFM7Q'
+[2026-09-24 10:14:33] [SIMULATED SMS] To: 011****678| Msg: Appointment CONFIRMED. Ref: OFF-20261002-001. With: Secretary on 2026-10-02 at 02:30 PM. Please bring your NIC/Passport (OFFICIAL) and arrive 10m early. - Ministry Portal
+[2026-09-24 10:14:37] [LIVE EMAIL SENT] To: d*@treasury.gov.lk | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: OFF-20261002-001'
+[2026-09-24 11:05:39] [SIMULATED SMS] To: 077****567| Msg: Appointment request received. Ref: APPT-TEST03. Officer: Minister, Date: 2026-09-28 10:00 AM. Status: Pending review. - Ministry Portal
+[2026-09-24 11:05:39] [SIMULATED SMS] To: 077****568| Msg: Appointment request received. Ref: APPT-TEST04. Officer: Secretary, Date: 2026-09-28 02:00 PM. Status: Pending review. - Ministry Portal
+[2026-09-24 13:02:24] [SIMULATED SMS] To: 071****407| Msg: Appointment request received. Ref: OFF-46NEKQ. Officer: Secretary, Date: 2026-10-02 1:00 PM. Status: Pending review. - Ministry Portal
+[2026-09-24 13:02:30] [LIVE EMAIL SENT] To: c****3@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: OFF-46NEKQ'
+[2026-09-24 13:02:58] [SIMULATED SMS] To: 071****407| Msg: Appointment CONFIRMED. Ref: OFF-46NEKQ. With: Secretary on 2026-10-02 at 1:00 PM. Please bring your NIC/Passport (OFFICIAL) and arrive 10m early. - Ministry Portal
+[2026-09-24 13:03:03] [LIVE EMAIL SENT] To: c****3@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: OFF-46NEKQ'

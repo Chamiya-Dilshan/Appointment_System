@@ -112,6 +112,7 @@ def init_db_with_retry(app) -> bool:  # type: ignore[type-arg]
             db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN phone VARCHAR(255) NOT NULL;"))
             db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN nic VARCHAR(255) NOT NULL;"))
             db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN address TEXT NOT NULL;"))
+            db.session.execute(text("ALTER TABLE appointments MODIFY COLUMN email VARCHAR(255) NULL;"))
             db.session.commit()
         except Exception:
             db.session.rollback()
@@ -124,7 +125,29 @@ def init_db_with_retry(app) -> bool:  # type: ignore[type-arg]
         except Exception:
             db.session.rollback()
 
-        # Encrypt any legacy unencrypted phone/nic/address values in MySQL
+        # Ensure meetingType, organization, and venue columns exist in MySQL
+        try:
+            from sqlalchemy import text
+            db.session.execute(text("ALTER TABLE appointments ADD COLUMN meetingType VARCHAR(50) DEFAULT 'Public Consultation';"))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
+        try:
+            from sqlalchemy import text
+            db.session.execute(text("ALTER TABLE appointments ADD COLUMN organization VARCHAR(150) NULL;"))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
+        try:
+            from sqlalchemy import text
+            db.session.execute(text("ALTER TABLE appointments ADD COLUMN venue VARCHAR(150) NULL;"))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
+        # Encrypt any legacy unencrypted phone/nic/address/email values in MySQL
         try:
             from app.models.appointment import Appointment
             from app.utils.crypto import encrypt_field
@@ -139,6 +162,9 @@ def init_db_with_retry(app) -> bool:  # type: ignore[type-arg]
                     migrated = True
                 if a.address and not a.address.startswith("gAAAAA"):
                     a.address = encrypt_field(a.address)
+                    migrated = True
+                if a.email and not a.email.startswith("gAAAAA"):
+                    a.email = encrypt_field(a.email)
                     migrated = True
             if migrated:
                 db.session.commit()

@@ -20,7 +20,8 @@ class Appointment(db.Model):  # type: ignore[name-defined]
     reason = db.Column(db.String(255), nullable=False)
     # Enlarged to VARCHAR(255) to hold Fernet encrypted ciphertext
     phone = db.Column(db.String(255), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
+    # Enlarged to VARCHAR(255) to hold Fernet encrypted ciphertext
+    email = db.Column(db.String(255), nullable=True, default="")
 
     # Date stored as YYYY-MM-DD string; time stored as formatted string (e.g. "10:00 AM")
     date = db.Column(db.String(10), nullable=False)
@@ -43,6 +44,11 @@ class Appointment(db.Model):  # type: ignore[name-defined]
 
     # Which ministerial officer this appointment is with
     officer = db.Column(db.String(50), nullable=False)
+
+    # Meeting category: 'Public Consultation' (default) or 'Official Meeting'
+    meetingType = db.Column(db.String(50), default="Public Consultation", nullable=False)
+    organization = db.Column(db.String(150), nullable=True, default="")
+    venue = db.Column(db.String(150), nullable=True, default="")
 
     # Populated only when status == 'Cancelled' or 'Completed'
     cancellationRemark = db.Column(db.Text, nullable=True)
@@ -67,6 +73,9 @@ class Appointment(db.Model):  # type: ignore[name-defined]
         address: str = "",
         postalCode: str = "",
         officer: str = "",
+        meetingType: str = "Public Consultation",
+        organization: str = "",
+        venue: str = "",
         cancellationRemark: str | None = None,
         completionRemark: str | None = None,
         **kwargs: Any,
@@ -77,7 +86,7 @@ class Appointment(db.Model):  # type: ignore[name-defined]
         self.name = name
         self.reason = reason
         self.phone = encrypt_field(phone)
-        self.email = email
+        self.email = encrypt_field(email) if email else ""
         self.date = date
         self.time = time
         self.status = status
@@ -90,6 +99,9 @@ class Appointment(db.Model):  # type: ignore[name-defined]
         self.address = encrypt_field(address)
         self.postalCode = postalCode
         self.officer = officer
+        self.meetingType = meetingType or "Public Consultation"
+        self.organization = organization or ""
+        self.venue = venue or ""
         self.cancellationRemark = cancellationRemark
         self.completionRemark = encrypt_field(completionRemark) if completionRemark else None
 
@@ -99,7 +111,7 @@ class Appointment(db.Model):  # type: ignore[name-defined]
             "name": self.name,
             "reason": self.reason,
             "phone": decrypt_field(self.phone),
-            "email": self.email,
+            "email": decrypt_field(self.email) if self.email else "",
             "date": self.date,
             "time": self.time,
             "status": self.status,
@@ -112,6 +124,9 @@ class Appointment(db.Model):  # type: ignore[name-defined]
             "address": decrypt_field(self.address),
             "postalCode": self.postalCode,
             "officer": self.officer,
+            "meetingType": getattr(self, "meetingType", "Public Consultation") or "Public Consultation",
+            "organization": getattr(self, "organization", "") or "",
+            "venue": getattr(self, "venue", "") or "",
             "cancellationRemark": self.cancellationRemark,
             "completionRemark": decrypt_field(self.completionRemark) if self.completionRemark else None,
         }

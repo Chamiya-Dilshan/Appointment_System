@@ -22,7 +22,7 @@ const INITIAL_APPOINTMENTS = [
   { id: 9, name: 'Zaphod Beeblebrox', reason: 'Ego Boost Interview', date: '2026-08-31', time: '04:00 PM', status: 'Pending', phone: '+1 555-9999', email: 'president@galaxy.gov', refNo: 'APPT-9O1P2Q', nic: '197011335577', district: 'Jaffna', province: 'Northern', council: 'Jaffna Municipal Council', gsDivision: 'Chunnakam', address: 'Kankesanthurai Rd, Jaffna', postalCode: '40000', officer: 'Minister' }
 ]
 
-export default function Dashboard({ currentUser, onLogout }) {
+export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }) {
   const [appointments, setAppointments] = useState([])
   const [allowedDatesByRole, setAllowedDatesByRole] = useState({
     'Secretary': [],
@@ -119,9 +119,7 @@ export default function Dashboard({ currentUser, onLogout }) {
     try {
       const response = await fetch('/api/appointments', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(newAppt)
       })
       if (response.ok) {
@@ -417,6 +415,7 @@ export default function Dashboard({ currentUser, onLogout }) {
         isMobileOpen={isMobileOpen}
         setIsMobileOpen={setIsMobileOpen}
         currentUser={currentUser}
+        onNavigateToCitizen={onNavigateToCitizen}
       />
 
       {/* Main Content Area */}

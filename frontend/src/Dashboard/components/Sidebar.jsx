@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Sidebar({ activeTab, setActiveTab, pendingCount, onLogout, isMobileOpen, setIsMobileOpen, currentUser }) {
+export default function Sidebar({ activeTab, setActiveTab, pendingCount, onLogout, isMobileOpen, setIsMobileOpen, currentUser, onNavigateToCitizen }) {
   const tabs = [
     {
       id: 'overview',
@@ -124,6 +124,19 @@ export default function Sidebar({ activeTab, setActiveTab, pendingCount, onLogou
             </p>
           </div>
         </div>
+        {onNavigateToCitizen && (
+          <button
+            type="button"
+            onClick={onNavigateToCitizen}
+            className="w-full flex items-center justify-center gap-2 mb-2 px-4 py-2 rounded-xl border border-indigo-200 dark:border-indigo-900/60 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors cursor-pointer"
+            title="Switch to public citizen appointment booking page"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+            <span>Public Citizen Portal</span>
+          </button>
+        )}
         <button
           onClick={onLogout}
           className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800/80 text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-600 dark:hover:bg-rose-900 hover:text-white dark:hover:text-white transition-colors cursor-pointer"

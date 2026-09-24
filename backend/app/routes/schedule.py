@@ -12,10 +12,26 @@ from flask import Blueprint, request, jsonify
 from app.extensions import db
 from app.models.allowed_date import AllowedDate
 from app.utils.auth_guard import jwt_required
+import datetime
 
 schedule_bp = Blueprint("schedule", __name__)
 
 VALID_ROLES = {"Secretary", "Deputy Minister", "Minister"}
+
+
+def get_upcoming_public_days(weeks: int = 12) -> list[str]:
+    """Return ISO date strings of upcoming Mondays (official Public Days for Secretary & Minister)."""
+    today = datetime.date.today()
+    public_days = []
+    # Monday is weekday == 0 in Python
+    days_ahead = (0 - today.weekday()) % 7
+    if days_ahead == 0:
+        days_ahead = 7
+    start_date = today + datetime.timedelta(days=days_ahead)
+    for i in range(weeks):
+        d = start_date + datetime.timedelta(weeks=i)
+        public_days.append(d.isoformat())
+    return public_days
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -27,23 +43,19 @@ VALID_ROLES = {"Secretary", "Deputy Minister", "Minister"}
 def get_schedule():
     """
     Return all allowed booking dates grouped by officer role.
-
-    Response shape:
-        {
-          "Secretary":       ["2026-09-01", ...],
-          "Deputy Minister": ["2026-09-03", ...],
-          "Minister":        ["2026-09-05", ...]
-        }
+    Automatically includes all upcoming official Public Days (Mondays)
+    plus any specially configured dates from the database.
     """
     try:
         rows = AllowedDate.query.all()
+        upcoming_mondays = get_upcoming_public_days(weeks=12)
 
-        grouped: dict = {role: [] for role in VALID_ROLES}
+        grouped: dict = {role: list(upcoming_mondays) for role in VALID_ROLES}
         for row in rows:
             if row.role in grouped:
-                grouped[row.role].append(row.date)
+                if row.date not in grouped[row.role]:
+                    grouped[row.role].append(row.date)
             else:
-                # Support any future roles added directly to the DB
                 grouped[row.role] = [row.date]
 
         # Sort each role's dates chronologically
