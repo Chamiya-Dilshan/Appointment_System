@@ -34,15 +34,6 @@ const PROVINCES_AND_DISTRICTS = {
   "Sabaragamuwa": ["Kegalle", "Ratnapura"]
 }
 
-const VENUE_OPTIONS = [
-  "Hon. Minister's Office & Boardroom",
-  "Secretary's Conference Room",
-  "Main Ministry Auditorium (3rd Floor)",
-  "Executive Committee Room A",
-  "Executive Committee Room B",
-  "Virtual Video Conference (Zoom / Teams)"
-]
-
 export default function BookTab({ appointments, allowedDates, onAddAppointment, setActiveTab, currentUser }) {
   // Category switch: 'Official Meeting' (Default for Admin) vs 'Public Consultation'
   const [meetingCategory, setMeetingCategory] = useState('Official Meeting')
@@ -59,8 +50,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
   const [organization, setOrganization] = useState('')
   const [leadOfficial, setLeadOfficial] = useState('')
   const [designation, setDesignation] = useState('')
-  const [venue, setVenue] = useState(VENUE_OPTIONS[0])
-  const [customVenue, setCustomVenue] = useState('')
+  const [venue, setVenue] = useState('')
   const [meetingNotes, setMeetingNotes] = useState('')
 
   // Citizen Consultation specific states
@@ -79,7 +69,6 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
   const [showProvinceDropdown, setShowProvinceDropdown] = useState(false)
   const [showDistrictDropdown, setShowDistrictDropdown] = useState(false)
   const [showTimeDropdown, setShowTimeDropdown] = useState(false)
-  const [showVenueDropdown, setShowVenueDropdown] = useState(false)
 
   // Validation errors
   const [formError, setFormError] = useState('')
@@ -195,14 +184,14 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
 
     // Category specific validations
     if (meetingCategory === 'Official Meeting') {
-      if (!meetingTitle.trim() || !organization.trim() || !leadOfficial.trim()) {
-        setFormError("Please fill in the Meeting Subject, Organization / Entity, and Lead Official Name.")
+      if (!meetingTitle.trim() || !organization.trim() || !leadOfficial.trim() || !venue.trim()) {
+        setFormError("Please fill in the Meeting Subject, Organization / Entity, Lead Official Name, and Meeting Venue.")
         return
       }
     } else {
       // Citizen Consultation validation
       if (!newName.trim() || !newReason.trim() || !newNic.trim() || !newDistrict.trim() ||
-          !newProvince.trim() || !newCouncil.trim() || !newAddress.trim()) {
+        !newProvince.trim() || !newCouncil.trim() || !newAddress.trim()) {
         setFormError("Please fill in all required citizen details.")
         return
       }
@@ -243,7 +232,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
     }
 
     const refNo = generateRefNo()
-    const selectedVenue = venue === "Other Custom Venue" ? (customVenue.trim() || "Ministry Headquarters") : venue
+    const selectedVenue = venue.trim() || "Ministry Boardroom"
 
     const newAppt = {
       id: Date.now(),
@@ -282,6 +271,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
     setOrganization('')
     setLeadOfficial('')
     setDesignation('')
+    setVenue('')
     setMeetingNotes('')
     setNewName('')
     setNewPhone('')
@@ -305,7 +295,6 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
     setShowProvinceDropdown(false)
     setShowDistrictDropdown(false)
     setShowTimeDropdown(false)
-    setShowVenueDropdown(false)
 
     // Switch to appointments listing tab
     setActiveTab('appointments')
@@ -345,17 +334,15 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                 setNewStatus('Confirmed')
                 setFormError('')
               }}
-              className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-center gap-3 ${
-                meetingCategory === 'Official Meeting'
+              className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-center gap-3 ${meetingCategory === 'Official Meeting'
                   ? 'border-indigo-600 bg-white dark:bg-slate-900 ring-2 ring-indigo-500/20 shadow-sm'
                   : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-100/50 dark:bg-slate-950/40'
-              }`}
+                }`}
             >
-              <div className={`p-2.5 rounded-xl ${
-                meetingCategory === 'Official Meeting'
+              <div className={`p-2.5 rounded-xl ${meetingCategory === 'Official Meeting'
                   ? 'bg-indigo-600 text-white'
                   : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-              }`}>
+                }`}>
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
@@ -387,17 +374,15 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                   }
                 }
               }}
-              className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-center gap-3 ${
-                meetingCategory === 'Public Consultation'
+              className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-center gap-3 ${meetingCategory === 'Public Consultation'
                   ? 'border-indigo-600 bg-white dark:bg-slate-900 ring-2 ring-indigo-500/20 shadow-sm'
                   : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-100/50 dark:bg-slate-950/40'
-              }`}
+                }`}
             >
-              <div className={`p-2.5 rounded-xl ${
-                meetingCategory === 'Public Consultation'
+              <div className={`p-2.5 rounded-xl ${meetingCategory === 'Public Consultation'
                   ? 'bg-indigo-600 text-white'
                   : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-              }`}>
+                }`}>
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
@@ -461,7 +446,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                 />
               </div>
 
-              {/* Organization & Lead Official */}
+              {/* Organization & Meeting Venue */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
@@ -479,6 +464,23 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
 
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                    Meeting Venue / Location *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Hon. Minister's Office & Boardroom"
+                    value={venue}
+                    onChange={(e) => setVenue(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Lead Official & Official Designation */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                     Lead Official / Representative *
                   </label>
                   <input
@@ -490,10 +492,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm"
                   />
                 </div>
-              </div>
 
-              {/* Designation & Venue */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                     Official Designation / Title
@@ -505,43 +504,6 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                     onChange={(e) => setDesignation(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all text-sm"
                   />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                    Meeting Venue / Location *
-                  </label>
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setShowVenueDropdown(!showVenueDropdown)}
-                      className="w-full text-left px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white flex items-center justify-between text-sm cursor-pointer"
-                    >
-                      <span className="truncate">{venue}</span>
-                      <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                    {showVenueDropdown && (
-                      <div className="absolute left-0 right-0 mt-1 z-30 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-2 space-y-1">
-                        {VENUE_OPTIONS.map((v) => (
-                          <button
-                            key={v}
-                            type="button"
-                            onClick={() => {
-                              setVenue(v)
-                              setShowVenueDropdown(false)
-                            }}
-                            className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-                              venue === v ? 'bg-indigo-600 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
-                            }`}
-                          >
-                            {v}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
                 </div>
               </div>
 
@@ -560,9 +522,8 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                       setNewPhone(e.target.value)
                       if (phoneError) setPhoneError('')
                     }}
-                    className={`w-full px-4 py-2.5 rounded-xl border ${
-                      phoneError ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'
-                    } bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm`}
+                    className={`w-full px-4 py-2.5 rounded-xl border ${phoneError ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'
+                      } bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm`}
                   />
                   {phoneError && <p className="text-[11px] text-rose-500">{phoneError}</p>}
                 </div>
@@ -635,9 +596,8 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                         setNewNic(e.target.value)
                         if (nicError) setNicError('')
                       }}
-                      className={`w-full px-4 py-2.5 rounded-xl border ${
-                        nicError ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'
-                      } bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm`}
+                      className={`w-full px-4 py-2.5 rounded-xl border ${nicError ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'
+                        } bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm`}
                     />
                     {nicError && <p className="text-[11px] text-rose-500">{nicError}</p>}
                   </div>
@@ -657,9 +617,8 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                         setNewPhone(e.target.value)
                         if (phoneError) setPhoneError('')
                       }}
-                      className={`w-full px-4 py-2.5 rounded-xl border ${
-                        phoneError ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'
-                      } bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm`}
+                      className={`w-full px-4 py-2.5 rounded-xl border ${phoneError ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'
+                        } bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm`}
                     />
                     {phoneError && <p className="text-[11px] text-rose-500">{phoneError}</p>}
                   </div>
@@ -733,9 +692,8 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                                 setNewDistrict('')
                                 setShowProvinceDropdown(false)
                               }}
-                              className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                                newProvince === prov ? 'bg-indigo-600 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
-                              }`}
+                              className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all ${newProvince === prov ? 'bg-indigo-600 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
+                                }`}
                             >
                               {prov}
                             </button>
@@ -771,9 +729,8 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                                 setNewDistrict(dist)
                                 setShowDistrictDropdown(false)
                               }}
-                              className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                                newDistrict === dist ? 'bg-indigo-600 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
-                              }`}
+                              className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all ${newDistrict === dist ? 'bg-indigo-600 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
+                                }`}
                             >
                               {dist}
                             </button>
@@ -847,7 +804,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
           <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800/80">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-slate-100 dark:border-slate-800 pb-2">
               <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-                <span>3. Schedule Date & Time Slot</span>
+                <span>{meetingCategory === 'Official Meeting' ? '2' : '3'}. Schedule Date & Time Slot</span>
                 <span className="text-[10px] font-normal px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
                   {meetingCategory === 'Official Meeting' ? 'Any Working Day' : 'Mondays (Public Day)'}
                 </span>
@@ -932,13 +889,12 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                                 disabled={booked}
                                 onClick={() => setNewTime(slot.value)}
                                 title={booked ? `${slot.label} is already booked` : `Select ${slot.label}`}
-                                className={`py-2 px-2 rounded-xl text-xs font-semibold text-center transition-all cursor-pointer flex flex-col items-center justify-center relative ${
-                                  isSelected
+                                className={`py-2 px-2 rounded-xl text-xs font-semibold text-center transition-all cursor-pointer flex flex-col items-center justify-center relative ${isSelected
                                     ? 'bg-indigo-600 text-white font-extrabold shadow-sm shadow-indigo-500/30 ring-2 ring-indigo-400 scale-[1.02]'
                                     : booked
                                       ? 'bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-600 line-through cursor-not-allowed opacity-50 border border-transparent'
                                       : 'bg-slate-50 dark:bg-slate-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700/80 hover:border-indigo-300 dark:hover:border-indigo-600'
-                                }`}
+                                  }`}
                               >
                                 <span>{slot.label}</span>
                                 {booked && <span className="text-[9px] no-underline font-normal text-rose-500 dark:text-rose-400 leading-none mt-0.5">Booked</span>}
@@ -983,13 +939,12 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                                   disabled={booked}
                                   onClick={() => setNewTime(slot.value)}
                                   title={booked ? `${slot.label} is already booked` : `Select ${slot.label}`}
-                                  className={`py-2 px-2 rounded-xl text-xs font-semibold text-center transition-all cursor-pointer flex flex-col items-center justify-center relative ${
-                                    isSelected
+                                  className={`py-2 px-2 rounded-xl text-xs font-semibold text-center transition-all cursor-pointer flex flex-col items-center justify-center relative ${isSelected
                                       ? 'bg-indigo-600 text-white font-extrabold shadow-sm shadow-indigo-500/30 ring-2 ring-indigo-400 scale-[1.02]'
                                       : booked
                                         ? 'bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-600 line-through cursor-not-allowed opacity-50 border border-transparent'
                                         : 'bg-slate-50 dark:bg-slate-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700/80 hover:border-indigo-300 dark:hover:border-indigo-600'
-                                  }`}
+                                    }`}
                                 >
                                   <span>{slot.label}</span>
                                   {booked && <span className="text-[9px] no-underline font-normal text-rose-500 dark:text-rose-400 leading-none mt-0.5">Booked</span>}
@@ -1036,11 +991,10 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                       <button
                         type="button"
                         onClick={() => setNewStatus('Confirmed')}
-                        className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                          newStatus === 'Confirmed'
+                        className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${newStatus === 'Confirmed'
                             ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20'
                             : 'border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:bg-slate-100'
-                        }`}
+                          }`}
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                         Confirmed
@@ -1049,11 +1003,10 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                       <button
                         type="button"
                         onClick={() => setNewStatus('Pending')}
-                        className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                          newStatus === 'Pending'
+                        className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${newStatus === 'Pending'
                             ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/20'
                             : 'border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:bg-slate-100'
-                        }`}
+                          }`}
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-300"></span>
                         Pending
