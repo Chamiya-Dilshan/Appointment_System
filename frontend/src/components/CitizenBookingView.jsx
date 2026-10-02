@@ -9,7 +9,9 @@ import {
   parseInputTimeToMinutes,
   parseTimeToMinutes,
   formatTime,
-  generateRefNo
+  generateRefNo,
+  isSlotOverlappingAppointment,
+  getAppointmentTimeRange
 } from '../utils/sriLankaData'
 
 export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false }) {
@@ -97,15 +99,18 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
     }
   }
 
-  // Check if a specific 30-minute time slot is already booked for selectedOfficer on date
-  const isSlotBooked = (slotValue) => {
-    if (!date) return false
-    const slotMinutes = parseInputTimeToMinutes(slotValue)
-    return bookedSlots.some(b => {
+  // Check which booked appointment overlaps with a specific time slot (taking custom durations into account)
+  const getSlotBookingInfo = (slotValue) => {
+    if (!date) return null
+    return bookedSlots.find(b => {
       if (b.officer !== selectedOfficer || b.date !== date) return false
-      const bookedMinutes = parseTimeToMinutes(b.time)
-      return Math.abs(bookedMinutes - slotMinutes) < 30
+      return isSlotOverlappingAppointment(slotValue, 30, b.time, b.duration || 30)
     })
+  }
+
+  // Check if a specific time slot is already booked or overlaps with an extended appointment
+  const isSlotBooked = (slotValue) => {
+    return Boolean(getSlotBookingInfo(slotValue))
   }
 
   // Morning slots (09:00 - 12:30)
@@ -198,16 +203,14 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
       }
     }
 
-    // Double-booking conflict check
-    const newTimeMinutes = parseInputTimeToMinutes(time)
+    // Double-booking conflict check taking custom appointment duration into account
     const conflict = bookedSlots.some(b => {
       if (b.officer !== selectedOfficer || b.date !== date) return false
-      const diff = Math.abs(parseTimeToMinutes(b.time) - newTimeMinutes)
-      return diff < 30
+      return isSlotOverlappingAppointment(time, 30, b.time, b.duration || 30)
     })
 
     if (conflict) {
-      setFormError("Scheduling Conflict: Another appointment is already booked at or within 30 minutes of this slot for this officer. Please pick another time.")
+      setFormError("Scheduling Conflict: Another appointment is already booked or ongoing during this time window. Please pick another available time slot.")
       return
     }
 
@@ -629,15 +632,19 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
                           </span>
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                             {morningSlots.map(slot => {
-                              const booked = isSlotBooked(slot.value)
+                              const booking = getSlotBookingInfo(slot.value)
+                              const booked = Boolean(booking)
                               const isSelected = time === slot.value
+                              const tooltip = booked
+                                ? `${slot.label} is unavailable (Occupied: ${getAppointmentTimeRange(booking.time, booking.duration || 30)})`
+                                : `Select ${slot.label}`
                               return (
                                 <button
                                   key={slot.value}
                                   type="button"
                                   disabled={booked}
                                   onClick={() => setTime(slot.value)}
-                                  title={booked ? `${slot.label} is already booked` : `Select ${slot.label}`}
+                                  title={tooltip}
                                   className={`py-2 px-2 rounded-xl text-xs font-semibold text-center transition-all cursor-pointer flex flex-col items-center justify-center relative ${
                                     isSelected
                                       ? 'bg-indigo-600 text-white font-extrabold shadow-sm shadow-indigo-500/30 ring-2 ring-indigo-400 scale-[1.02]'
@@ -647,7 +654,11 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
                                   }`}
                                 >
                                   <span>{slot.label}</span>
-                                  {booked && <span className="text-[9px] no-underline font-normal text-rose-500 dark:text-rose-400 leading-none mt-0.5">Booked</span>}
+                                  {booked && (
+                                    <span className="text-[9px] no-underline font-medium text-rose-500 dark:text-rose-400 leading-none mt-0.5">
+                                      {booking.duration > 30 ? 'In Session' : 'Booked'}
+                                    </span>
+                                  )}
                                 </button>
                               )
                             })}
@@ -680,15 +691,19 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
                           ) : (
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                               {afternoonSlots.map(slot => {
-                                const booked = isSlotBooked(slot.value)
+                                const booking = getSlotBookingInfo(slot.value)
+                                const booked = Boolean(booking)
                                 const isSelected = time === slot.value
+                                const tooltip = booked
+                                  ? `${slot.label} is unavailable (Occupied: ${getAppointmentTimeRange(booking.time, booking.duration || 30)})`
+                                  : `Select ${slot.label}`
                                 return (
                                   <button
                                     key={slot.value}
                                     type="button"
                                     disabled={booked}
                                     onClick={() => setTime(slot.value)}
-                                    title={booked ? `${slot.label} is already booked` : `Select ${slot.label}`}
+                                    title={tooltip}
                                     className={`py-2 px-2 rounded-xl text-xs font-semibold text-center transition-all cursor-pointer flex flex-col items-center justify-center relative ${
                                       isSelected
                                         ? 'bg-indigo-600 text-white font-extrabold shadow-sm shadow-indigo-500/30 ring-2 ring-indigo-400 scale-[1.02]'
@@ -698,7 +713,11 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
                                     }`}
                                   >
                                     <span>{slot.label}</span>
-                                    {booked && <span className="text-[9px] no-underline font-normal text-rose-500 dark:text-rose-400 leading-none mt-0.5">Booked</span>}
+                                    {booked && (
+                                      <span className="text-[9px] no-underline font-medium text-rose-500 dark:text-rose-400 leading-none mt-0.5">
+                                        {booking.duration > 30 ? 'In Session' : 'Booked'}
+                                      </span>
+                                    )}
                                   </button>
                                 )
                               })}

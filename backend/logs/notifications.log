@@ -77,3 +77,13 @@
 [2026-09-24 13:02:30] [LIVE EMAIL SENT] To: c****3@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: OFF-46NEKQ'
 [2026-09-24 13:02:58] [SIMULATED SMS] To: 071****407| Msg: Appointment CONFIRMED. Ref: OFF-46NEKQ. With: Secretary on 2026-10-02 at 1:00 PM. Please bring your NIC/Passport (OFFICIAL) and arrive 10m early. - Ministry Portal
 [2026-09-24 13:03:03] [LIVE EMAIL SENT] To: c****3@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: OFF-46NEKQ'
+[2026-10-02 10:01:12] [SIMULATED SMS] To: 077****567| Msg: Appointment request received. Ref: APPT-TEST99. Officer: Secretary, Date: 2026-10-12 09:00 AM. Status: Pending review. - Ministry Portal
+[2026-10-02 10:01:18] [LIVE EMAIL SENT] To: t****t@example.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-TEST99'
+[2026-10-02 10:01:30] [SIMULATED SMS] To: 077****888| Msg: Appointment request received. Ref: APPT-TEN01. Officer: Secretary, Date: 2026-10-12 10:00 AM. Status: Pending review. - Ministry Portal
+[2026-10-02 10:01:34] [LIVE EMAIL SENT] To: t****n@example.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APPT-TEN01'
+[2026-10-02 10:09:50] [SIMULATED SMS] To: +94****353| Msg: Appointment request received. Ref: APT-HVOLBJ. Officer: Secretary, Date: 2026-10-05 09:00 AM. Status: Pending review. - Ministry Portal
+[2026-10-02 10:09:54] [LIVE EMAIL SENT] To: c****3@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APT-HVOLBJ'
+[2026-10-02 10:11:59] [SIMULATED SMS] To: +94****353| Msg: Appointment request received. Ref: APT-HVOLBJ. Officer: Secretary, Date: 2026-10-05 09:00 AM. Status: Pending review. - Ministry Portal
+[2026-10-02 10:12:04] [LIVE EMAIL SENT] To: c****3@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APT-HVOLBJ'
+[2026-10-02 10:13:23] [SIMULATED SMS] To: +94****353| Msg: Appointment CONFIRMED. Ref: APT-HVOLBJ. With: Secretary on 2026-10-05 at 12:00 PM. Please bring your NIC/Passport (2001****28) and arrive 10m early. - Ministry Portal
+[2026-10-02 10:13:28] [LIVE EMAIL SENT] To: c****3@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-HVOLBJ'

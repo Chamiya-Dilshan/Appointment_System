@@ -1,10 +1,21 @@
 import React, { useState, useEffect } from 'react'
-import { isOfficialMeeting, getOfficialDetails } from '../../utils/sriLankaData'
+import {
+  isOfficialMeeting,
+  getOfficialDetails,
+  TIME_SLOTS,
+  DURATION_OPTIONS,
+  formatTime,
+  getAppointmentTimeRange,
+  formatDurationLabel,
+  parseTimeToMinutes,
+  parseInputTimeToMinutes,
+} from '../../utils/sriLankaData'
 
 export default function AppointmentDetailsModal({
   appointment,
   onClose,
   onUpdateStatus,
+  onUpdateTime,
   onResendNotification,
   isHistory = false,
 }) {
@@ -15,12 +26,23 @@ export default function AppointmentDetailsModal({
   const [completionRemark, setCompletionRemark] = useState('')
   const [resendingId, setResendingId] = useState(null)
 
+  // Schedule Adjustment States (Extend / Change Slot)
+  const [isAdjustingSchedule, setIsAdjustingSchedule] = useState(false)
+  const [selectedTime, setSelectedTime] = useState(appointment?.time || '')
+  const [selectedDuration, setSelectedDuration] = useState(appointment?.duration || 30)
+  const [adjustError, setAdjustError] = useState('')
+  const [isSavingSchedule, setIsSavingSchedule] = useState(false)
+
   useEffect(() => {
     setCurrentAppt(appointment)
     setIsCancelling(false)
     setIsCompleting(false)
     setCancellationRemark('')
     setCompletionRemark('')
+    setIsAdjustingSchedule(false)
+    setSelectedTime(appointment?.time || '')
+    setSelectedDuration(appointment?.duration || 30)
+    setAdjustError('')
   }, [appointment])
 
   useEffect(() => {
@@ -80,6 +102,38 @@ export default function AppointmentDetailsModal({
     setIsCancelling(false)
   }
 
+  const calculateImpactedSlots = (startTimeStr, durationMins) => {
+    const startMins = parseTimeToMinutes(startTimeStr)
+    const endMins = startMins + Number(durationMins)
+    return TIME_SLOTS.filter((slot) => {
+      const slotMins = parseInputTimeToMinutes(slot.value)
+      return slotMins < endMins && slotMins + 30 > startMins
+    }).map((s) => s.label)
+  }
+
+  const handleSaveSchedule = async () => {
+    if (!onUpdateTime) return
+    setAdjustError('')
+    setIsSavingSchedule(true)
+    try {
+      const res = await onUpdateTime(currentAppt.id, {
+        time: selectedTime,
+        duration: Number(selectedDuration),
+        date: currentAppt.date,
+      })
+      if (res && res.success) {
+        setCurrentAppt(res.appointment)
+        setIsAdjustingSchedule(false)
+      } else {
+        setAdjustError(res?.error || 'Failed to update schedule.')
+      }
+    } catch (err) {
+      setAdjustError('Error saving schedule.')
+    } finally {
+      setIsSavingSchedule(false)
+    }
+  }
+
   const statusBadge = (
     <span
       className={`px-2.5 py-1 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 ${
@@ -105,6 +159,190 @@ export default function AppointmentDetailsModal({
       />
       {currentAppt.status}
     </span>
+  )
+
+  const renderScheduleDetails = (sectionNumber = 2, additionalContent = null) => (
+    <div className="space-y-3 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-950/30 border border-slate-200/70 dark:border-slate-800/70">
+      <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/60 pb-2">
+        <h4 className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>{sectionNumber}. Schedule Date & Time Slot</span>
+        </h4>
+
+        {onUpdateTime && currentAppt.status !== 'Cancelled' && currentAppt.status !== 'Completed' && (
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedTime(currentAppt.time)
+              setSelectedDuration(currentAppt.duration || 30)
+              setAdjustError('')
+              setIsAdjustingSchedule(!isAdjustingSchedule)
+            }}
+            className="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{isAdjustingSchedule ? 'Close Editor' : 'Adjust Time / Duration'}</span>
+          </button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        <div>
+          <span className="text-slate-400 dark:text-slate-500 block mb-0.5">Meeting Date</span>
+          <strong className="font-extrabold text-slate-900 dark:text-white text-sm">
+            📅 {currentAppt.date}
+          </strong>
+        </div>
+        <div>
+          <span className="text-slate-400 dark:text-slate-500 block mb-0.5">Time & Duration</span>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <strong className="font-extrabold text-indigo-600 dark:text-indigo-400 text-sm">
+              ⏰ {getAppointmentTimeRange(currentAppt.time, currentAppt.duration || 30)}
+            </strong>
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300">
+              {formatDurationLabel(currentAppt.duration || 30)}
+            </span>
+          </div>
+        </div>
+        <div>
+          <span className="text-slate-400 dark:text-slate-500 block mb-1">Session Status</span>
+          {statusBadge}
+        </div>
+      </div>
+
+      {/* Adjust Schedule Form Card */}
+      {isAdjustingSchedule && (
+        <div className="mt-3 pt-3 border-t border-indigo-100 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3.5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <h5 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
+              <span>Adjust Time Slot & Duration Window</span>
+            </h5>
+            <span className="text-[10px] text-slate-400 font-medium">Admin Schedule Override</span>
+          </div>
+
+          {adjustError && (
+            <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-rose-700 dark:text-rose-300 text-xs font-medium">
+              ⚠️ {adjustError}
+            </div>
+          )}
+
+          {/* Quick Duration Buttons */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                1. Select Session Duration
+              </label>
+              <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">
+                Current: {selectedDuration} mins
+              </span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+              {DURATION_OPTIONS.map((opt) => {
+                const isSel = Number(selectedDuration) === opt.value
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setSelectedDuration(opt.value)}
+                    className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-center ${
+                      isSel
+                        ? 'bg-indigo-600 text-white shadow-xs ring-2 ring-indigo-400'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Start Time Dropdown */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              2. Appointment Start Time
+            </label>
+            <select
+              value={formatTime(selectedTime)}
+              onChange={(e) => setSelectedTime(e.target.value)}
+              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white font-semibold"
+            >
+              {TIME_SLOTS.map((s) => (
+                <option key={s.value} value={s.label}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Live Impact Preview */}
+          <div className="p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/50 text-xs space-y-1.5">
+            <div className="font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
+              <span>⏱️ Calculated Time Window:</span>
+              <span className="font-extrabold text-indigo-700 dark:text-indigo-300">
+                {getAppointmentTimeRange(selectedTime, selectedDuration)} ({selectedDuration} mins)
+              </span>
+            </div>
+            <div className="text-[11px] text-amber-800 dark:text-amber-300 leading-relaxed">
+              <span>Public slots blocked for other citizens: </span>
+              <strong className="font-mono bg-amber-100 dark:bg-amber-900/60 px-1.5 py-0.5 rounded">
+                {calculateImpactedSlots(selectedTime, selectedDuration).join(', ') || 'None'}
+              </strong>
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex justify-end gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => setIsAdjustingSchedule(false)}
+              className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              disabled={isSavingSchedule}
+              onClick={handleSaveSchedule}
+              className="px-4 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer shadow-xs disabled:opacity-50 flex items-center gap-1.5"
+            >
+              {isSavingSchedule ? 'Saving...' : 'Apply & Block Overlapping Slots'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Additional content */}
+      {additionalContent}
+
+      {/* Outcome Remarks (if Completed or Cancelled) */}
+      {currentAppt.status === 'Completed' && (
+        <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/60 text-xs">
+          <span className="text-blue-600 dark:text-blue-400 font-bold block mb-1">
+            Completion Remark / Session Outcomes
+          </span>
+          <p className="font-medium text-slate-800 dark:text-slate-200 bg-blue-50/60 dark:bg-blue-950/30 p-2.5 rounded-xl border border-blue-100 dark:border-blue-900/50">
+            {currentAppt.completionRemark || 'Session marked as completed successfully.'}
+          </p>
+        </div>
+      )}
+
+      {currentAppt.status === 'Cancelled' && (
+        <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/60 text-xs">
+          <span className="text-rose-600 dark:text-rose-400 font-bold block mb-1">
+            Cancellation Remark / Reason
+          </span>
+          <p className="font-medium text-rose-600 dark:text-rose-300 bg-rose-50/60 dark:bg-rose-950/30 p-2.5 rounded-xl border border-rose-100 dark:border-rose-900/50 italic">
+            {currentAppt.cancellationRemark || 'Session cancelled.'}
+          </p>
+        </div>
+      )}
+    </div>
   )
 
   return (
@@ -258,59 +496,7 @@ export default function AppointmentDetailsModal({
               </div>
 
               {/* Section 2: Meeting Schedule & Status */}
-              <div className="space-y-3 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-950/30 border border-slate-200/70 dark:border-slate-800/70">
-                <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/60 pb-2">
-                  <h4 className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span>2. Schedule Date & Time Slot</span>
-                  </h4>
-                  <span className="text-[10px] text-slate-400 font-medium">Session Timing</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                  <div>
-                    <span className="text-slate-400 dark:text-slate-500 block mb-0.5">Meeting Date</span>
-                    <strong className="font-extrabold text-slate-900 dark:text-white text-sm">
-                      📅 {currentAppt.date}
-                    </strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 dark:text-slate-500 block mb-0.5">Time Slot (30m Interval)</span>
-                    <strong className="font-extrabold text-indigo-600 dark:text-indigo-400 text-sm">
-                      ⏰ {currentAppt.time}
-                    </strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 dark:text-slate-500 block mb-1">Session Status</span>
-                    {statusBadge}
-                  </div>
-                </div>
-
-                {/* Session Outcome Remarks (if Completed or Cancelled) */}
-                {currentAppt.status === 'Completed' && (
-                  <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/60 text-xs">
-                    <span className="text-blue-600 dark:text-blue-400 font-bold block mb-1">
-                      Completion Remark / Session Outcomes
-                    </span>
-                    <p className="font-medium text-slate-800 dark:text-slate-200 bg-blue-50/60 dark:bg-blue-950/30 p-2.5 rounded-xl border border-blue-100 dark:border-blue-900/50">
-                      {currentAppt.completionRemark || 'Session marked as completed successfully.'}
-                    </p>
-                  </div>
-                )}
-
-                {currentAppt.status === 'Cancelled' && (
-                  <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/60 text-xs">
-                    <span className="text-rose-600 dark:text-rose-400 font-bold block mb-1">
-                      Cancellation Remark / Reason
-                    </span>
-                    <p className="font-medium text-rose-600 dark:text-rose-300 bg-rose-50/60 dark:bg-rose-950/30 p-2.5 rounded-xl border border-rose-100 dark:border-rose-900/50 italic">
-                      {currentAppt.cancellationRemark || 'Session cancelled.'}
-                    </p>
-                  </div>
-                )}
-              </div>
+              {renderScheduleDetails(2)}
             </>
           ) : (
             /* ========================================================
@@ -358,33 +544,8 @@ export default function AppointmentDetailsModal({
               </div>
 
               {/* Section 2: Schedule & Consultation Details */}
-              <div className="space-y-3 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-950/30 border border-slate-200/70 dark:border-slate-800/70">
-                <h4 className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 border-b border-slate-200/60 dark:border-slate-800/60 pb-2 flex items-center gap-1.5">
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <span>2. Schedule & Consultation Details</span>
-                </h4>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                  <div>
-                    <span className="text-slate-400 dark:text-slate-500 block mb-0.5">Appointment Date</span>
-                    <strong className="font-extrabold text-slate-900 dark:text-white text-sm">
-                      📅 {currentAppt.date}
-                    </strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 dark:text-slate-500 block mb-0.5">Time Slot</span>
-                    <strong className="font-extrabold text-indigo-600 dark:text-indigo-400 text-sm">
-                      ⏰ {currentAppt.time}
-                    </strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 dark:text-slate-500 block mb-1">Booking Status</span>
-                    {statusBadge}
-                  </div>
-                </div>
-
+              {renderScheduleDetails(
+                2,
                 <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/60 text-xs grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <span className="text-slate-400 dark:text-slate-500 block mb-0.5">Assigned Officer</span>
@@ -397,29 +558,7 @@ export default function AppointmentDetailsModal({
                     <p className="font-bold text-slate-900 dark:text-white mt-0.5">{currentAppt.reason}</p>
                   </div>
                 </div>
-
-                {currentAppt.status === 'Completed' && (
-                  <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/60 text-xs">
-                    <span className="text-blue-600 dark:text-blue-400 font-bold block mb-1">
-                      Completion Remark / Session Notes
-                    </span>
-                    <p className="font-medium text-slate-800 dark:text-slate-200 bg-blue-50/60 dark:bg-blue-950/30 p-2.5 rounded-xl border border-blue-100 dark:border-blue-900/50">
-                      {currentAppt.completionRemark || 'Consultation concluded.'}
-                    </p>
-                  </div>
-                )}
-
-                {currentAppt.status === 'Cancelled' && (
-                  <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/60 text-xs">
-                    <span className="text-rose-600 dark:text-rose-400 font-bold block mb-1">
-                      Cancellation Remark / Reason
-                    </span>
-                    <p className="font-medium text-rose-600 dark:text-rose-300 bg-rose-50/60 dark:bg-rose-950/30 p-2.5 rounded-xl border border-rose-100 dark:border-rose-900/50 italic">
-                      {currentAppt.cancellationRemark || 'Appointment cancelled.'}
-                    </p>
-                  </div>
-                )}
-              </div>
+              )}
 
               {/* Section 3: Address & Regional Details */}
               <div className="space-y-3 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-950/30 border border-slate-200/70 dark:border-slate-800/70">

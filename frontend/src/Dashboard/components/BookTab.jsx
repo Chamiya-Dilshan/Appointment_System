@@ -1,5 +1,14 @@
 import React, { useState } from 'react'
 import CustomDatePicker from './CustomDatePicker'
+import {
+  DURATION_OPTIONS,
+  parseInputTimeToMinutes,
+  parseTimeToMinutes,
+  minutesToFormattedTime,
+  getAppointmentTimeRange,
+  formatDurationLabel,
+  isSlotOverlappingAppointment
+} from '../../utils/sriLankaData'
 
 // Standard 30-minute interval time slots from 9:00 AM to 5:00 PM
 const TIME_SLOTS = [
@@ -41,6 +50,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
   // Common scheduling state
   const [newDate, setNewDate] = useState('')
   const [newTime, setNewTime] = useState('')
+  const [newDuration, setNewDuration] = useState(30)
   const [newStatus, setNewStatus] = useState('Confirmed')
   const [newPhone, setNewPhone] = useState('')
   const [newEmail, setNewEmail] = useState('')
@@ -76,30 +86,31 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
   const [nicError, setNicError] = useState('')
   const [emailError, setEmailError] = useState('')
 
-  // Parse input time string in 24h format (e.g. "14:30") to minutes from midnight
-  const parseInputTimeToMinutes = (timeStr) => {
-    const [hours, minutes] = timeStr.split(':').map(Number)
-    return hours * 60 + minutes
-  }
+  // Get booking details for a 30m slot interval (checks duration overlaps)
+  const getSlotBookingInfo = (slotValue) => {
+    if (!newDate) return { isBooked: false, appointment: null }
+    const slotMinutes = parseInputTimeToMinutes(slotValue)
+    const slotDuration = 30
+    const currentOfficer = currentUser?.role || 'Secretary'
 
-  // Parse formatted appointment time string (e.g. "02:30 PM") to minutes from midnight
-  const parseTimeToMinutes = (timeStr) => {
-    const [time, modifier] = timeStr.split(' ')
-    let [hours, minutes] = time.split(':').map(Number)
-    if (modifier === 'PM' && hours < 12) hours += 12
-    if (modifier === 'AM' && hours === 12) hours = 0
-    return hours * 60 + minutes
+    const overlappingAppt = appointments.find(appt => {
+      if (appt.date !== newDate || appt.status === 'Cancelled') return false
+      if (appt.officer && currentOfficer && appt.officer !== currentOfficer) return false
+
+      const apptMinutes = parseTimeToMinutes(appt.time)
+      const apptDuration = appt.duration || 30
+      return isSlotOverlappingAppointment(slotMinutes, slotDuration, apptMinutes, apptDuration)
+    })
+
+    return {
+      isBooked: !!overlappingAppt,
+      appointment: overlappingAppt
+    }
   }
 
   // Check if a specific 30-minute time slot is already booked on newDate
   const isSlotBooked = (slotValue) => {
-    if (!newDate) return false
-    const slotMinutes = parseInputTimeToMinutes(slotValue)
-    return appointments.some(appt => {
-      if (appt.date !== newDate || appt.status === 'Cancelled') return false
-      const apptMinutes = parseTimeToMinutes(appt.time)
-      return Math.abs(apptMinutes - slotMinutes) < 30
-    })
+    return getSlotBookingInfo(slotValue).isBooked
   }
 
   // Morning slots (09:00 - 12:30)
@@ -217,17 +228,19 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
       }
     }
 
-    // Conflict check (30 min buffer)
+    // Conflict check using slot interval and newDuration
     const newTimeMinutes = parseInputTimeToMinutes(newTime)
-    const timeConflict = appointments.some(appt => {
+    const currentOfficer = currentUser?.role || 'Secretary'
+    const timeConflictAppt = appointments.find(appt => {
       if (appt.date !== newDate || appt.status === 'Cancelled') return false
+      if (appt.officer && currentOfficer && appt.officer !== currentOfficer) return false
       const apptMinutes = parseTimeToMinutes(appt.time)
-      const diff = Math.abs(apptMinutes - newTimeMinutes)
-      return diff < 30
+      const apptDuration = appt.duration || 30
+      return isSlotOverlappingAppointment(newTimeMinutes, newDuration, apptMinutes, apptDuration)
     })
 
-    if (timeConflict) {
-      setFormError("Scheduling Conflict: Another appointment or meeting is already scheduled at or within 30 minutes of this slot on the same day.")
+    if (timeConflictAppt) {
+      setFormError(`Scheduling Conflict: The chosen ${formatDurationLabel(newDuration)} session overlaps with an existing appointment (${timeConflictAppt.name || timeConflictAppt.refNo} scheduled at ${getAppointmentTimeRange(timeConflictAppt.time, timeConflictAppt.duration)}).`)
       return
     }
 
@@ -251,6 +264,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
       email: newEmail.trim(),
       date: newDate,
       time: formatTime(newTime),
+      duration: newDuration,
       status: newStatus,
       refNo: refNo,
       nic: meetingCategory === 'Official Meeting' ? 'OFFICIAL' : newNic.trim(),
@@ -279,6 +293,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
     setNewReason('')
     setNewDate('')
     setNewTime('')
+    setNewDuration(30)
     setNewNic('')
     setNewDistrict('')
     setNewProvince('')
@@ -848,13 +863,41 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                   <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
                     <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                       <span className="w-5 h-5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-[10px] font-black">2</span>
-                      Select Time Slot (30m Interval) *
+                      Select Time Slot & Duration *
                     </span>
                     {newTime && (
                       <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full">
-                        {formatTime(newTime)}
+                        {formatTime(newTime)} – {minutesToFormattedTime(parseInputTimeToMinutes(newTime) + newDuration)}
                       </span>
                     )}
+                  </div>
+
+                  {/* Duration Selector */}
+                  <div className="mb-4 p-3 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
+                        Session Duration
+                      </span>
+                      <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">
+                        {formatDurationLabel(newDuration)}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-4 sm:grid-cols-7 gap-1">
+                      {DURATION_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setNewDuration(opt.value)}
+                          className={`py-1.5 px-1 rounded-xl text-[11px] font-bold transition-all text-center cursor-pointer ${
+                            newDuration === opt.value
+                              ? 'bg-indigo-600 text-white shadow-xs ring-2 ring-indigo-400 scale-[1.02]'
+                              : 'bg-white dark:bg-slate-800 text-slate-650 dark:text-slate-300 hover:bg-indigo-100/50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700/60'
+                          }`}
+                        >
+                          {opt.shortLabel || opt.label.split(' ')[0]}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   {!newDate ? (
@@ -880,24 +923,32 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                         </span>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                           {morningSlots.map(slot => {
-                            const booked = isSlotBooked(slot.value)
+                            const { isBooked: booked, appointment: bookedAppt } = getSlotBookingInfo(slot.value)
                             const isSelected = newTime === slot.value
+                            const isDirectMatch = bookedAppt && parseTimeToMinutes(bookedAppt.time) === parseInputTimeToMinutes(slot.value)
                             return (
                               <button
                                 key={slot.value}
                                 type="button"
                                 disabled={booked}
                                 onClick={() => setNewTime(slot.value)}
-                                title={booked ? `${slot.label} is already booked` : `Select ${slot.label}`}
+                                title={booked
+                                  ? `${slot.label} is unavailable (${isDirectMatch ? 'Booked' : 'Occupied by session: ' + getAppointmentTimeRange(bookedAppt?.time, bookedAppt?.duration)})`
+                                  : `Select ${slot.label}`
+                                }
                                 className={`py-2 px-2 rounded-xl text-xs font-semibold text-center transition-all cursor-pointer flex flex-col items-center justify-center relative ${isSelected
                                     ? 'bg-indigo-600 text-white font-extrabold shadow-sm shadow-indigo-500/30 ring-2 ring-indigo-400 scale-[1.02]'
                                     : booked
-                                      ? 'bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-600 line-through cursor-not-allowed opacity-50 border border-transparent'
+                                      ? 'bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-600 line-through cursor-not-allowed opacity-60 border border-transparent'
                                       : 'bg-slate-50 dark:bg-slate-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700/80 hover:border-indigo-300 dark:hover:border-indigo-600'
                                   }`}
                               >
                                 <span>{slot.label}</span>
-                                {booked && <span className="text-[9px] no-underline font-normal text-rose-500 dark:text-rose-400 leading-none mt-0.5">Booked</span>}
+                                {booked && (
+                                  <span className="text-[9px] no-underline font-bold text-rose-500 dark:text-rose-400 leading-none mt-0.5">
+                                    {isDirectMatch ? 'Booked' : 'In Session'}
+                                  </span>
+                                )}
                               </button>
                             )
                           })}
@@ -930,24 +981,32 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                         ) : (
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                             {afternoonSlots.map(slot => {
-                              const booked = isSlotBooked(slot.value)
+                              const { isBooked: booked, appointment: bookedAppt } = getSlotBookingInfo(slot.value)
                               const isSelected = newTime === slot.value
+                              const isDirectMatch = bookedAppt && parseTimeToMinutes(bookedAppt.time) === parseInputTimeToMinutes(slot.value)
                               return (
                                 <button
                                   key={slot.value}
                                   type="button"
                                   disabled={booked}
                                   onClick={() => setNewTime(slot.value)}
-                                  title={booked ? `${slot.label} is already booked` : `Select ${slot.label}`}
+                                  title={booked
+                                    ? `${slot.label} is unavailable (${isDirectMatch ? 'Booked' : 'Occupied by session: ' + getAppointmentTimeRange(bookedAppt?.time, bookedAppt?.duration)})`
+                                    : `Select ${slot.label}`
+                                  }
                                   className={`py-2 px-2 rounded-xl text-xs font-semibold text-center transition-all cursor-pointer flex flex-col items-center justify-center relative ${isSelected
                                       ? 'bg-indigo-600 text-white font-extrabold shadow-sm shadow-indigo-500/30 ring-2 ring-indigo-400 scale-[1.02]'
                                       : booked
-                                        ? 'bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-600 line-through cursor-not-allowed opacity-50 border border-transparent'
+                                        ? 'bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-600 line-through cursor-not-allowed opacity-60 border border-transparent'
                                         : 'bg-slate-50 dark:bg-slate-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700/80 hover:border-indigo-300 dark:hover:border-indigo-600'
                                     }`}
                                 >
                                   <span>{slot.label}</span>
-                                  {booked && <span className="text-[9px] no-underline font-normal text-rose-500 dark:text-rose-400 leading-none mt-0.5">Booked</span>}
+                                  {booked && (
+                                    <span className="text-[9px] no-underline font-bold text-rose-500 dark:text-rose-400 leading-none mt-0.5">
+                                      {isDirectMatch ? 'Booked' : 'In Session'}
+                                    </span>
+                                  )}
                                 </button>
                               )
                             })}
@@ -972,7 +1031,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                           Selected Slot Confirmed
                         </span>
                         <span className="text-emerald-700 dark:text-emerald-400 font-medium">
-                          {formatDisplayDate(newDate)} at {formatTime(newTime)}
+                          {formatDisplayDate(newDate)} • {formatTime(newTime)} – {minutesToFormattedTime(parseInputTimeToMinutes(newTime) + newDuration)} ({formatDurationLabel(newDuration)})
                         </span>
                       </div>
                     </div>

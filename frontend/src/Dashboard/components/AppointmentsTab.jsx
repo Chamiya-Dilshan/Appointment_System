@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { isOfficialMeeting } from '../../utils/sriLankaData'
+import { isOfficialMeeting, getAppointmentTimeRange, formatDurationLabel } from '../../utils/sriLankaData'
 import AppointmentDetailsModal from './AppointmentDetailsModal'
 
 export default function AppointmentsTab({
@@ -7,6 +7,7 @@ export default function AppointmentsTab({
   onConfirm,
   onDelete,
   onUpdateStatus,
+  onUpdateTime,
   onResendNotification,
   setActiveTab,
   title = "Appointments Directory",
@@ -38,6 +39,17 @@ export default function AppointmentsTab({
   useEffect(() => {
     setQuickCompleteRemark('')
   }, [completingAppt])
+
+  // Keep modal in sync when appointments change (e.g. after updating time/duration or status)
+  useEffect(() => {
+    if (selectedDetailedAppt) {
+      const refreshed = appointments.find(a => a.id === selectedDetailedAppt.id)
+      if (refreshed) {
+        setSelectedDetailedAppt(refreshed)
+      }
+    }
+  }, [appointments])
+
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [categoryFilter, setCategoryFilter] = useState('All')
@@ -266,7 +278,15 @@ export default function AppointmentsTab({
 
                     {/* Time */}
                     <td className="px-6 py-4 text-slate-600 dark:text-slate-400 font-semibold">
-                      {appt.time}
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-bold text-slate-800 dark:text-slate-200">
+                          {getAppointmentTimeRange(appt.time, appt.duration || 30)}
+                        </span>
+                        <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                          <span>{formatDurationLabel(appt.duration || 30)} session</span>
+                        </span>
+                      </div>
                     </td>
 
                     {/* Status */}
@@ -474,8 +494,15 @@ export default function AppointmentsTab({
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm pt-2 border-t border-slate-105 dark:border-slate-800/40">
                   {/* Date/Time */}
                   <div className="text-slate-500 dark:text-slate-400">
-                    <p className="font-semibold text-slate-600 dark:text-slate-300">{appt.date}</p>
-                    <p className="text-[10px] mt-0.5">{appt.time}</p>
+                    <p className="font-semibold text-slate-700 dark:text-slate-200">{appt.date}</p>
+                    <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                      <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                        {getAppointmentTimeRange(appt.time, appt.duration || 30)}
+                      </span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold">
+                        {formatDurationLabel(appt.duration || 30)}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Action buttons */}
@@ -569,6 +596,7 @@ export default function AppointmentsTab({
           appointment={selectedDetailedAppt}
           onClose={() => setSelectedDetailedAppt(null)}
           onUpdateStatus={onUpdateStatus}
+          onUpdateTime={onUpdateTime}
           onResendNotification={onResendNotification}
           isHistory={isHistory}
         />

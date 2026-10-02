@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { isOfficialMeeting } from '../../utils/sriLankaData'
+import { isOfficialMeeting, getAppointmentTimeRange, formatDurationLabel } from '../../utils/sriLankaData'
 import AppointmentDetailsModal from './AppointmentDetailsModal'
 
-export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateStatus, onResendNotification }) {
+export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateStatus, onResendNotification, onUpdateTime }) {
   // Get today's local date string (YYYY-MM-DD)
   const todayStr = (() => {
     const today = new Date()
@@ -17,6 +17,16 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
 
   const [selectedDetailedAppt, setSelectedDetailedAppt] = useState(null)
   const [resendingId, setResendingId] = useState(null)
+
+  // Keep modal sync with updated appointment data
+  useEffect(() => {
+    if (selectedDetailedAppt) {
+      const refreshed = appointments.find(a => a.id === selectedDetailedAppt.id)
+      if (refreshed) {
+        setSelectedDetailedAppt(refreshed)
+      }
+    }
+  }, [appointments])
 
   const handleResend = async (apptId) => {
     if (!onResendNotification) return
@@ -231,9 +241,14 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                               </span>
                             )}
                           </div>
-                          <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded-lg shrink-0">
-                            {appt.time}
-                          </span>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2.5 py-1 rounded-lg">
+                              {getAppointmentTimeRange(appt.time, appt.duration)}
+                            </span>
+                            <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-850 px-1.5 py-0.5 rounded border border-slate-200/50 dark:border-slate-800">
+                              {formatDurationLabel(appt.duration || 30)}
+                            </span>
+                          </div>
                         </div>
 
                         {appt.organization && (
@@ -366,6 +381,7 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
           onClose={() => setSelectedDetailedAppt(null)}
           onUpdateStatus={onUpdateStatus}
           onResendNotification={onResendNotification}
+          onUpdateTime={onUpdateTime}
         />
       )}
     </div>

@@ -147,6 +147,13 @@ def init_db_with_retry(app) -> bool:  # type: ignore[type-arg]
         except Exception:
             db.session.rollback()
 
+        try:
+            from sqlalchemy import text
+            db.session.execute(text("ALTER TABLE appointments ADD COLUMN duration INT NOT NULL DEFAULT 30;"))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
         # Encrypt any legacy unencrypted phone/nic/address/email values in MySQL
         try:
             from app.models.appointment import Appointment

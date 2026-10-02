@@ -77,7 +77,33 @@ def auto_cancel_past_pending() -> int:
                 appt.cancellationRemark = "Auto-cancelled: Appointment date expired"
         db.session.commit()
         return len(past_pending)
-    return 0
+def parse_time_to_minutes(time_str: str) -> int:
+    """
+    Parse a time string like '09:00 AM', '09:00', '14:30', or '2:30 PM' to minutes from midnight.
+    """
+    clean = time_str.strip().upper()
+    match = re.match(r"^(\d{1,2}):(\d{2})\s*(AM|PM)?$", clean)
+    if not match:
+        return 0
+    hour = int(match.group(1))
+    minute = int(match.group(2))
+    ampm = match.group(3)
+    if ampm == "PM" and hour < 12:
+        hour += 12
+    elif ampm == "AM" and hour == 12:
+        hour = 0
+    return hour * 60 + minute
+
+
+def check_time_overlap(time1: str, dur1: int, time2: str, dur2: int) -> bool:
+    """
+    Check if two time intervals [start1, start1 + dur1) and [start2, start2 + dur2) overlap.
+    """
+    start1 = parse_time_to_minutes(time1)
+    end1 = start1 + max(int(dur1), 1)
+    start2 = parse_time_to_minutes(time2)
+    end2 = start2 + max(int(dur2), 1)
+    return start1 < end2 and end1 > start2
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -116,7 +142,16 @@ def get_booked_slots():
         appts = Appointment.query.filter(
             Appointment.status.in_(["Pending", "Confirmed", "Completed"])
         ).all()
-        slots = [{"date": a.date, "time": a.time, "officer": a.officer} for a in appts]
+        slots = [
+            {
+                "id": a.id,
+                "date": a.date,
+                "time": a.time,
+                "duration": getattr(a, "duration", 30) or 30,
+                "officer": a.officer,
+            }
+            for a in appts
+        ]
         return jsonify(slots), 200
     except Exception as exc:  # noqa: BLE001
         return jsonify({"error": str(exc)}), 500
@@ -228,6 +263,20 @@ def create_appointment():
         org_val = data.get("organization") or ""
         venue_val = data.get("venue") or ("Hon. Minister's Office" if data.get("officer") == "Minister" else "Ministry Boardroom")
         initial_status = data.get("status") or ("Confirmed" if (meeting_type == "Official Meeting" and is_admin) else "Pending")
+        duration_val = int(data.get("duration", 30)) if data.get("duration") else 30
+
+        # Check time slot conflict against existing active appointments
+        existing_active = Appointment.query.filter(
+            Appointment.date == data["date"],
+            Appointment.officer == data["officer"],
+            Appointment.status.in_(["Pending", "Confirmed", "Completed"])
+        ).all()
+        for ex in existing_active:
+            ex_dur = getattr(ex, "duration", 30) or 30
+            if check_time_overlap(data["time"], duration_val, ex.time, ex_dur):
+                return jsonify({
+                    "error": f"Scheduling Conflict: The slot {data['time']} ({duration_val}m) overlaps with an existing appointment ({ex.time}, {ex_dur}m) for {data['officer']}."
+                }), 409
 
         appt = Appointment(
             id=appt_id,
@@ -237,6 +286,7 @@ def create_appointment():
             email=data.get("email", "").strip() if data.get("email") else "",
             date=data["date"],
             time=data["time"],
+            duration=duration_val,
             status=initial_status,
             refNo=data["refNo"],
             nic=nic_val,
@@ -314,6 +364,69 @@ def update_appointment_status(appt_id: int):
         appt_dict = appt.to_dict()
         notify_appointment_status_updated(appt_dict, new_status=new_status, remark=remark or "")
 
+        return jsonify(appt_dict), 200
+
+    except Exception as exc:  # noqa: BLE001
+        db.session.rollback()
+        return jsonify({"error": str(exc)}), 500
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# PUT /api/appointments/<id>/time
+# ──────────────────────────────────────────────────────────────────────────────
+
+@appointments_bp.put("/<int:appt_id>/time")
+@appointments_bp.put("/<int:appt_id>/schedule")
+@jwt_required
+def update_appointment_time(appt_id: int):
+    """
+    Adjust the date, time, and/or duration of an existing appointment.
+    Validates that the new time window does not overlap with other active appointments.
+
+    Request body (JSON):
+        {
+          "time": "09:00 AM",
+          "duration": 45,        # in minutes (e.g. 15, 30, 45, 60, 90, 120)
+          "date": "2026-10-05"   # optional
+        }
+    """
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "No JSON payload provided"}), 400
+
+    try:
+        appt = db.session.get(Appointment, appt_id)
+        if appt is None:
+            return jsonify({"error": "Appointment not found"}), 404
+
+        new_time = str(data.get("time") or appt.time).strip()
+        new_duration = int(data.get("duration") or getattr(appt, "duration", 30) or 30)
+        new_date = str(data.get("date") or appt.date).strip()
+
+        if new_duration <= 0 or new_duration > 480:
+            return jsonify({"error": "Duration must be between 5 and 480 minutes."}), 400
+
+        # Check overlap with other active appointments on that date for this officer
+        other_appts = Appointment.query.filter(
+            Appointment.id != appt_id,
+            Appointment.date == new_date,
+            Appointment.officer == appt.officer,
+            Appointment.status.in_(["Pending", "Confirmed", "Completed"])
+        ).all()
+
+        for other in other_appts:
+            other_dur = getattr(other, "duration", 30) or 30
+            if check_time_overlap(new_time, new_duration, other.time, other_dur):
+                return jsonify({
+                    "error": f"Schedule Conflict: Time slot ({new_time}, {new_duration}m) overlaps with an existing appointment ({other.time}, {other_dur}m) for {appt.officer} on {new_date}."
+                }), 409
+
+        appt.date = new_date
+        appt.time = new_time
+        appt.duration = new_duration
+        db.session.commit()
+
+        appt_dict = appt.to_dict()
         return jsonify(appt_dict), 200
 
     except Exception as exc:  # noqa: BLE001

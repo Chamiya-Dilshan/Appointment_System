@@ -224,6 +224,32 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
     }
   }
 
+  // Handle adjusting appointment time & duration
+  const handleUpdateTime = async (id, { time, duration, date }) => {
+    try {
+      const response = await fetch(`/api/appointments/${id}/time`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ time, duration, date })
+      })
+      if (response.status === 401) {
+        handleAuthError(401)
+        return { success: false, error: 'Unauthorized' }
+      }
+      const data = await response.json()
+      if (response.ok) {
+        setAppointments(appointments.map(appt => appt.id === id ? data : appt))
+        triggerNotification(data, 'updated')
+        return { success: true, appointment: data }
+      } else {
+        return { success: false, error: data.error || 'Failed to adjust time slot' }
+      }
+    } catch (err) {
+      console.error('Adjust time error:', err)
+      return { success: false, error: 'Network error: Could not reach the server.' }
+    }
+  }
+
   // Handle manual notification re-dispatch / trigger
   const handleResendNotification = async (id) => {
     try {
@@ -350,6 +376,7 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
             onConfirm={handleConfirmAppointment}
             onDelete={handleDeleteAppointment}
             onUpdateStatus={handleUpdateStatus}
+            onUpdateTime={handleUpdateTime}
             onResendNotification={handleResendNotification}
             setActiveTab={setActiveTab}
             title="Active Appointments"
@@ -363,6 +390,7 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
             onConfirm={handleConfirmAppointment}
             onDelete={handleDeleteAppointment}
             onUpdateStatus={handleUpdateStatus}
+            onUpdateTime={handleUpdateTime}
             onResendNotification={handleResendNotification}
             setActiveTab={setActiveTab}
             title="Appointment History"
@@ -395,6 +423,7 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
             onConfirm={handleConfirmAppointment}
             onDelete={handleDeleteAppointment}
             onUpdateStatus={handleUpdateStatus}
+            onUpdateTime={handleUpdateTime}
             onResendNotification={handleResendNotification}
           />
         )
@@ -516,6 +545,10 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
           title = 'Status Changed to Pending'
           bgIconClass = 'bg-amber-500 text-white'
           statusText = 'Schedule status updated in ministerial registry.'
+        } else if (type === 'updated') {
+          title = 'Schedule & Duration Updated'
+          bgIconClass = 'bg-indigo-600 text-white'
+          statusText = 'Appointment duration adjusted and overlapping slots updated.'
         }
 
         return (
