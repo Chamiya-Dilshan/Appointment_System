@@ -18,12 +18,19 @@ function App() {
   }
 
   const getIsEmbed = () => {
+    const pathname = window.location.pathname
     const searchParams = new URLSearchParams(window.location.search)
-    return searchParams.get('embed') === 'true'
+    return (
+      searchParams.get('embed') === 'true' ||
+      searchParams.has('embed') ||
+      pathname === '/embed' ||
+      pathname.startsWith('/embed/') ||
+      pathname.startsWith('/embed')
+    )
   }
 
   const [isAdminRoute, setIsAdminRoute] = useState(getIsAdminPath)
-  const isEmbed = getIsEmbed()
+  const [isEmbed, setIsEmbed] = useState(getIsEmbed)
 
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return localStorage.getItem('currentUser') !== null
@@ -39,6 +46,7 @@ function App() {
   useEffect(() => {
     const handlePopState = () => {
       setIsAdminRoute(getIsAdminPath())
+      setIsEmbed(getIsEmbed())
     }
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
