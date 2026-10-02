@@ -139,10 +139,13 @@ export const DURATION_OPTIONS = [
   { value: 15, label: '15 mins', shortLabel: '15' },
   { value: 30, label: '30 mins (Standard)', shortLabel: '30' },
   { value: 45, label: '45 mins (Extended)', shortLabel: '45' },
-  { value: 60, label: '1 hour (60 mins)', shortLabel: '1' },
-  { value: 75, label: '1.25 hours (75 mins)', shortLabel: '1.25' },
-  { value: 90, label: '1.5 hours (90 mins)', shortLabel: '1.5' },
-  { value: 120, label: '2 hours (120 mins)', shortLabel: '2' },
+  { value: 60, label: '1 hour (60 mins)', shortLabel: '1h' },
+  { value: 75, label: '1.25 hours (75 mins)', shortLabel: '1.25h' },
+  { value: 90, label: '1.5 hours (90 mins)', shortLabel: '1.5h' },
+  { value: 120, label: '2 hours (120 mins)', shortLabel: '2h' },
+  { value: 180, label: '3 hours (180 mins)', shortLabel: '3h' },
+  { value: 240, label: '4 hours (240 mins)', shortLabel: '4h' },
+  { value: 300, label: '5 hours (300 mins)', shortLabel: '5h' },
 ]
 
 // Parse input time string in 24h format (e.g. "14:30") to minutes from midnight
