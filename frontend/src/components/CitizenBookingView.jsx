@@ -39,10 +39,10 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
   const [postalCode, setPostalCode] = useState('')
 
   // UI Dropdowns & validation states
-  const [showDatePicker, setShowDatePicker] = useState(false)
+  //const [showDatePicker, setShowDatePicker] = useState(false)
   const [showProvinceDropdown, setShowProvinceDropdown] = useState(false)
   const [showDistrictDropdown, setShowDistrictDropdown] = useState(false)
-  const [showTimeDropdown, setShowTimeDropdown] = useState(false)
+  //const [showTimeDropdown, setShowTimeDropdown] = useState(false)
 
   const [formError, setFormError] = useState('')
   const [phoneError, setPhoneError] = useState('')
@@ -398,23 +398,16 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
             </div>
 
             {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="flex-1 py-3 px-4 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                <span>Print / Save Receipt</span>
-              </button>
+            <div className="pt-2">
               <button
                 type="button"
                 onClick={resetForm}
-                className="flex-1 py-3 px-4 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-all shadow-sm cursor-pointer"
+                className="w-full py-3.5 px-5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-all shadow-sm cursor-pointer flex items-center justify-center gap-2"
               >
-                Book Another Appointment
+                <span>Book Another Appointment</span>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
               </button>
             </div>
 
@@ -958,7 +951,7 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
                 {/* Divisional Secretariat / Council */}
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                    Divisional Secretariat / Council *
+                    Local Council / Pradeshiya Sabha *
                   </label>
                   <input
                     type="text"

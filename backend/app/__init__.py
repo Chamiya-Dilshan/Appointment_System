@@ -11,7 +11,7 @@ from __future__ import annotations
 import os
 import time
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 from app.config import config_map, Config
 from app.extensions import db, cors, limiter
@@ -73,6 +73,16 @@ def create_app(env: str | None = None) -> Flask:
     flask_app.register_blueprint(appointments_bp,  url_prefix="/api/appointments")
     flask_app.register_blueprint(schedule_bp,      url_prefix="/api/schedule")
 
+    # ── Health check endpoint ────────────────────────────────────────────────
+    @flask_app.route("/api/health", methods=["GET"])
+    def health_check():
+        from app import database as _db_module
+        return jsonify({
+            "status": "healthy" if _db_module.db_connected else "degraded",
+            "database": "connected" if _db_module.db_connected else "offline",
+            "timestamp": time.time(),
+        }), 200
+
     # ── Database connectivity guard ──────────────────────────────────────────
     from app import database as _db_module
 
@@ -86,6 +96,9 @@ def create_app(env: str | None = None) -> Flask:
         to avoid per-request blocking on Windows.
         Returns a 503 JSON response if the database is still unreachable.
         """
+        if request.path.rstrip("/") == "/api/health":
+            return  # Allow health check endpoint to report status even if DB is offline
+
         if _db_module.db_connected:
             return  # Fast path — already connected
 

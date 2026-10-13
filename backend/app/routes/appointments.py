@@ -163,7 +163,11 @@ def get_booked_slots():
 
 @appointments_bp.route("", methods=["POST"])
 @appointments_bp.route("/", methods=["POST"])
-@limiter.limit("15 per hour")
+@limiter.limit(
+    "15 per hour",
+    exempt_when=is_authenticated_admin,
+    deduct_when=lambda response: response.status_code == 201,
+)
 def create_appointment():
     """
     Create a new appointment.
@@ -400,10 +404,17 @@ def update_appointment_time(appt_id: int):
             return jsonify({"error": "Appointment not found"}), 404
 
         new_time = str(data.get("time") or appt.time).strip()
-        new_duration = int(data.get("duration") or getattr(appt, "duration", 30) or 30)
         new_date = str(data.get("date") or appt.date).strip()
 
-        if new_duration <= 0 or new_duration > 480:
+        if "duration" in data and data["duration"] is not None:
+            try:
+                new_duration = int(data["duration"])
+            except (ValueError, TypeError):
+                return jsonify({"error": "Duration must be a valid integer between 5 and 480 minutes."}), 400
+        else:
+            new_duration = int(getattr(appt, "duration", 30) or 30)
+
+        if new_duration < 5 or new_duration > 480:
             return jsonify({"error": "Duration must be between 5 and 480 minutes."}), 400
 
         # Check overlap with other active appointments on that date for this officer

@@ -87,3 +87,40 @@
 [2026-10-02 10:12:04] [LIVE EMAIL SENT] To: c****3@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APT-HVOLBJ'
 [2026-10-02 10:13:23] [SIMULATED SMS] To: +94****353| Msg: Appointment CONFIRMED. Ref: APT-HVOLBJ. With: Secretary on 2026-10-05 at 12:00 PM. Please bring your NIC/Passport (2001****28) and arrive 10m early. - Ministry Portal
 [2026-10-02 10:13:28] [LIVE EMAIL SENT] To: c****3@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-HVOLBJ'
+[2026-10-02 10:58:46] [SIMULATED SMS] To: +94****407| Msg: Appointment request received. Ref: APT-IRKVRB. Officer: Deputy Minister, Date: 2026-10-12 09:00 AM. Status: Pending review. - Ministry Portal
+[2026-10-02 10:58:51] [LIVE EMAIL SENT] To: c****3@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: APT-IRKVRB'
+[2026-10-02 10:59:58] [SIMULATED SMS] To: +94****407| Msg: Appointment CONFIRMED. Ref: APT-IRKVRB. With: Deputy Minister on 2026-10-12 at 09:00 AM. Please bring your NIC/Passport (2001****28) and arrive 10m early. - Ministry Portal
+[2026-10-02 11:00:05] [LIVE EMAIL SENT] To: c****3@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: APT-IRKVRB'
+[2026-10-13 13:49:48] [SIMULATED SMS] To: +94****334| Msg: Appointment request received. Ref: REF-SLOT1-1791879588. Officer: Secretary, Date: 2026-10-26 11:00 AM. Status: Pending review. - Ministry Portal
+[2026-10-13 13:49:48] [SIMULATED SMS] To: +94****334| Msg: Appointment CONFIRMED. Ref: REF-SLOT1-1791879588. With: Secretary on 2026-10-26 at 11:00 AM. Please bring your NIC/Passport (9211****6V) and arrive 10m early. - Ministry Portal
+[2026-10-13 13:49:48] [SIMULATED SMS] To: +94****334| Msg: Appointment CONFIRMED. Ref: REF-SLOT1-1791879588. With: Secretary on 2026-10-26 at 11:30 AM. Please bring your NIC/Passport (9211****6V) and arrive 10m early. - Ministry Portal
+[2026-10-13 13:49:54] [LIVE EMAIL SENT] To: n****i@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: REF-SLOT1-1791879588'
+[2026-10-13 13:49:55] [LIVE EMAIL SENT] To: n****i@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: REF-SLOT1-1791879588'
+[2026-10-13 13:49:56] [LIVE EMAIL SENT] To: n****i@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: REF-SLOT1-1791879588'
+[2026-10-13 13:49:57] [SIMULATED SMS] To: +94****678| Msg: Appointment CONFIRMED. Ref: OFFICIAL-AUTH-1791879597. With: Secretary on 2026-10-22 at 02:30 PM. Please bring your NIC/Passport (OFFICIAL) and arrive 10m early. - Ministry Portal
+[2026-10-13 13:49:57] [SIMULATED SMS] To: +94****334| Msg: Appointment CANCELLED. Ref: REF-SLOT1-1791879588 on 2026-10-26. Reason: Citizen requested cancellation via phone. You may book a new slot via the portal. - Ministry Portal
+[2026-10-13 13:50:02] [LIVE EMAIL SENT] To: n****i@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Cancelled - Ref: REF-SLOT1-1791879588'
+[2026-10-13 13:50:03] [SIMULATED SMS] To: 077****567| Msg: Appointment request received. Ref: XSS-1791879603. Officer: Secretary, Date: 2026-10-19 10:30 AM. Status: Pending review. - Ministry Portal
+[2026-10-13 13:50:10] [LIVE EMAIL SENT] To: t****t@test.lk | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: XSS-1791879603'
+[2026-10-13 14:09:46] [SIMULATED SMS] To: +94****334| Msg: Appointment request received. Ref: REF-SLOT1-1791880786. Officer: Secretary, Date: 2026-10-26 11:00 AM. Status: Pending review. - Ministry Portal
+[2026-10-13 14:09:46] [SIMULATED SMS] To: +94****334| Msg: Appointment CONFIRMED. Ref: REF-SLOT1-1791880786. With: Secretary on 2026-10-26 at 11:00 AM. Please bring your NIC/Passport (9211****6V) and arrive 10m early. - Ministry Portal
+[2026-10-13 14:09:46] [SIMULATED SMS] To: +94****334| Msg: Appointment CONFIRMED. Ref: REF-SLOT1-1791880786. With: Secretary on 2026-10-26 at 11:30 AM. Please bring your NIC/Passport (9211****6V) and arrive 10m early. - Ministry Portal
+[2026-10-13 14:09:51] [LIVE EMAIL SENT] To: n****i@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: REF-SLOT1-1791880786'
+[2026-10-13 14:09:52] [LIVE EMAIL SENT] To: n****i@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: REF-SLOT1-1791880786'
+[2026-10-13 14:09:52] [LIVE EMAIL SENT] To: n****i@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: REF-SLOT1-1791880786'
+[2026-10-13 14:09:54] [SIMULATED SMS] To: +94****678| Msg: Appointment CONFIRMED. Ref: OFFICIAL-AUTH-1791880794. With: Secretary on 2026-10-22 at 02:30 PM. Please bring your NIC/Passport (OFFICIAL) and arrive 10m early. - Ministry Portal
+[2026-10-13 14:09:54] [SIMULATED SMS] To: +94****334| Msg: Appointment CANCELLED. Ref: REF-SLOT1-1791880786 on 2026-10-26. Reason: Citizen requested cancellation via phone. You may book a new slot via the portal. - Ministry Portal
+[2026-10-13 14:09:59] [LIVE EMAIL SENT] To: n****i@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Cancelled - Ref: REF-SLOT1-1791880786'
+[2026-10-13 14:10:00] [SIMULATED SMS] To: 077****567| Msg: Appointment request received. Ref: XSS-1791880800. Officer: Secretary, Date: 2026-10-19 10:30 AM. Status: Pending review. - Ministry Portal
+[2026-10-13 14:10:07] [LIVE EMAIL SENT] To: t****t@test.lk | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: XSS-1791880800'
+[2026-10-13 14:10:42] [SIMULATED SMS] To: +94****334| Msg: Appointment request received. Ref: REF-SLOT1-1791880842. Officer: Secretary, Date: 2026-10-26 11:00 AM. Status: Pending review. - Ministry Portal
+[2026-10-13 14:10:42] [SIMULATED SMS] To: +94****334| Msg: Appointment CONFIRMED. Ref: REF-SLOT1-1791880842. With: Secretary on 2026-10-26 at 11:00 AM. Please bring your NIC/Passport (9211****6V) and arrive 10m early. - Ministry Portal
+[2026-10-13 14:10:42] [SIMULATED SMS] To: +94****334| Msg: Appointment CONFIRMED. Ref: REF-SLOT1-1791880842. With: Secretary on 2026-10-26 at 11:30 AM. Please bring your NIC/Passport (9211****6V) and arrive 10m early. - Ministry Portal
+[2026-10-13 14:10:47] [LIVE EMAIL SENT] To: n****i@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: REF-SLOT1-1791880842'
+[2026-10-13 14:10:47] [LIVE EMAIL SENT] To: n****i@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: REF-SLOT1-1791880842'
+[2026-10-13 14:10:48] [LIVE EMAIL SENT] To: n****i@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Confirmed - Ref: REF-SLOT1-1791880842'
+[2026-10-13 14:10:49] [SIMULATED SMS] To: +94****678| Msg: Appointment CONFIRMED. Ref: OFFICIAL-AUTH-1791880849. With: Secretary on 2026-10-22 at 02:30 PM. Please bring your NIC/Passport (OFFICIAL) and arrive 10m early. - Ministry Portal
+[2026-10-13 14:10:49] [SIMULATED SMS] To: +94****334| Msg: Appointment CANCELLED. Ref: REF-SLOT1-1791880842 on 2026-10-26. Reason: Citizen requested cancellation via phone. You may book a new slot via the portal. - Ministry Portal
+[2026-10-13 14:10:54] [LIVE EMAIL SENT] To: n****i@gmail.com | From: c****3@gmail.com | Subject: 'Appointment Cancelled - Ref: REF-SLOT1-1791880842'
+[2026-10-13 14:10:56] [SIMULATED SMS] To: 077****567| Msg: Appointment request received. Ref: XSS-1791880856. Officer: Secretary, Date: 2026-10-19 10:30 AM. Status: Pending review. - Ministry Portal
+[2026-10-13 14:11:01] [LIVE EMAIL SENT] To: t****t@test.lk | From: c****3@gmail.com | Subject: 'Appointment Request Received - Ref: XSS-1791880856'
