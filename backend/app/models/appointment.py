@@ -92,7 +92,7 @@ class Appointment(db.Model):  # type: ignore[name-defined]
         self.email = encrypt_field(email) if email else ""
         self.date = date
         self.time = time
-        self.duration = int(duration) if duration else 30
+        self.duration = duration if duration else 30
         self.status = status
         self.refNo = refNo
         self.nic = encrypt_field(nic)
