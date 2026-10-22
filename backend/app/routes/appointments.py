@@ -18,6 +18,7 @@ from flask import Blueprint, request, jsonify
 from app.extensions import db, limiter
 from app.models.appointment import Appointment
 from app.models.allowed_date import AllowedDate
+from app.models.unavailable_date import UnavailableDate
 from app.utils.auth_guard import jwt_required, decode_jwt
 from app.utils.crypto import encrypt_field
 from app.services.notification_service import (
@@ -197,9 +198,10 @@ def create_appointment():
         if missing:
             return jsonify({"error": f"Missing required fields: {', '.join(missing)}"}), 400
 
-        # If booking is made by a public citizen (unauthenticated), enforce Public Day (Monday)
+        # If booking is made by a public citizen (unauthenticated), enforce Public Day (Monday) and check unavailability
         if not is_admin:
             date_val = str(data.get("date", "")).strip()
+            officer_val = str(data.get("officer", "")).strip()
             try:
                 parsed_date = datetime.date.fromisoformat(date_val)
             except ValueError:
@@ -209,9 +211,17 @@ def create_appointment():
             if parsed_date <= today:
                 return jsonify({"error": "Appointments must be booked at least 24 hours in advance."}), 400
 
+            # Check if officer is explicitly marked unavailable on this date
+            unavail = UnavailableDate.query.filter_by(role=officer_val, date=date_val).first()
+            if unavail:
+                reason_msg = f" (Reason: {unavail.reason})" if unavail.reason else ""
+                return jsonify({
+                    "error": f"The {officer_val} is unavailable on {date_val}{reason_msg}. Please choose another available Public Day."
+                }), 400
+
             # Official Public Day is Monday (weekday == 0 in Python)
             is_monday = (parsed_date.weekday() == 0)
-            is_explicitly_allowed = (AllowedDate.query.filter_by(role=data.get("officer"), date=date_val).first() is not None)
+            is_explicitly_allowed = (AllowedDate.query.filter_by(role=officer_val, date=date_val).first() is not None)
 
             if not is_monday and not is_explicitly_allowed:
                 return jsonify({

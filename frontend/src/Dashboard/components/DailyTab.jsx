@@ -41,8 +41,10 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
   // State to control display limit of active booking dates
   const [showAllDates, setShowAllDates] = useState(false)
 
-  // Get list of unique dates that have appointments, sorted chronologically
-  const activeDates = Array.from(new Set(appointments.map(appt => appt.date))).sort()
+  // Get list of unique dates that have appointments, sorted latest to oldest and limited to maximum 20 in display
+  const activeDates = Array.from(new Set(appointments.map(appt => appt.date).filter(Boolean)))
+    .sort((a, b) => b.localeCompare(a))
+    .slice(0, 20)
 
   // Filter appointments for the selected day
   const dailyAppointments = appointments
@@ -108,13 +110,15 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                   <button
                     key={date}
                     onClick={() => setSelectedDate(date)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${isSelected
-                      ? 'bg-indigo-650 text-black shadow-sm dark:text-white'
-                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 dark:bg-slate-950 dark:text-slate-455 dark:hover:bg-slate-800/50'
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${isSelected
+                      ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/20 ring-1 ring-indigo-500 dark:bg-indigo-600'
+                      : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200'
                       }`}
                   >
                     <span>{date}</span>
-                    <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold ${isSelected ? 'bg-indigo-700 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                    <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-extrabold ${isSelected
+                      ? 'bg-white/20 text-white'
+                      : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
                       }`}>
                       {count}
                     </span>
@@ -127,7 +131,7 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                 <button
                   type="button"
                   onClick={() => setShowAllDates(!showAllDates)}
-                  className="px-3 py-1.5 rounded-xl text-xs font-extrabold text-indigo-655 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-all cursor-pointer shrink-0"
+                  className="px-3 py-1.5 rounded-xl text-xs font-extrabold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all cursor-pointer shrink-0"
                 >
                   {showAllDates ? 'Show Less ▲' : `Show More (${activeDates.length - 6}) ▼`}
                 </button>

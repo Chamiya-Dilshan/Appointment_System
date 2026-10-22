@@ -43,7 +43,7 @@ const PROVINCES_AND_DISTRICTS = {
   "Sabaragamuwa": ["Kegalle", "Ratnapura"]
 }
 
-export default function BookTab({ appointments, allowedDates, onAddAppointment, setActiveTab, currentUser }) {
+export default function BookTab({ appointments, allowedDates, unavailableDates = [], onAddAppointment, setActiveTab, currentUser }) {
   // Category switch: 'Official Meeting' (Default for Admin) vs 'Public Consultation'
   const [meetingCategory, setMeetingCategory] = useState('Official Meeting')
 
@@ -850,6 +850,7 @@ export default function BookTab({ appointments, allowedDates, onAddAppointment, 
                 </div>
                 <CustomDatePicker
                   allowedDates={allowedDates}
+                  unavailableDates={unavailableDates}
                   value={newDate}
                   allowAnyDate={true}
                   allowToday={true}

@@ -29,6 +29,11 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
     'Deputy Minister': [],
     'Minister': []
   })
+  const [unavailableDatesByRole, setUnavailableDatesByRole] = useState({
+    'Secretary': [],
+    'Deputy Minister': [],
+    'Minister': []
+  })
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('authToken') || currentUser?.token
@@ -45,16 +50,17 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
     }
   }
 
-  // Load appointments and allowed dates from backend API on mount
+  // Load appointments, allowed dates, and unavailable dates from backend API on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('authToken') || currentUser?.token
-        const [apptsRes, scheduleRes] = await Promise.all([
+        const [apptsRes, scheduleRes, unavailRes] = await Promise.all([
           fetch('/api/appointments', {
             headers: token ? { 'Authorization': `Bearer ${token}` } : {}
           }),
-          fetch('/api/schedule')
+          fetch('/api/schedule'),
+          fetch('/api/schedule/unavailable')
         ])
 
         if (apptsRes.ok) {
@@ -72,6 +78,13 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
         } else {
           console.error("Failed to load schedule from backend")
         }
+
+        if (unavailRes.ok) {
+          const unavailData = await unavailRes.json()
+          setUnavailableDatesByRole(unavailData)
+        } else {
+          console.error("Failed to load unavailable schedule from backend")
+        }
       } catch (err) {
         console.error("Error fetching dashboard data:", err)
       }
@@ -81,6 +94,7 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
 
   const currentRole = currentUser?.role || 'Secretary'
   const allowedDates = allowedDatesByRole[currentRole] || []
+  const unavailableDates = unavailableDatesByRole[currentRole] || []
 
   // Navigation active tab: 'overview' | 'appointments' | 'schedule' | 'booking'
   const [activeTab, setActiveTab] = useState('overview')
@@ -277,13 +291,12 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
     }
   }
 
-  const handleAddDate = async (date) => {
-    const currentRole = currentUser?.role || 'Secretary'
+  const handleAddDate = async (date, role = currentRole) => {
     try {
       const response = await fetch('/api/schedule', {
         method: 'POST',
         headers: getAuthHeaders(),
-        body: JSON.stringify({ role: currentRole, date: date })
+        body: JSON.stringify({ role: role, date: date })
       })
       if (response.status === 401) {
         handleAuthError(401)
@@ -292,7 +305,11 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
       if (response.ok) {
         setAllowedDatesByRole(prev => ({
           ...prev,
-          [currentRole]: [...(prev[currentRole] || []), date].sort()
+          [role]: Array.from(new Set([...(prev[role] || []), date])).sort()
+        }))
+        setUnavailableDatesByRole(prev => ({
+          ...prev,
+          [role]: (prev[role] || []).filter(u => (typeof u === 'string' ? u : u.date) !== date)
         }))
       } else {
         const errData = await response.json()
@@ -304,10 +321,9 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
     }
   }
 
-  const handleRemoveDate = async (date) => {
-    const currentRole = currentUser?.role || 'Secretary'
+  const handleRemoveDate = async (date, role = currentRole) => {
     try {
-      const response = await fetch(`/api/schedule?role=${encodeURIComponent(currentRole)}&date=${encodeURIComponent(date)}`, {
+      const response = await fetch(`/api/schedule?role=${encodeURIComponent(role)}&date=${encodeURIComponent(date)}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       })
@@ -318,8 +334,13 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
       if (response.ok) {
         setAllowedDatesByRole(prev => ({
           ...prev,
-          [currentRole]: (prev[currentRole] || []).filter(d => d !== date)
+          [role]: (prev[role] || []).filter(d => d !== date)
         }))
+        // Refresh unavailable dates in background
+        const unavailRes = await fetch('/api/schedule/unavailable')
+        if (unavailRes.ok) {
+          setUnavailableDatesByRole(await unavailRes.json())
+        }
       } else {
         const errData = await response.json()
         alert("Failed to remove date: " + (errData.error || "Server error"))
@@ -327,6 +348,74 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
     } catch (err) {
       console.error("Remove date error:", err)
       alert("Network error: Could not reach the server to remove date.")
+    }
+  }
+
+  const handleMakeUnavailable = async (role, date, reason) => {
+    try {
+      const response = await fetch('/api/schedule/unavailable', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ role, date, reason })
+      })
+      if (response.status === 401) {
+        handleAuthError(401)
+        return
+      }
+      if (response.ok) {
+        const createdRecord = await response.json()
+        setAllowedDatesByRole(prev => ({
+          ...prev,
+          [role]: (prev[role] || []).filter(d => d !== date)
+        }))
+        setUnavailableDatesByRole(prev => {
+          const list = prev[role] || []
+          const existingIdx = list.findIndex(u => (typeof u === 'string' ? u : u.date) === date)
+          if (existingIdx >= 0) {
+            const next = [...list]
+            next[existingIdx] = createdRecord
+            return { ...prev, [role]: next }
+          }
+          return { ...prev, [role]: [...list, createdRecord] }
+        })
+        if (createdRecord.affected_appointments > 0) {
+          alert(`Date ${date} marked unavailable for ${role}.\nNotice: ${createdRecord.affected_appointments} existing appointment(s) are already booked on this date.`)
+        }
+      } else {
+        const errData = await response.json()
+        alert("Failed to mark date as unavailable: " + (errData.error || "Server error"))
+      }
+    } catch (err) {
+      console.error("Make unavailable error:", err)
+      alert("Network error: Could not reach the server.")
+    }
+  }
+
+  const handleRestoreAvailability = async (role, date) => {
+    try {
+      const response = await fetch(`/api/schedule/unavailable?role=${encodeURIComponent(role)}&date=${encodeURIComponent(date)}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      })
+      if (response.status === 401) {
+        handleAuthError(401)
+        return
+      }
+      if (response.ok) {
+        // Re-fetch schedule to get the restored allowed dates
+        const [schedRes, unavailRes] = await Promise.all([
+          fetch('/api/schedule'),
+          fetch('/api/schedule/unavailable')
+        ])
+        if (schedRes.ok) setAllowedDatesByRole(await schedRes.json())
+        if (unavailRes.ok) setUnavailableDatesByRole(await unavailRes.json())
+      } else {
+        const errData = await response.json()
+        alert("Failed to restore availability: " + (errData.error || "Server error"))
+      }
+    } catch (err) {
+      console.error("Restore availability error:", err)
+      alert("Network error: Could not reach the server.")
     }
   }
 
@@ -402,8 +491,15 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
         return (
           <ScheduleTab
             allowedDates={allowedDates}
+            unavailableDates={unavailableDates}
+            allowedDatesByRole={allowedDatesByRole}
+            unavailableDatesByRole={unavailableDatesByRole}
             onAddDate={handleAddDate}
             onRemoveDate={handleRemoveDate}
+            onMakeUnavailable={handleMakeUnavailable}
+            onRestoreAvailability={handleRestoreAvailability}
+            currentUser={currentUser}
+            appointments={authorizedAppointments}
           />
         )
       case 'booking':
@@ -411,6 +507,7 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
           <BookTab
             appointments={processedAppointments}
             allowedDates={allowedDates}
+            unavailableDates={unavailableDates}
             onAddAppointment={handleAddAppointment}
             setActiveTab={setActiveTab}
             currentUser={currentUser}

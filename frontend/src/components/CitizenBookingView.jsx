@@ -20,6 +20,7 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
 
   // Schedules and booked slots from backend
   const [scheduleByRole, setScheduleByRole] = useState({})
+  const [unavailableByRole, setUnavailableByRole] = useState({})
   const [bookedSlots, setBookedSlots] = useState([])
   const [loadingSchedule, setLoadingSchedule] = useState(true)
 
@@ -54,14 +55,15 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
   const [confirmedBooking, setConfirmedBooking] = useState(null)
   const [copiedRef, setCopiedRef] = useState(false)
 
-  // Fetch public allowed schedule and booked slots
+  // Fetch public allowed schedule, unavailable dates, and booked slots
   useEffect(() => {
     const fetchPublicData = async () => {
       setLoadingSchedule(true)
       try {
-        const [schedRes, slotsRes] = await Promise.all([
+        const [schedRes, slotsRes, unavailRes] = await Promise.all([
           fetch('/api/schedule'),
-          fetch('/api/appointments/booked-slots')
+          fetch('/api/appointments/booked-slots'),
+          fetch('/api/schedule/unavailable')
         ])
 
         if (schedRes.ok) {
@@ -72,6 +74,10 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
           const slotsData = await slotsRes.json()
           setBookedSlots(slotsData)
         }
+        if (unavailRes.ok) {
+          const unavailData = await unavailRes.json()
+          setUnavailableByRole(unavailData)
+        }
       } catch (err) {
         console.error("Error fetching public schedule:", err)
       } finally {
@@ -81,14 +87,16 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
     fetchPublicData()
   }, [])
 
-  // Allowed dates for the currently selected officer
+  // Allowed & unavailable dates for the currently selected officer
   const allowedDates = scheduleByRole[selectedOfficer] || []
+  const unavailableDates = unavailableByRole[selectedOfficer] || []
 
-  // When officer changes, clear date and time if previously selected date is not allowed, or if switching to Minister with an afternoon slot
+  // When officer changes, clear date and time if previously selected date is not allowed or unavailable
   const handleOfficerChange = (officerRole) => {
     setSelectedOfficer(officerRole)
     const newOfficerDates = scheduleByRole[officerRole] || []
-    if (!newOfficerDates.includes(date)) {
+    const newOfficerUnavail = (unavailableByRole[officerRole] || []).map(u => typeof u === 'string' ? u : u?.date)
+    if (!newOfficerDates.includes(date) || newOfficerUnavail.includes(date)) {
       setDate('')
       setTime('')
     } else if (officerRole === 'Minister' && time) {
@@ -187,10 +195,15 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
       return
     }
 
-    // Date availability check - Citizens can only book on official Public Days (Mondays)
-    const isMonday = new Date(date + 'T00:00:00').getDay() === 1
-    if (!isMonday && !allowedDates.includes(date)) {
-      setFormError("Citizen appointments can only be scheduled on official Public Days (Every Monday).")
+    // Date availability check - Citizens cannot book on dates when the officer is unavailable
+    const unavailList = (unavailableByRole[selectedOfficer] || []).map(u => typeof u === 'string' ? u : u?.date)
+    if (unavailList.includes(date)) {
+      setFormError(`The ${selectedOfficer} is unavailable on ${date}. Please choose another available Public Day.`)
+      return
+    }
+
+    if (!allowedDates.includes(date)) {
+      setFormError("Citizen appointments can only be scheduled on designated active Public Days.")
       return
     }
 
@@ -555,6 +568,39 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
                 </span>
               </div>
 
+              {/* Notice of Officer Unavailability Banner */}
+              {unavailableDates.length > 0 && (
+                <div className="p-3.5 rounded-2xl bg-rose-50/90 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/60 flex items-start gap-2.5 text-xs text-rose-900 dark:text-rose-200 shadow-2xs">
+                  <span className="text-base shrink-0">📢</span>
+                  <div className="space-y-1">
+                    <div className="font-extrabold flex items-center gap-2">
+                      <span>Public Day Notice: {selectedOfficer} Unavailability</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-200/70 dark:bg-rose-900/70 text-rose-800 dark:text-rose-200">
+                        {unavailableDates.length} exception(s)
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-rose-800/90 dark:text-rose-300/90">
+                      The {selectedOfficer} is unavailable for public consultations on the following date(s):
+                    </p>
+                    <div className="flex flex-wrap gap-2 pt-0.5">
+                      {unavailableDates.map(u => {
+                        const d = typeof u === 'string' ? u : u.date
+                        const r = typeof u === 'object' && u.reason ? u.reason : null
+                        return (
+                          <span
+                            key={d}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-rose-200 dark:border-rose-800 text-[11px] font-bold text-rose-700 dark:text-rose-300"
+                          >
+                            <span>🚫 {d}</span>
+                            {r && <span className="font-normal opacity-80">({r})</span>}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* 2-Column Responsive Layout for Calendar & Time Slots */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-slate-50/50 dark:bg-slate-950/30 p-4 sm:p-6 rounded-3xl border border-slate-200/70 dark:border-slate-800/70">
 
@@ -577,6 +623,7 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
                   ) : (
                     <CustomDatePicker
                       allowedDates={allowedDates}
+                      unavailableDates={unavailableDates}
                       value={date}
                       allowAnyDate={false}
                       onChange={(d) => {

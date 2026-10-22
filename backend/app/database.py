@@ -154,6 +154,23 @@ def init_db_with_retry(app) -> bool:  # type: ignore[type-arg]
         except Exception:
             db.session.rollback()
 
+        # Ensure unavailable_dates table exists in MySQL
+        try:
+            from sqlalchemy import text
+            db.session.execute(text("""
+                CREATE TABLE IF NOT EXISTS `unavailable_dates` (
+                    `id` INT AUTO_INCREMENT PRIMARY KEY,
+                    `role` VARCHAR(50) NOT NULL,
+                    `date` VARCHAR(10) NOT NULL,
+                    `reason` VARCHAR(255) NULL DEFAULT '',
+                    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE KEY `uq_officer_unavailable_date` (`role`, `date`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            """))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
         # Encrypt any legacy unencrypted phone/nic/address/email values in MySQL
         try:
             from app.models.appointment import Appointment
