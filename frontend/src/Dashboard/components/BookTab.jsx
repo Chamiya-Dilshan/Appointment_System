@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import CustomDatePicker from './CustomDatePicker'
 import {
+  TIME_SLOTS,
   DURATION_OPTIONS,
   parseInputTimeToMinutes,
   parseTimeToMinutes,
@@ -9,27 +10,6 @@ import {
   formatDurationLabel,
   isSlotOverlappingAppointment
 } from '../../utils/sriLankaData'
-
-// Standard 30-minute interval time slots from 9:00 AM to 5:00 PM
-const TIME_SLOTS = [
-  { value: "09:00", label: "09:00 AM" },
-  { value: "09:30", label: "09:30 AM" },
-  { value: "10:00", label: "10:00 AM" },
-  { value: "10:30", label: "10:30 AM" },
-  { value: "11:00", label: "11:00 AM" },
-  { value: "11:30", label: "11:30 AM" },
-  { value: "12:00", label: "12:00 PM" },
-  { value: "12:30", label: "12:30 PM" },
-  { value: "13:00", label: "01:00 PM" },
-  { value: "13:30", label: "01:30 PM" },
-  { value: "14:00", label: "02:00 PM" },
-  { value: "14:30", label: "02:30 PM" },
-  { value: "15:00", label: "03:00 PM" },
-  { value: "15:30", label: "03:30 PM" },
-  { value: "16:00", label: "04:00 PM" },
-  { value: "16:30", label: "04:30 PM" },
-  { value: "17:00", label: "05:00 PM" }
-]
 
 const PROVINCES_AND_DISTRICTS = {
   "Western": ["Colombo", "Gampaha", "Kalutara"],
@@ -50,7 +30,7 @@ export default function BookTab({ appointments, allowedDates, unavailableDates =
   // Common scheduling state
   const [newDate, setNewDate] = useState('')
   const [newTime, setNewTime] = useState('')
-  const [newDuration, setNewDuration] = useState(30)
+  const [newDuration, setNewDuration] = useState(15)
   const [newStatus, setNewStatus] = useState('Confirmed')
   const [newPhone, setNewPhone] = useState('')
   const [newEmail, setNewEmail] = useState('')
@@ -86,11 +66,11 @@ export default function BookTab({ appointments, allowedDates, unavailableDates =
   const [nicError, setNicError] = useState('')
   const [emailError, setEmailError] = useState('')
 
-  // Get booking details for a 30m slot interval (checks duration overlaps)
+  // Get booking details for a 15m slot interval (checks duration overlaps)
   const getSlotBookingInfo = (slotValue) => {
     if (!newDate) return { isBooked: false, appointment: null }
     const slotMinutes = parseInputTimeToMinutes(slotValue)
-    const slotDuration = 30
+    const slotDuration = 15
     const currentOfficer = currentUser?.role || 'Secretary'
 
     const overlappingAppt = appointments.find(appt => {
@@ -98,7 +78,7 @@ export default function BookTab({ appointments, allowedDates, unavailableDates =
       if (appt.officer && currentOfficer && appt.officer !== currentOfficer) return false
 
       const apptMinutes = parseTimeToMinutes(appt.time)
-      const apptDuration = appt.duration || 30
+      const apptDuration = appt.duration || 15
       return isSlotOverlappingAppointment(slotMinutes, slotDuration, apptMinutes, apptDuration)
     })
 
@@ -108,7 +88,7 @@ export default function BookTab({ appointments, allowedDates, unavailableDates =
     }
   }
 
-  // Check if a specific 30-minute time slot is already booked on newDate
+  // Check if a specific 15-minute time slot is already booked on newDate
   const isSlotBooked = (slotValue) => {
     return getSlotBookingInfo(slotValue).isBooked
   }
@@ -235,12 +215,12 @@ export default function BookTab({ appointments, allowedDates, unavailableDates =
       if (appt.date !== newDate || appt.status === 'Cancelled') return false
       if (appt.officer && currentOfficer && appt.officer !== currentOfficer) return false
       const apptMinutes = parseTimeToMinutes(appt.time)
-      const apptDuration = appt.duration || 30
+      const apptDuration = appt.duration || 15
       return isSlotOverlappingAppointment(newTimeMinutes, newDuration, apptMinutes, apptDuration)
     })
 
     if (timeConflictAppt) {
-      setFormError(`Scheduling Conflict: The chosen ${formatDurationLabel(newDuration)} session overlaps with an existing appointment (${timeConflictAppt.name || timeConflictAppt.refNo} scheduled at ${getAppointmentTimeRange(timeConflictAppt.time, timeConflictAppt.duration)}).`)
+      setFormError(`Scheduling Conflict: The chosen ${formatDurationLabel(newDuration)} session overlaps with an existing appointment (${timeConflictAppt.name || timeConflictAppt.refNo} scheduled at ${getAppointmentTimeRange(timeConflictAppt.time, timeConflictAppt.duration || 15)}).`)
       return
     }
 
@@ -293,7 +273,7 @@ export default function BookTab({ appointments, allowedDates, unavailableDates =
     setNewReason('')
     setNewDate('')
     setNewTime('')
-    setNewDuration(30)
+    setNewDuration(15)
     setNewNic('')
     setNewDistrict('')
     setNewProvince('')
@@ -760,11 +740,10 @@ export default function BookTab({ appointments, allowedDates, unavailableDates =
                       title="Local Council / Pradeshiya Sabha"
                       className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5 block truncate"
                     >
-                      Local Council / Pradeshiya Sabha *
+                      Local Council / Pradeshiya Sabha 
                     </label>
                     <input
                       type="text"
-                      required
                       placeholder="e.g. Colombo MC"
                       value={newCouncil}
                       onChange={(e) => setNewCouncil(e.target.value)}
@@ -962,7 +941,7 @@ export default function BookTab({ appointments, allowedDates, unavailableDates =
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                            🌤️ Afternoon Sessions (01:00 PM – 05:00 PM)
+                            🌤️ Afternoon Sessions (02:00 PM – 05:00 PM)
                           </span>
                           {meetingCategory === 'Public Consultation' && (currentUser?.role || 'Secretary') === 'Minister' && (
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">

@@ -36,7 +36,7 @@ VALID_STATUSES = {"Pending", "Confirmed", "Cancelled", "Completed"}
 REQUIRED_FIELDS = [
     "name", "reason", "phone", "date", "time",
     "refNo", "nic", "district", "province", "council",
-    "address", "postalCode", "officer",
+    "address", "officer",
 ]
 
 REQUIRED_OFFICIAL_FIELDS = [
@@ -148,7 +148,7 @@ def get_booked_slots():
                 "id": a.id,
                 "date": a.date,
                 "time": a.time,
-                "duration": getattr(a, "duration", 30) or 30,
+                "duration": getattr(a, "duration", 15) or 15,
                 "officer": a.officer,
             }
             for a in appts
@@ -273,11 +273,11 @@ def create_appointment():
         council_val = data.get("council") or data.get("districtSecretariat") or (data.get("organization") or "Ministry Headquarters")
         gs_div_val = data.get("gsDivision", "").strip() if data.get("gsDivision") else ""
         address_val = data.get("address") or data.get("permanentAddress") or (data.get("venue") or "Ministry Headquarters")
-        postal_val = data.get("postalCode") or ("00100" if meeting_type == "Official Meeting" else "")
+        postal_val = data.get("postalCode") or ""
         org_val = data.get("organization") or ""
         venue_val = data.get("venue") or ("Hon. Minister's Office" if data.get("officer") == "Minister" else "Ministry Boardroom")
         initial_status = data.get("status") or ("Confirmed" if (meeting_type == "Official Meeting" and is_admin) else "Pending")
-        duration_val = int(data.get("duration", 30)) if data.get("duration") else 30
+        duration_val = int(data.get("duration", 15)) if data.get("duration") else 15
 
         # Check time slot conflict against existing active appointments
         existing_active = Appointment.query.filter(
@@ -286,7 +286,7 @@ def create_appointment():
             Appointment.status.in_(["Pending", "Confirmed", "Completed"])
         ).all()
         for ex in existing_active:
-            ex_dur = getattr(ex, "duration", 30) or 30
+            ex_dur = getattr(ex, "duration", 15) or 15
             if check_time_overlap(data["time"], duration_val, ex.time, ex_dur):
                 return jsonify({
                     "error": f"Scheduling Conflict: The slot {data['time']} ({duration_val}m) overlaps with an existing appointment ({ex.time}, {ex_dur}m) for {data['officer']}."
@@ -422,7 +422,7 @@ def update_appointment_time(appt_id: int):
             except (ValueError, TypeError):
                 return jsonify({"error": "Duration must be a valid integer between 5 and 480 minutes."}), 400
         else:
-            new_duration = int(getattr(appt, "duration", 30) or 30)
+            new_duration = int(getattr(appt, "duration", 15) or 15)
 
         if new_duration < 5 or new_duration > 480:
             return jsonify({"error": "Duration must be between 5 and 480 minutes."}), 400
@@ -436,7 +436,7 @@ def update_appointment_time(appt_id: int):
         ).all()
 
         for other in other_appts:
-            other_dur = getattr(other, "duration", 30) or 30
+            other_dur = getattr(other, "duration", 15) or 15
             if check_time_overlap(new_time, new_duration, other.time, other_dur):
                 return jsonify({
                     "error": f"Schedule Conflict: Time slot ({new_time}, {new_duration}m) overlaps with an existing appointment ({other.time}, {other_dur}m) for {appt.officer} on {new_date}."

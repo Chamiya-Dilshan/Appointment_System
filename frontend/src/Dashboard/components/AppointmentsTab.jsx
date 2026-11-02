@@ -280,11 +280,11 @@ export default function AppointmentsTab({
                     <td className="px-6 py-4 text-slate-600 dark:text-slate-400 font-semibold">
                       <div className="flex flex-col gap-0.5">
                         <span className="font-bold text-slate-800 dark:text-slate-200">
-                          {getAppointmentTimeRange(appt.time, appt.duration || 30)}
+                          {getAppointmentTimeRange(appt.time, appt.duration || 15)}
                         </span>
                         <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold flex items-center gap-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                          <span>{formatDurationLabel(appt.duration || 30)} session</span>
+                          <span>{formatDurationLabel(appt.duration || 15)} session</span>
                         </span>
                       </div>
                     </td>
@@ -497,10 +497,10 @@ export default function AppointmentsTab({
                     <p className="font-semibold text-slate-700 dark:text-slate-200">{appt.date}</p>
                     <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                       <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
-                        {getAppointmentTimeRange(appt.time, appt.duration || 30)}
+                        {getAppointmentTimeRange(appt.time, appt.duration || 15)}
                       </span>
                       <span className="text-[9px] px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold">
-                        {formatDurationLabel(appt.duration || 30)}
+                        {formatDurationLabel(appt.duration || 15)}
                       </span>
                     </div>
                   </div>

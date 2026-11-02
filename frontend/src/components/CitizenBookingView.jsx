@@ -112,7 +112,7 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
     if (!date) return null
     return bookedSlots.find(b => {
       if (b.officer !== selectedOfficer || b.date !== date) return false
-      return isSlotOverlappingAppointment(slotValue, 30, b.time, b.duration || 30)
+      return isSlotOverlappingAppointment(slotValue, 15, b.time, b.duration || 15)
     })
   }
 
@@ -219,7 +219,7 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
     // Double-booking conflict check taking custom appointment duration into account
     const conflict = bookedSlots.some(b => {
       if (b.officer !== selectedOfficer || b.date !== date) return false
-      return isSlotOverlappingAppointment(time, 30, b.time, b.duration || 30)
+      return isSlotOverlappingAppointment(time, 15, b.time, b.duration || 15)
     })
 
     if (conflict) {
@@ -239,6 +239,7 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
       email: email.trim(),
       date: date,
       time: formatTime(time),
+      duration: 15,
       status: 'Pending',
       refNo: refNo,
       nic: nic.trim(),
@@ -676,7 +677,7 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
                               const booked = Boolean(booking)
                               const isSelected = time === slot.value
                               const tooltip = booked
-                                ? `${slot.label} is unavailable (Occupied: ${getAppointmentTimeRange(booking.time, booking.duration || 30)})`
+                                ? `${slot.label} is unavailable (Occupied: ${getAppointmentTimeRange(booking.time, booking.duration || 15)})`
                                 : `Select ${slot.label}`
                               return (
                                 <button
@@ -696,7 +697,7 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
                                   <span>{slot.label}</span>
                                   {booked && (
                                     <span className="text-[9px] no-underline font-medium text-rose-500 dark:text-rose-400 leading-none mt-0.5">
-                                      {booking.duration > 30 ? 'In Session' : 'Booked'}
+                                      {booking.duration > 15 ? 'In Session' : 'Booked'}
                                     </span>
                                   )}
                                 </button>
@@ -709,7 +710,7 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
                         <div>
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                              🌤️ Afternoon Sessions (01:00 PM – 05:00 PM)
+                              🌤️ Afternoon Sessions (02:00 PM – 05:00 PM)
                             </span>
                             {selectedOfficer === 'Minister' && (
                               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
@@ -735,7 +736,7 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
                                 const booked = Boolean(booking)
                                 const isSelected = time === slot.value
                                 const tooltip = booked
-                                  ? `${slot.label} is unavailable (Occupied: ${getAppointmentTimeRange(booking.time, booking.duration || 30)})`
+                                  ? `${slot.label} is unavailable (Occupied: ${getAppointmentTimeRange(booking.time, booking.duration || 15)})`
                                   : `Select ${slot.label}`
                                 return (
                                   <button
@@ -755,7 +756,7 @@ export default function CitizenBookingView({ onNavigateToAdmin, isEmbed = false 
                                     <span>{slot.label}</span>
                                     {booked && (
                                       <span className="text-[9px] no-underline font-medium text-rose-500 dark:text-rose-400 leading-none mt-0.5">
-                                        {booking.duration > 30 ? 'In Session' : 'Booked'}
+                                        {booking.duration > 15 ? 'In Session' : 'Booked'}
                                       </span>
                                     )}
                                   </button>

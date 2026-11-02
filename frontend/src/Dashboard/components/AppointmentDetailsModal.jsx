@@ -29,7 +29,7 @@ export default function AppointmentDetailsModal({
   // Schedule Adjustment States (Extend / Change Slot)
   const [isAdjustingSchedule, setIsAdjustingSchedule] = useState(false)
   const [selectedTime, setSelectedTime] = useState(appointment?.time || '')
-  const [selectedDuration, setSelectedDuration] = useState(appointment?.duration || 30)
+  const [selectedDuration, setSelectedDuration] = useState(appointment?.duration || 15)
   const [adjustError, setAdjustError] = useState('')
   const [isSavingSchedule, setIsSavingSchedule] = useState(false)
 
@@ -41,7 +41,7 @@ export default function AppointmentDetailsModal({
     setCompletionRemark('')
     setIsAdjustingSchedule(false)
     setSelectedTime(appointment?.time || '')
-    setSelectedDuration(appointment?.duration || 30)
+    setSelectedDuration(appointment?.duration || 15)
     setAdjustError('')
   }, [appointment])
 
@@ -107,7 +107,7 @@ export default function AppointmentDetailsModal({
     const endMins = startMins + Number(durationMins)
     return TIME_SLOTS.filter((slot) => {
       const slotMins = parseInputTimeToMinutes(slot.value)
-      return slotMins < endMins && slotMins + 30 > startMins
+      return slotMins < endMins && slotMins + 15 > startMins
     }).map((s) => s.label)
   }
 
@@ -176,7 +176,7 @@ export default function AppointmentDetailsModal({
             type="button"
             onClick={() => {
               setSelectedTime(currentAppt.time)
-              setSelectedDuration(currentAppt.duration || 30)
+              setSelectedDuration(currentAppt.duration || 15)
               setAdjustError('')
               setIsAdjustingSchedule(!isAdjustingSchedule)
             }}
@@ -201,10 +201,10 @@ export default function AppointmentDetailsModal({
           <span className="text-slate-400 dark:text-slate-500 block mb-0.5">Time & Duration</span>
           <div className="flex items-center gap-1.5 flex-wrap">
             <strong className="font-extrabold text-indigo-600 dark:text-indigo-400 text-sm">
-              ⏰ {getAppointmentTimeRange(currentAppt.time, currentAppt.duration || 30)}
+              ⏰ {getAppointmentTimeRange(currentAppt.time, currentAppt.duration || 15)}
             </strong>
             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300">
-              {formatDurationLabel(currentAppt.duration || 30)}
+              {formatDurationLabel(currentAppt.duration || 15)}
             </span>
           </div>
         </div>

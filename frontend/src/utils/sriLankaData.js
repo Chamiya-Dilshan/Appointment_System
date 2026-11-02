@@ -1,22 +1,33 @@
-// Standard 30-minute interval time slots from 9:00 AM to 5:00 PM
+// Standard 15-minute interval time slots from 9:00 AM to 5:00 PM
 export const TIME_SLOTS = [
   { value: "09:00", label: "09:00 AM" },
+  { value: "09:15", label: "09:15 AM" },
   { value: "09:30", label: "09:30 AM" },
+  { value: "09:45", label: "09:45 AM" },
   { value: "10:00", label: "10:00 AM" },
+  { value: "10:15", label: "10:15 AM" },
   { value: "10:30", label: "10:30 AM" },
+  { value: "10:45", label: "10:45 AM" },
   { value: "11:00", label: "11:00 AM" },
+  { value: "11:15", label: "11:15 AM" },
   { value: "11:30", label: "11:30 AM" },
+  { value: "11:45", label: "11:45 AM" },
   { value: "12:00", label: "12:00 PM" },
+  { value: "12:15", label: "12:15 PM" },
   { value: "12:30", label: "12:30 PM" },
-  { value: "13:00", label: "01:00 PM" },
-  { value: "13:30", label: "01:30 PM" },
+  { value: "12:45", label: "12:45 PM" },
   { value: "14:00", label: "02:00 PM" },
+  { value: "14:15", label: "02:15 PM" },
   { value: "14:30", label: "02:30 PM" },
+  { value: "14:45", label: "02:45 PM" },
   { value: "15:00", label: "03:00 PM" },
+  { value: "15:15", label: "03:15 PM" },
   { value: "15:30", label: "03:30 PM" },
+  { value: "15:45", label: "03:45 PM" },
   { value: "16:00", label: "04:00 PM" },
+  { value: "16:15", label: "04:15 PM" },
   { value: "16:30", label: "04:30 PM" },
-  { value: "17:00", label: "05:00 PM" }
+  { value: "16:45", label: "04:45 PM" }
 ]
 
 export const SRI_LANKA_PROVINCES = [
@@ -136,9 +147,9 @@ export const getOfficialDetails = (appt) => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const DURATION_OPTIONS = [
-  { value: 15, label: '15 mins', shortLabel: '15' },
-  { value: 30, label: '30 mins (Standard)', shortLabel: '30' },
-  { value: 45, label: '45 mins (Extended)', shortLabel: '45' },
+  { value: 15, label: '15 mins (Default)', shortLabel: '15m' },
+  { value: 30, label: '30 mins', shortLabel: '30m' },
+  { value: 45, label: '45 mins (Extended)', shortLabel: '45m' },
   { value: 60, label: '1 hour (60 mins)', shortLabel: '1h' },
   { value: 75, label: '1.25 hours (75 mins)', shortLabel: '1.25h' },
   { value: 90, label: '1.5 hours (90 mins)', shortLabel: '1.5h' },
@@ -191,36 +202,36 @@ export const formatTime = (timeStr) => {
   return `${String(formattedHour).padStart(2, '0')}:${minStr} ${ampm}`
 }
 
-// Format duration into a clean human label (e.g. 45 -> "45 mins", 60 -> "1 hour")
+// Format duration into a clean human label (e.g. 15 -> "15m", 45 -> "45m", 60 -> "1 hour")
 export const formatDurationLabel = (durationInMinutes) => {
-  const mins = parseInt(durationInMinutes, 10) || 30
+  const mins = parseInt(durationInMinutes, 10) || 15
   if (mins < 60) return `${mins}m`
   const h = Math.floor(mins / 60)
   const m = mins % 60
   return m === 0 ? `${h}h` : `${h}h ${m}m`
 }
 
-// Calculate the full time range for an appointment (e.g. "09:00 AM – 09:45 AM")
-export const getAppointmentTimeRange = (timeStr, duration = 30) => {
+// Calculate the full time range for an appointment (e.g. "09:00 AM – 09:15 AM")
+export const getAppointmentTimeRange = (timeStr, duration = 15) => {
   if (!timeStr) return ''
   const startMins = parseTimeToMinutes(timeStr)
-  const dur = parseInt(duration, 10) || 30
+  const dur = parseInt(duration, 10) || 15
   const endMins = startMins + dur
   return `${formatTime(timeStr)} – ${minutesToFormattedTime(endMins)}`
 }
 
 // Check if a candidate time slot interval [slotStart, slotStart + slotDuration)
 // overlaps with an appointment [apptStart, apptStart + apptDuration)
-export const isSlotOverlappingAppointment = (slotValue, slotDuration = 30, apptTime, apptDuration = 30) => {
+export const isSlotOverlappingAppointment = (slotValue, slotDuration = 15, apptTime, apptDuration = 15) => {
   const slotStart = typeof slotValue === 'number'
     ? slotValue
     : (slotValue.includes(' ') ? parseTimeToMinutes(slotValue) : parseInputTimeToMinutes(slotValue))
-  const slotEnd = slotStart + (parseInt(slotDuration, 10) || 30)
+  const slotEnd = slotStart + (parseInt(slotDuration, 10) || 15)
 
   const apptStart = typeof apptTime === 'number'
     ? apptTime
     : parseTimeToMinutes(apptTime)
-  const apptEnd = apptStart + (parseInt(apptDuration, 10) || 30)
+  const apptEnd = apptStart + (parseInt(apptDuration, 10) || 15)
 
   return slotStart < apptEnd && slotEnd > apptStart
 }

@@ -6,6 +6,7 @@ import AppointmentsTab from './components/AppointmentsTab'
 import ScheduleTab from './components/ScheduleTab'
 import BookTab from './components/BookTab'
 import DailyTab from './components/DailyTab'
+import EfficiencyTab from './components/EfficiencyTab'
 
 // Mock initial appointments
 const INITIAL_APPOINTMENTS = [
@@ -437,6 +438,13 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
   })
 
   // Auto-cancel past pending appointments dynamically
+  const allProcessedAppointments = appointments.map(appt => {
+    if (appt.date < todayStr && appt.status === 'Pending') {
+      return { ...appt, status: 'Cancelled' }
+    }
+    return appt
+  })
+
   const processedAppointments = authorizedAppointments.map(appt => {
     if (appt.date < todayStr && appt.status === 'Pending') {
       return { ...appt, status: 'Cancelled' }
@@ -458,6 +466,17 @@ export default function Dashboard({ currentUser, onLogout, onNavigateToCitizen }
     switch (activeTab) {
       case 'overview':
         return <OverviewTab appointments={processedAppointments} setActiveTab={setActiveTab} />
+      case 'efficiency':
+        return (
+          <EfficiencyTab
+            appointments={allProcessedAppointments}
+            currentUser={currentUser}
+            setActiveTab={setActiveTab}
+            onUpdateStatus={handleUpdateStatus}
+            onUpdateTime={handleUpdateTime}
+            onResendNotification={handleResendNotification}
+          />
+        )
       case 'appointments':
         return (
           <AppointmentsTab

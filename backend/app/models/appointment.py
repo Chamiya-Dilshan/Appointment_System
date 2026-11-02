@@ -26,8 +26,8 @@ class Appointment(db.Model):  # type: ignore[name-defined]
     # Date stored as YYYY-MM-DD string; time stored as formatted string (e.g. "10:00 AM")
     date = db.Column(db.String(10), nullable=False)
     time = db.Column(db.String(20), nullable=False)
-    # Appointment duration in minutes (e.g. 30, 45, 60, etc.)
-    duration = db.Column(db.Integer, default=30, nullable=False)
+    # Appointment duration in minutes (e.g. 15, 30, 45, 60, etc.)
+    duration = db.Column(db.Integer, default=15, nullable=False)
 
     # Possible values: Pending | Confirmed | Cancelled | Completed
     status = db.Column(db.String(20), default="Pending", nullable=False)
@@ -65,7 +65,7 @@ class Appointment(db.Model):  # type: ignore[name-defined]
         email: str = "",
         date: str = "",
         time: str = "",
-        duration: int = 30,
+        duration: int = 15,
         status: str = "Pending",
         refNo: str = "",
         nic: str = "",
@@ -92,7 +92,7 @@ class Appointment(db.Model):  # type: ignore[name-defined]
         self.email = encrypt_field(email) if email else ""
         self.date = date
         self.time = time
-        self.duration = duration if duration else 30
+        self.duration = duration if duration else 15
         self.status = status
         self.refNo = refNo
         self.nic = encrypt_field(nic)
@@ -118,7 +118,7 @@ class Appointment(db.Model):  # type: ignore[name-defined]
             "email": decrypt_field(self.email) if self.email else "",
             "date": self.date,
             "time": self.time,
-            "duration": getattr(self, "duration", 30) or 30,
+            "duration": getattr(self, "duration", 15) or 15,
             "status": self.status,
             "refNo": self.refNo,
             "nic": decrypt_field(self.nic),

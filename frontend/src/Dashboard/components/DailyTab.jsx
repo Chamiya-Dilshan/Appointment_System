@@ -250,7 +250,7 @@ export default function DailyTab({ appointments, onConfirm, onDelete, onUpdateSt
                               {getAppointmentTimeRange(appt.time, appt.duration)}
                             </span>
                             <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-850 px-1.5 py-0.5 rounded border border-slate-200/50 dark:border-slate-800">
-                              {formatDurationLabel(appt.duration || 30)}
+                              {formatDurationLabel(appt.duration || 15)}
                             </span>
                           </div>
                         </div>
